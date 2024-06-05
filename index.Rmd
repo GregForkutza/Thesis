@@ -1,0 +1,111 @@
+---
+title: 'Inferring the time-varying transmission rate and effective reproduction number by fitting semi-mechanistic compartmental models to incidence data'
+author: 'Greg Forkutza'
+#date: 'May 20xx'
+university: 'McMaster University'
+faculty: 'Faculty of Science'
+department: 'Mathematics & Statistics'
+subject: 'Statistics'
+supervisor: 'Ben Bolker'
+bdegree: 'B.Sc.' 
+mdegree: 'M.Sc.'   
+degree: 'Master of Science'
+
+knit: bookdown::render_book
+site: bookdown::bookdown_site
+
+# Remove the hashtag to specify which version of output you would like.
+# Can only choose one at a time.
+output:
+  thesisdown::thesis_pdf: default 
+  keep_tex: true
+#  thesisdown::thesis_gitbook: default         
+#  thesisdown::thesis_word: default
+#  thesisdown::thesis_epub: default
+lay_abstract: |
+  This thesis explores a new way to model how diseases spread using a deterministic mathematical framework. We focus on estimating the changing transmission rate and the effective reproduction number, key factors in understanding and controlling disease outbreaks. Our method, incorporated into the `macpan2` software, uses advanced techniques to smoothly estimate these changing rates over time. We first prove the effectiveness of our approach with simulations and then apply it to real data from Scarlet Fever, COVID-19, and Measles. We also compare model performance using statistical criteria and different smoothing methods. Our results show that this flexible and user-friendly approach is a valuable tool for modelers working on disease dynamics.
+  
+abstract: |
+  This thesis presents a novel approach to ecological dynamic modeling using non-stochastic compartmental models. Estimating the transmission rate (\(\beta\)) and the effective reproduction number (\(R_t\)) is essential for understanding disease spread and guiding public health interventions. We extend this method to infectious disease models, where the transmission rate varies dynamically due to external factors. Using Simon Wood's partially specified modeling framework, we introduce penalized smoothing to estimate time-varying latent variables within the `R` package `macpan2`. This integration provides an accessible tool for complex estimations. The efficacy of our approach is first validated via a simulation study and then demonstrated with real-world datasets on Scarlet Fever, COVID-19, and Measles. Additionally, we infer the effective reproduction number (\(R_t\)) using the estimated \(\beta\) values, providing further insights into the dynamics of disease transmission. Model fit is compared using Akaike Information Criterion (AIC), and we evaluate the performance of different smoothing bases derived using the `mgcv` package. Our findings indicate that this methodology can be extended to various ecological and epidemiological contexts, offering a versatile and robust approach to parameter estimation in dynamic models.
+
+acknowledgements: |
+  Acknowledgements go here. TBD
+  
+declarations: |
+  I did most of the research.
+  
+  Also the writting. 
+  
+  Sometimes I pulled my hair out.
+  
+  But mostly I had fun.
+quotation: |
+  "What is your aim in Philosophy?
+  
+  To show the fly the way out of the fly-bottle."
+# Author of the quotation
+qauthor: |
+  Ludwig Wittgenstein
+# Specify the location where the bibliography file is found below
+bibliography: bib/thesis.bib
+# Download your specific csl file and refer to it in the line below.
+csl: csl/vancouver.csl
+lot: true
+lof: true
+#always_allow_html: yes
+---
+
+<!--
+Above is the YAML (YAML Ain't Markup Language) header that includes a lot of 
+metadata used to produce the document.  Be careful with spacing in this header!
+
+If you'd prefer to not include a Dedication, for example, simply delete the section entirely, or silence them (add # before each line). 
+
+If you have other LaTeX packages you would like to include, delete the # before header-includes and list the packages after hyphens on new lines.
+
+If you'd like to include a comment that won't be produced in your resulting file enclose it in a block like this.
+
+If you receive a duplicate label error after knitting, make sure to delete the index.Rmd file and then knit again.
+-->
+
+```{r include_packages, include = FALSE}
+# This chunk ensures that the macdown package is
+# installed and loaded. This macdown package includes
+# the template files for the thesis.
+if(!require(remotes))
+  install.packages("remotes", repos = "http://cran.rstudio.com")
+if(!require(macdown))
+  remotes::install_github("paezha/macdown")
+library(macdown)
+```
+
+
+
+```{r eval=!knitr::is_latex_output(), child=here::here("01-Introduction.Rmd")}
+
+```
+
+```{r eval=!knitr::is_latex_output(), child=here::here("02-Background.Rmd")}
+
+```
+
+```{r eval=!knitr::is_latex_output(), child=here::here("03-MaterialsAndMethods.Rmd")}
+
+```
+
+```{r eval=!knitr::is_latex_output(), child=here::here("04-Results.Rmd")}
+
+```
+
+```{r eval=!knitr::is_latex_output(), child=here::here("05-Discussion.Rmd")}
+
+```
+
+
+```{r eval=!knitr::is_latex_output(), child=here::here("07-Appendix.Rmd")}
+
+```
+
+```{r eval=!knitr::is_latex_output(), child=here::here("99-references.Rmd")}
+
+```

@@ -1,0 +1,490 @@
+---
+output:
+  html_document: default
+  pdf_document: default
+  
+---
+
+# Background {#Background}
+This chapter contains two sections. The first section outlines the theory required to understand how to use univariate Gaussian regression smoothers in statistical modeling. Most importantly, this section culminates in describing the relationship between Gaussian random effects and smoothing splines within a Bayesian framework. Understanding this relationship is crucial for fitting semi-mechanistic models to data.
+
+The second section provides a brief introduction to the basic concepts of using compartmental models in the statistical modeling of infectious diseases. 
+
+## Smoothers {#Smoothers}
+When using linear model methods, there's an assumption that the true function \( f(\mathbf{X}) \) is linear in \( \mathbf{X} \). To extend beyond this linearity, one approach is to employ a linear transformation of \( \mathbf{X} \). This leads to:
+
+\[
+f(\mathbf{X}) = \sum_{m=1}^{M}\beta_m h_m(\mathbf{X}),
+\]
+
+which is a linear basis expansion of \( \mathbf{X} \),
+where \( h_m(\mathbf{X}): \mathbb{R}^{p} \to \mathbb{R} \) represents the \( m \)-th transformation of \( \mathbf{X} \).
+
+A notable class of these transformations is restriction methods, where the class of functions that \( f(\mathbf{X}) \) can assume is limited. A common example within this class is _splines_, which define \( m \) basis functions \( \beta_m h_m(\mathbf{X}) \) as local polynomial representations. The domain is divided into contiguous intervals, each represented by a separate polynomial function. The boundaries of these intervals are known as _knots_. An order-\( M \) spline with knots \( \xi_j \), \( j = 1,\dots, K \), is a piecewise-polynomial of order \( M \) and has continuous derivatives up to order \( M-2 \).
+
+When the location, derivative order, and number of knots are predetermined, the technique is referred to as regression splines. Natural cubic splines are a specific type where the spline function is composed of cubic polynomial segments and it is linear beyond the outermost knots. This spline is represented by \( K \) basis functions \( \beta_m h_m(\mathbf{X}) \), one for each specified knot.
+
+The complexity of the fit can be adjusted by incorporating regularization to manage the trade-off between data fidelity and smoothness of the curve fit. This is achieved by minimizing a residual sum of squares with an additional penalty term. The penalty term includes a parameter that controls this trade-off, allowing the fit to range between the extremes of pure interpolation and a linear least squares fit. Splines used in this context are known as smoothing splines.
+
+For a higher-level overview of this topic, see [@trevorhastieroberttibshiranijeromefriedmanElementsStatisticalLearning]. For a more detailed exposition, refer to [@woodGeneralizedAdditiveModels2017a]. Additionally, a comprehensive mathematical treatment of splines and their applications can be found in [@carldeboorPracticalGuideSplines1978].
+
+### Natural cubic splines {#Natural-cubic-splines}
+Suppose we have a dataset consisting of points \((x_i, y_i)\) for \(i = 1, \ldots, n\), with each \(x_i\) strictly less than \(x_{i+1}\). A _natural cubic spline_ \(g(x)\) is defined as a function that smoothly interpolates between these points. This spline is constructed from cubic polynomial segments, where each segment corresponds to an interval \([x_i, x_{i+1}]\). These polynomial segments are connected such that \(g(x)\), \(g'(x)\), and \(g''(x)\) are all continuous across the entire domain.
+
+Furthermore, the spline satisfies the interpolation condition \(g(x_i) = y_i\) for each point, with the additional constraint that the second derivatives at the endpoints of the domain, \(x_1\) and \(x_n\), are set to zero. This constraint ensures that the spline is linear beyond the boundary points, contributing to its 'natural' behavior.
+
+Among all functions that are continuous over \([x_1, x_n]\), possess absolutely continuous first derivatives, and interpolate the given data points \((x_i, y_i)\), the natural cubic spline \(g(x)\) is uniquely the smoothest in terms of minimizing the integral:
+
+\begin{equation}
+J(f) = \int_{x_{1}}^{x_{2}} f''(x)^{2}\,dx,
+\label{eq:min_smoothness}
+\end{equation}
+
+which quantifies the overall curvature of the function. Minimizing this integral promotes a function with less curvature and smoother transitions between the interpolated points.
+
+A detailed proof and further discussion on this property of natural cubic splines can be found in [@greenNonparametricRegressionGeneralized1993], which explores the mathematical underpinnings and optimizations that define these splines.
+
+### Cubic smoothing splines {#Cubic-smoothing-splines}
+With a natural cubic spline, \(g(x)\), we have two main options: we can interpolate the data by setting each \(g(x_i) = y_i\), or we can smooth the data by treating the values \(g(x_i)\) as variables to be optimized, as in _cubic smoothing splines_. Smoothing is achieved by minimizing the following objective function:
+
+\begin{equation}
+J_{2}(f) = \sum_{i=1}^n (y_i - g(x_i))^2 + \lambda \int g''(x)^2 \, dx,
+\label{eq:min_smoothness_obj}
+\end{equation}
+
+Here, \(\lambda\) serves as a tuning parameter that balances the fidelity to the data with the smoothness of the function \(g\). A higher \(\lambda\) value places greater emphasis on minimizing the integral of the squared second derivative, which encourages a smoother curve for \(g\). Conversely, a lower \(\lambda\) value focuses on closely matching the actual data points, minimizing the sum of squared differences \(\sum_{i=1}^n (y_i - g(x_i))^2\).
+
+The formulation given in Equation \ref{eq:min_smoothness_obj} is flexible and does not depend on a predefined set of basis functions. Instead, the model itself dictates the structure, leading to the derivation of optimal basis functions based on the specified terms for data fidelity and smoothness. 
+
+Solving Equation \ref{eq:min_smoothness_obj} entails tackling a variational problem where the basis functions for the cubic spline are derived using the Euler-Lagrange equation.
+While a comprehensive derivation of this process is provided in [@orfanidis1989optimum], in appendix \ref{A1} we briefly outline some key aspects of the proof to understand why these basis functions take their particular form. We present this outline for two primary reasons: historically, cubic smoothing splines were among the first types of smoothers to be thoroughly investigated. Furthermore, the general approach of penalized likelihood methods can be effectively abstracted from the solution to the minimization problem presented by cubic smoothing splines. For a broader definition of penalized splines, refer to subsection \ref{General-definition-of-a-penalized-spline}
+
+### Cubic regression splines {#Cubic-regression-splines}
+Using the results from appendix \ref{A1}, we can define the cubic spline function \(f(x)\) with \(k\) knots \(x_1, \dots, x_k\) as follows:
+
+\begin{equation}
+f(x) = a_j(x)f(x_j) + b_j(x_j)f(x_{j+1}) + c_j(x)f''(x_j) + d_j(x_j)f''(x_{j+1}) \quad \text{if} \quad x_j \leq x \leq x_{j+1}.
+\label{eq:spline eqn}
+\end{equation}
+
+This formulation ensures continuity at each knot, as the continuity conditions \ref{eq:continuity_conditions} imply that the derivatives at the knots must match:
+
+\[\mathbf{B} \cdot (f''(x_2),\dots, f''(x_{k-1}))^{T} = \mathbf{D} \cdot (f(x_2),\dots, f(x_{k-1}))^{T}
+\]
+
+By integrating these conditions into Equation \ref{eq:spline eqn}, and redefining \(f(x)\) in terms of the basis functions, we arrive at:
+
+\begin{equation}
+f(x) = \sum_{i=1}^{k}b_i(x)\beta_i,
+\label{eq:spline sum}
+\end{equation}
+
+where \(\beta_i = f(x_i)\) and \(b_i\) represents the transformed basis functions obtained by applying \(\mathbf{B^{-1}D}\) to the original basis functions \ref{eq:spline basis functions}. This defines a _cubic regression spline_. The full details of how to derive  equation \ref{eq:spline sum} can be found in [@lancasterCurveSurfaceFitting1986]. 
+
+This structure effectively maps the spline basis to the spline evaluated at a specified set of knots. Furthermore, a computationally efficient form of Equation \ref{eq:min_smoothness} in terms of these basis functions and matrix elements is:
+
+\[
+\int_{x_1}^{x_k} f''(x)^2 \, dx = \beta^T \mathbf{D}^T \mathbf{B}^{-1} \mathbf{D} \beta =  \beta^T \mathbf{S} \beta,
+\]
+
+where \( \mathbf{S} \equiv \mathbf{D}^T \mathbf{B}^{-1} \mathbf{D} \) is the called the _penalty matrix_ for this basis.
+
+In subsection \ref{General-definition-of-a-penalized-spline}, we show how the method of penalizing cubic splines lead to a more general method of penalized regression and the abstract notion of penalized likelihood methods. 
+
+In the following sections we investigate some other penalized regression splines that are are used in chapter \ref{Results} as smoothers (available as basis and penalty matrices in the R package `mgcv`) for estimating time-varying parameters in discrete time deterministic compartmental models. 
+
+### B-splines {#B-splines}
+B-splines offer another basis for representing polynomials that are used in constructing smoothing splines. Detailed explanations of B-spline basis functions and their mathematical properties can be found in [@trevorhastieroberttibshiranijeromefriedmanElementsStatisticalLearning] and [@carldeboorPracticalGuideSplines1978]. For a concise definition of B-spline basis functions, refer to [@woodGeneralizedAdditiveModels2017a].
+
+_B-splines_ allow an \((m+1)^{\text{th}}\) order spline to be expressed uniquely using the B-spline basis functions \(B_i^m(x)\):
+
+\[
+f(x) = \sum_{i=1}^{k} B_i^m(x) \beta_i,
+\]
+
+where each \(B_i^m(x)\) is defined by a local combination of knots. The means any curve can be uniquely represented as a linear combination of B-splines and hence as a linear smoother. 
+
+### P-splines {#P-splines}
+_P-splines_ are a low rank (the number of knots is less than the length of the input vector) smoother that adapt a B-spline basis with a penalty to control wiggliness by penalizing adjacent \(\beta_i = f(x_i)\) as
+
+\[
+\mathbf{P} = \sum^{k-1}_{i=1}(\beta_{i+1}-\beta_i)^2.
+\]
+
+Let matrix \( \mathbf{P} \) be defined as follows:
+
+\[
+\mathbf{R} = \begin{bmatrix}
+-1 & 1 & 0 & \cdots \\
+0 & -1 & 1 & 0 & \cdots \\
+\vdots & & \ddots & \ddots
+\end{bmatrix}
+\]
+
+so that
+
+\[
+\begin{bmatrix}
+\beta_2 - \beta_1 \\
+\beta_3 - \beta_2 \\
+\vdots
+\end{bmatrix}
+= \mathbf{R} \beta.
+\]
+
+Then you can write the penalty term for adjacent basis coefficients as:
+
+\[
+\mathbf{P} = \beta \mathbf{R}^T \mathbf{R} \beta = \beta
+\begin{bmatrix}
+1 & -1 & 0 & \cdots \\
+-1 & 2 & -1 & \cdots \\
+0 & -1 & 2 & -1 & \cdots \\
+\vdots & & \ddots & \ddots
+\end{bmatrix}
+\beta.
+\]
+
+### Thin plate regression splines {#Thin-plate-regression-splines}
+So far, the discussion has focused on smoothing methods that apply to a single predictor variable. While univariate smoothing is useful, it’s worth noting that there are multivariate smoothing techniques available as well. One such technique is the thin plate splines (TPS). This method can be used even with just one predictor variable. We follow the method given by Simon Wood in [@woodStableEfficientMultiple2004].
+
+
+In the general case, a _thin plate spline_ (TPS) is defined for a number of predictor variables \(d\) and a penalty of degree \(m\) such that \(2m > d\). The TPS penalty, \(J_{md}\), is given by:
+
+\[
+J_{md} = \int_{\mathbb{R}^d} \sum_{\nu_1 + \cdots + \nu_d = m} \frac{m!}{\nu_1! \cdots \nu_d!} \left( \frac{\partial^m f}{\partial x_1^{\nu_1} \cdots \partial x_d^{\nu_d}} \right)^2 \, dx_1 \cdots dx_d,
+\]
+
+where \(\nu_1, \nu_2, \ldots, \nu_d\) are non-negative integers representing the orders of the partial derivatives with respect to each predictor variable \(x_i\).
+
+
+The function that minimizes this penalty is expressed as:
+
+\[
+\hat{f}(x) = \sum_{i=1}^n \delta_i \eta_{md}(\|x - x_i\|) + \sum_{j=1}^M \alpha_j \phi_j(x),
+\]
+
+where \(\delta\) and \(\alpha\) are vectors of coefficients to be estimated. The \(\delta\) coefficients must satisfy the linear constraints \(\mathbf{T}^T \delta = 0\), with \(T_{ij} = \phi_j(x_i)\). Here, \(M = \binom{m+d-1}{d}\), representing the number of linearly independent polynomials \(\phi_i(x)\) that span the space of polynomials in \(\mathbb{R}^d\) of degree less than \(m\). These polynomials form the null space of \(J_{md}\).
+
+The remaining basis functions \(\eta_{md}(r)\) are defined as:
+\[
+\eta_{md}(r) = 
+\begin{cases} 
+(-1)^{m+1+d/2} \frac{2^{2m-1} \pi^{d/2} (m-1)!}{\Gamma(m-d/2)!} r^{2m-d} \log(r), & \text{if } d \text{ is even}, \\
+\Gamma(d/2 - m) \frac{2^{2m} \pi^{d/2} (m-1)!}{\Gamma(m)} r^{2m-d}, & \text{if } d \text{ is odd}.
+\end{cases}
+\]
+
+Therefore thin plate splines area an expansion \(\delta_i\) in radial basis functions \(\eta_{md} (r)\).
+
+In the univariate case with derivative penalty of degree two, i.e \(d =  1\) and \(m = 2\), equation \ref{eq: general penalized spline} is equivalent to that of the cubic smoothing spline, with objective function equation \ref{eq:min_smoothness_obj}. 
+
+In this case, the minimizing function has the form:
+\[
+\hat{f}(x) = \sum_{i=1}^n \delta_i |x - x_i|^2 \log(|x - x_i|) + \alpha_0\phi_1(x) + \alpha_1 \phi_2(x),
+\]
+
+where the basis function \(\eta_{21}(r) =|x - x_i|^2 \log(|x - x_i|)\) is a specific radial basis function for the univariate TPS. The basis functions \(\phi_i\) are:
+\[
+\phi_1(x) = 1, \quad \phi_2(x) = x_1.
+\]
+Here, \(\delta_i\) and \(\alpha_j\) are coefficients to be estimated, with \(\alpha_0\) and \(\alpha_1\) accounting for the polynomial part of the spline, which form the familiar "linear" null space of the univariate Gaussian objective function we have seen so far. 
+
+The expression of a TPS as a linear mixed model, with a separation of basis functions into null and non-null spaces, provides a clear understanding of how the smoothness penalty operates. 
+
+We construct the model matrix for the basis functions \(\mathbf{E}\) for the radial basis functions \(\mathbf{E}_{ij} = |x_i - x_j|^2 \log(|x_i - x_j|)\) and \(\mathbf{T}\) for the polynomial basis functions \(\mathbf{T}_{ij} = \phi_j(x_i)\).
+
+By expressing the function \(\hat{f}(x)\) in terms of \(\delta\) and \(\alpha\), the minimization problem becomes:
+
+\[
+\text{minimize} \quad \left\| \mathbf{y} - \mathbf{E} \delta - \mathbf{T} \alpha \right\|^2 + \lambda \delta^T \mathbf{E} \delta \quad \text{subject to} \quad \mathbf{T}^T \delta = 0,
+\]
+
+where \(\mathbf{y}\) is the vector of observed data points \(y_i\), \(\mathbf{E} \delta\) captures the non-null space (penalized) part of the basis functions, \(\mathbf{T} \alpha\) captures the null space (unpenalized) part of the basis functions and the constraint \(\mathbf{T}^T \delta = 0\) ensures that the non-null space coefficients \(\delta\) do not interfere with the polynomial terms.
+
+See subsection \ref{The-duality-of-smooths-and-random-effects} for background on thinking about smoothers as random effects in a linear mixed model framework. 
+
+Now Simon Wood constructs a low rank version of TPS called _thin plate regression spline_ (TPRS) by leaving the  \(\mathbf{\alpha}\) parameter space unchanged and instead finding a truncated basis in the \(\mathbf{\delta}\) parameter space. Details of this construction are done in [@woodThinPlateRegression2003]. TPRS are the low rank approximation to TPS that are used in the R package `mgcv`, that we use to obtain the basis and penalty matrices for our smoothers. See chapter \ref{Materials-and-methods} for more details on how `mgcv` is utilized in constructing compartmental model using smoothers to estimate time varying latent variables. 
+
+### Cyclic regression splines {#Cyclic-regression-splines}
+If a smooth function has the same value and first few derivatives at its upper and lower 
+boundaries its is called _cyclic_. This means that \(f_1''(\mathbf{x}) = f_k''(\mathbf{x})\) and \(f_1(\mathbf{x}) = f_k(\mathbf{x})\). In the case of the cubic regression spline the matrices \(\mathbf{B}\) and \(\mathbf{D}\) are defined similarly and result in the same quadratic matrix expression of the second derivative penalty. 
+
+P splines and thin plate splines also can be constructed with cyclic basis. These basis are available in the `mgcv` package and are used by us in chapter \ref{Results}. 
+
+### General definition of a penalized spline {#General-definition-of-a-penalized-spline}
+The penalized regression problem, formulated to minimize:
+\begin{equation}
+\|y - \mathbf{X}\beta\|^2 + \lambda \beta^T \mathbf{S} \beta,
+\label{eq:penalizedregression}
+\end{equation}
+
+leads to a solution for the _smoothing coefficients_ \(\beta\) expressed as:
+
+\begin{equation}
+\hat{\beta} = (\mathbf{X}^T\mathbf{X}+ \lambda \mathbf{S})^{-1}\mathbf{X}^Ty,
+\label{eq:penalizedleastsquaresminimizer}
+\end{equation}
+
+with the corresponding hat matrix:
+
+\[
+\mathbf{A} = \mathbf{X}(\mathbf{X}^T\mathbf{X}+ \lambda \mathbf{S})^{-1}\mathbf{X}^T,
+\]
+
+often called the _smoother matrix_. In a typical data model \(y = f(x) + \epsilon\), the estimate \(\hat{y}\) is computed as:
+
+\[
+\hat{y} = \mathbf{L}y,
+\]
+
+where \(\mathbf{L}\) is an \(n \times n\) matrix dependent on \(\lambda\), influencing the degree of smoothing. Although \(\mathbf{L}\) renders the smoother non-linear in nature due to its dependency on \(\lambda\), it can be treated as linear for fixed \(\lambda\), simplifying the use of penalized regression splines in practical applications.
+
+Now, consider the general case of flexible function estimation within a statistical model defined over some domain \(\mathcal{X}\). The functional can be expressed as:
+
+\begin{equation}
+S(f) = L(f | \text{data}) + J(f),
+\label{eq: general penalized spline}
+\end{equation}
+
+where \(L(f | \text{data})\) represents the likelihood of the function \(f\) given the data—essentially the deterministic part of the model—and \(J(f)\) is a functional that defines what it means for functions \(f\) on the domain \(\mathcal{X}\) to be smooth.
+
+In the examples discussed previously, such as cubic smoothing splines, P-splines, B-splines, and thin-plate regression splines, each represents a specialized case of this general equation tailored for Gaussian regression. Typically, the data model is assumed to be \( y = f(x) + \epsilon_i \), where \(\epsilon_i\) follows a Gaussian distribution. This assumption is why the likelihood function \(L(f)\) adopts the form of a least squares functional, and the roughness penalty \(J(f)\) employs a quadratic penalty. However, one could alternatively assume a different distribution (e.g., from the exponential family) for the residual errors in the data model, which would modify \(L(f)\) accordingly. The choice of a quadratic functional as the roughness penalty is also based on this assumption. Specializing to Gaussian Regression simplifies equation \ref{eq: general penalized spline} to the specific form seen in equation \ref{eq:min_smoothness_obj}.
+
+By focusing on Gaussian regression within the framework of penalized likelihood estimation, we derive an objective function that integrates both a stochastic component,the least squares functional and a roughness penalty component, the quadratic functional.
+
+### The duality of smooths and random effects {#The-duality-of-smooths-and-random-effects}
+
+It is possible to conceptually link penalized smoothing splines with linear mixed models (LMMs). This connection was first explored in-depth in  [@davidruppertm.p.wandr.j.carrollSemiparametricRegression2003]. In this framework, the smooth function in flexible function estimation is represented by a high-dimensional basis. The penalty on spline coefficients, represented as \(\beta^T \mathbf{S} \beta\), can be interpreted as an apriori distribution, thus yielding a mixed linear model through the following steps:
+
+**1.** Transform the smoothing coefficients into the constraint space. Here the constraint matrices is such that \(\mathbf{C}\beta = 0\), as in the sum to zero constraint (see
+section \ref{Time-varying-effective-reproduction-number}). Perform QR decomposition \(\mathbf{C}^T = \mathbf{QR}\) and define \(\mathbf{Z}\) to be the matrix which is \(\mathbf{Q}\) less its first \(n_c\) columns, where \(n_c\) is the number of rows of \(\mathbf{C}\). Now transform the basis matrix into constraint space by setting \(\beta_Z = \mathbf{Z}\beta\). 
+
+**2.** Perform the eigendecomposition \(\mathbf{Z}^T\mathbf{SZ} = \mathbf{UD}\mathbf{U}^T\) of the penalty matrix \(\mathbf{S}\), where \(\mathbf{S}\) is rank-deficient due to the non-zero dimension of the null space of \(\mathbf{P}\). This transformation aims to align the basis matrices and the coefficient vector with the eigenspace of \(\mathbf{S}\).
+
+**3.** Arrange the eigenvalues in decreasing order along the diagonal and form the submatrix \(\mathbf{D}^+\) by including only the non-zero eigenvalues. Then, multiply the coefficients \( \beta_U = \mathbf{U}^T\beta_Z\) and transform the basis matrix \(\mathbf{X}_U = \mathbf{XZU}\) to align these matrices along the eigenvectors of the penalty matrix and the constraint space. This step separates the effects of the penalty into components associated with non-zero eigenvalues and those that fall into the null space (associated with zero eigenvalues).
+
+**4.** Partition \(\beta_U\) into \([\beta_u, \beta_F]\) and \(\mathbf{X}_U\) into \([\mathbf{X}_u, \mathbf{X}_F]\) based on the aforementioned eigenvalue arrangement. Define \(b = \sqrt{\mathbf{D}^+} b_u\) and \(\mathbf{X}_R = \mathbf{X}_U(\sqrt{\mathbf{D}^+})^{-1}\), where \(\sqrt{\mathbf{D}^+}\) is derived from the Cholesky decomposition of \(\mathbf{D}\). The objective function then becomes:
+
+\begin{equation}
+s = \left\lVert y - \mathbf{X}\beta - \mathbf{X_R} b \right\rVert^2 + \lambda b^T b.
+\label{eq: mixed effect}
+\end{equation}
+
+**5.** Given the data \(\mathbf{y}\), the estimates of \(\mathbf{b}\) and \(\beta_F\) that result from minimizing \(s\) correspond to the expected values under the mixed model:
+
+\begin{equation}
+\mathbf{y} = \mathbf{X}_F \beta_F + \mathbf{X}_R \mathbf{b} + \mathbf{\epsilon},
+\label{eq:mixed model}
+\end{equation}
+
+   where \(\mathbf{\epsilon} \sim \mathcal{N}(0, \sigma^2 \mathbf{I})\), \(\mathbf{b} \sim \mathcal{N}(0, \tau^2 \mathbf{I})\), and \(\lambda = \frac{\sigma^2}{\tau^2}\). Here, \(\sigma^2\) and \(\tau^2\) are the variances of the observation error terms and random effects, respectively.
+
+In this model, the smooth coefficients \(\textbf{b}\) are tied under a common distribution, allowing them to share information. The columns of \(\mathbf{X}_F\) form a basis for the null space of the smoothing penalty, and the columns of \(\mathbf{X}_R\) form a basis for its range space. For a deeper exploration of this duality, see [@woodStableEfficientMultiple2004].
+
+The primary advantage of using the mixed model formulation for penalized splines is that the computational methods developed to estimate random effects in software like `lme4` can also be employed to estimate smooth functions.  However, it is possible to write the objective function out explicitly with the penalty term expressed as a quadratic form using the penalty matrices computed via the `mgcv` package. Optimization of the objective function is handled by `macpan2`, which uses template model builder as the optimization engine. Therefore in this case it is not necessary to write out the model in the mathematical form of a mixed model. However, should one choose to adopt this modeling methodology with another optimization engine, detailing the model in the form of a mixed model could be essential. These aspects are further explored in chapter \ref{Materials-and-methods}.
+
+
+### A Bayesian perspective of smoothing {#A-Bayesian-perspective-of-smoothing}
+Considering the quadratic penalty as a legitimate a priori distribution, we derive the likelihood for independent observations \((x_i, y_i)\), \(i = 1, \dots, n\), within the Linear Mixed Model framework:
+
+\[
+Y \mid u \sim \mathcal{N}(\mathbf{X}\beta + \mathbf{X}_Rb, \sigma^2 \mathbf{I}_n), \quad u \sim \mathcal{N}(0, \lambda^{-1}\sigma^2 \mathbf{D}^{-1}),
+\]
+
+with the marginal likelihood defined as:
+
+\[
+Y \sim \mathcal{N}(\mathbf{X}\beta, \sigma^2 \mathbf{V}_{\lambda}),
+\]
+
+where \( \mathbf{V}_{\lambda} = \mathbf{I} + \lambda^{-1} \mathbf{X}_R \mathbf{D}^{-1} \mathbf{X}_R^T\) as detailed by [@gorankauermannPenalizedSplinesMixed2010].
+
+In a Bayesian context, prior beliefs about parameters before observing the data are specified through a prior distribution. For smoothing, the penalty term \( \beta^T \mathbf{S} \beta \) suggests a prior on \( \beta \):
+
+\[
+\beta \sim \mathcal{N}(0, \mathbf{S}^{-}/\lambda),
+\label{eq:penalty prior}
+\]
+
+where \( \mathbf{S}^{-} \) is the pseudoinverse of \( \mathbf{S} \), accounting for its rank deficiency. This pseudoinverse \( \mathbf{S}^{-} \) corresponds to \((\mathbf{D}^+)^{-1}\). This prior implies that the values of \( \beta \) are normally distributed with a mean of zero and a covariance matrix \( \mathbf{S}^{-}\), tightening around zero as \(\lambda\) increases and becoming flatter as \(\lambda\) decreases. This Bayesian interpretation of smoothing is discussed in [@woodGeneralizedAdditiveModels2017a].
+
+Consequently, the maximum posteriori (MAP) estimate of \( \beta \) is given by:
+\begin{equation}
+\beta \mid y \sim \mathcal{N}(\hat{\beta}, (\mathbf{X}^T \mathbf{X} + \lambda \mathbf{S})^{-1} \sigma^2),
+\label{eq:MAP estimate}
+\end{equation}
+which aligns with the solution of Equation \ref{eq:penalizedleastsquaresminimizer} derived from Equation \ref{eq:penalizedregression}.
+
+This reveals that methodologies designed for smoothing problems are applicable for estimating Gaussian random effects.
+
+### Gaussian processes regression smoothers {#Gaussian-process-regression-smoothers}
+
+A _random field_ is a function \(f\) that assigns a random value \(f(x_i)\) at each point \(x_i\) within its domain \(\mathcal{X}\). If we assume that the collection of values \(f(x)\) for any finite selection of points \(\{x_i\}_{i=1}^n\) follows a multivariate Gaussian distribution, then the subset \(\{f(x_i)\}_{i=1}^n\) is jointly normally distributed. This distribution is characterized by a mean function \(\mu(x)\) and a covariance function \(C(x, x')\), which measures how correlations decay with distance between any two points, thereby defining a _Gaussian Random Field_ (GRF).
+
+Unlike being restricted to fixed or discrete locations, a GRF can be generalized by defining a distribution over functions, making the model continuous with respect to its domain. How is this achieved? The covariance function \(C\) of the GRF, initially defined on a set of discrete points such as a lattice, can be generalized through a _kernel_ \(k(x, x_i)\). This kernel extends the covariance function to a continuous domain, ensuring that its realization over any finite subset of this domain yields a positive semi-definite matrix. This requirement extends the univariate requirement of a positive variance parameter \(\sigma^2\) to a multivariate scenario.
+
+A _Gaussian process_ is thus defined as the model where any finite collection of realizations (i.e., \(n\) observations) is treated as having a multivariate normal distribution. The characteristics of these realizations are determined by the mean function \(\mu(x)\) and the kernel \(k(x, x_i)\), with the latter's realization forming a positive semi-definite symmetric matrix \(\mathbf{K}\).
+
+The function \(f\) can be represented as:
+\[
+f(x) = (1, \mathbf{x}^T)\beta + \sum_i b_i C(x, x_i),
+\]
+
+where \(C(x, x_i)\) is a non-negative function measuring the distance between two points. The value of \(C(x, x_i)\) should equal one when points are identical (indicating maximum correlation) and approach zero as the distance between points increases to infinity. Given the vector \(b\), its prior distribution is \(b \sim \mathcal{N}(0, \mathbf{S}^{-1}/\lambda)\). Here, \(\beta\) represents a vector of fixed effects parameters, and the model depicts \(f\) as a linear combination of these fixed effects and a random effect weighted by the kernel function \(C(x, x_i)\).
+
+In matrix form, \(f\) is represented as:
+\[
+f = \mathbf{B} \beta + \mathbf{C}b.
+\]
+To find the covariance matrix of \(f\), compute:
+\[
+\text{Cov}(f) = \text{Cov}(\mathbf{C}b) = \mathbf{C} \text{Cov}(b) \mathbf{C}^T = \mathbf{C} (\lambda \mathbf{C})^{-1} \mathbf{C}^T = \mathbf{C} / \lambda,
+\]
+leveraging the fact that \(\mathbf{C}\) is symmetric.
+
+Minimizing the objective function:
+\[
+\|y - \mathbf{B}\beta - \mathbf{C}b\|^2/\sigma^2 + \lambda b^T \mathbf{C} b
+\]
+is equivalent to maximizing the posterior probability of the parameters given the data, usually incorporating \(\sigma^2\) into the smoothing parameter \(\lambda\). The values of \(\beta\) and \(b\) that minimize this function are the MAP estimates given in equation \ref{eq:MAP estimate}.
+
+This methodology is known as _Gaussian process regression_. Originally referred to as kriging in the geostatistics literature of the 1960s, Gaussian process regression's complexity primarily resides in the choice of the kernel. The kernel encodes assumptions about the function \(f\) by defining the concept of proximity or similarity used in the estimation. For an introduction to Gaussian Processes, including many covariance functions and further details, see [@rasmussenGaussianProcessesMachine2005].
+
+### Ornstein–Uhlenbeck process {#OU}
+The Ornstein-Uhlenbeck (OU) process emerges as a special case of the Matérn covariance function with \(\nu = \frac{1}{2}\). This formulation leads to a stationary first-order Gaussian Markov process.
+
+The _Matérn class_ of covariance function is a n in Gaussian processes is defined as:
+\[
+k(r) = \sigma^2 \frac{2^{1-\nu}}{\Gamma(\nu)}\left(\frac{\sqrt{2\nu} r}{\ell}\right)^\nu K_\nu\left(\frac{\sqrt{2\nu} r}{\ell}\right),
+\]
+where \( r \) is the distance between points, \( \sigma^2 \) is the variance, \( \ell \) is the length scale, \( \nu \) is a smoothness parameter and \( K_\nu \) is a modified Bessel function of the second kind.
+
+When \(\nu = \frac{1}{2}\), the Matérn function simplifies significantly because the modified Bessel function of the second kind, \( K_{1/2}(z) \), has a known simple form that relates to the exponential function. The formula for \( K_{1/2}(z) \) is:
+\[
+K_{1/2}(z) = \sqrt{\frac{\pi}{2z}} e^{-z}.
+\]
+Substituting \(\nu = \frac{1}{2}\) into the Matérn formula, using \( \Gamma(\frac{1}{2}) = \sqrt{\pi} \), we get:
+\[
+k(r) = \sigma^2 \frac{2^{1-1/2}}{\sqrt{\pi}}\left(\frac{\sqrt{1} r}{\ell}\right)^{1/2} \sqrt{\frac{\pi}{2 \frac{\sqrt{1} r}{\ell}}} e^{-\frac{\sqrt{1} r}{\ell}}.
+\]
+This simplifies to:
+\[
+k(r) = \sigma^2 e^{-r/\ell}.
+\]
+Here, \( \ell \) acts as a scale parameter, and the resulting covariance function is the exponential covariance function.
+
+The _Ornstein-Uhlenbeck process_ is a continuous-time stochastic process that is both Gaussian and Markov, characterized by its mean-reverting property. The covariance function of the OU process over time \( t \) with mean reversion rate \( \theta \) is given by:
+\[
+k(t) = \sigma^2 e^{-\theta |t|},
+\]
+where \( \theta > 0 \) is the rate at which the process reverts to its mean.
+
+Comparing this with the exponential covariance function derived from the Matérn function, we see that they are essentially the same form when interpreted over time rather than space, with \( \theta = 1/\ell \). Thus, the OU process, which has this exponential form of the covariance function, is a Gaussian Markov process.
+
+Setting \(\nu = \frac{1}{2}\) in the Matérn covariance function yields an exponential covariance function, which corresponds to the covariance structure of the OU process. The first-order Markov property in the OU process is given from the memoryless feature of the exponential decay in its covariance function. This demonstrates how the OU process, as a stationary first-order Gaussian Markov process, is a special case of the Gaussian processes modeled by the Matérn covariance function with \(\nu = \frac{1}{2}\).
+
+## Compartmental models {#Compartmental-models}
+_Compartmental models_ are a technique for the mathematical modelling of infectious diseases. These models can be formulated as directed graphs using the language of graph theory [@flynn-primroseComprehensiveSystemConstructing2023]. 
+
+Consider the stratification of the total total population of individuals \(N\). Then suppose there are \(n\) possible states at which an individual can be in. Individuals transition from one state to another, and these transitions can be depicted as flows. Within the framework of graph theory, these flows are visualized as directed edges linking nodes, where each node represents a state.
+
+A flow between compartments is defined by a function that may depend on the conditions of any of the \(n\) compartments and any of the \(m\) parameters. The collection of all possible flow functions constitutes the model's _state space_, and the set of all potential parameters forms the model's _parameter space_. This approach to compartmental models through graph theory allows for a rigorous definition, as discussed by Flynn-Primrose et al. The primary purpose of this method is to facilitate the construction of complex models from a modified Cartesian product of simpler directed graphs. 
+
+However, for our purposes, we employed two very simple compartmental models, so a deeper development of this theory is not necessary for the current discussion.
+
+### The SIR and SIRS models     
+The _SIR model_ (Figure \ref{fig:sir-model}) categorizes the population into three distinct compartments: \(S(t)\), \(I(t)\), and \(R(t)\), which represent the number of susceptible, infected, and recovered individuals, respectively. As the disease progresses, the number of individuals in each compartment changes over time, thus these compartments are represented as functions of time. The transitions between these compartments are guided by the processes depicted in the schematic shown in Figure \ref{fig:sir-model}.
+
+The model incorporates two primary parameters: the transmission rate (\(\beta\)) and the recovery rate (\(\gamma\)). The _transmission rate_, \(\beta\), measures the probability of disease transmission per contact per unit time and reflects the likelihood that an interaction between a susceptible and an infected individual results in transmission. This rate is used to calculate \(\beta SI\), where \(SI\) is the total number of interactions between susceptible and infected individuals; \(\beta SI\) thus represents the expected number of new infections per unit time.
+
+On the other hand, the _recovery rate_, \(\gamma\), indicates how quickly infected individuals recover and gain immunity. If an individual is infectious for a period \(D\), then \(\gamma\) is defined as \(\gamma = \frac{1}{D}\). Therefore, \(\gamma I\) calculates what proportion of the infected population will recover during any given time interval, moving from the infected compartment to the recovered compartment, based on the infectious period \(D\).
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{figure/sir_model.png}
+\caption[Susceptible-Infected-Recovered (SIR) model]{\textbf{A Susceptible-Infected-Recovered (SIR) model.} The edges are the flows from one compartment to another. The nodes are the compartments that represent an element in the stratification of the total population.}
+\label{fig:sir-model}
+\end{figure}
+
+For any given time \(t\), the rates of transition between compartments in the SIR model can be derived from Figure \ref{fig:sir-model} and expressed as a nonlinear system of ordinary differential equations:
+
+\begin{equation}
+\begin{aligned}
+\frac{dS}{dt} &= -\beta IS, \\
+\frac{dI}{dt} &= \beta IS - \gamma I, \\
+\frac{dR}{dt} &= \gamma I.
+\end{aligned}
+\label{eq:sir ode}
+\end{equation}
+
+This set of equations assumes a closed population—meaning there are no births or deaths—such that the total rate of change across all compartments sums to zero:
+
+\[
+\frac{dS}{dt} + \frac{dI}{dt} + \frac{dR}{dt} = 0.
+\]
+
+This conservation of the total population implies that the sum of susceptible, infected, and recovered individuals remains constant over time:
+
+\[
+N = S + I + R.
+\]
+
+The basic SIR model can be modified to include a process where recovered individuals become susceptible again after losing immunity. This adaptation introduces a waning immunity parameter, \(\phi\), which quantifies the rate at which recovered individuals lose their immunity and return to the susceptible compartment. This extended model, illustrated in Figure \ref{fig:sirs}, is known as the  SIRS model or SIR model with waning immunity.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{figure/sirs_model.png}
+\caption[Susceptible-Infected-Recovered-Susceptible (SIRS) model]{\textbf{A SIR model with waning immunity (SIRS).} The waning parameter represents the flow of individuals who have lost their natural immunity from the recovered back to the susceptible compartment.}
+\label{fig:sirs}
+\end{figure}
+
+### Force of Infection (FOI) and the Basic Reproduction Number (\(R_0\)) {#FOI-and-R0}
+
+An important quantity is called the _force of infection_ (FOI). In equation \ref{eq:sir ode}, for \(\frac{dS}{dt}\), the term \(\beta \frac{I}{N} S\) represents the rate at which susceptible are becoming infected. Here, \( \lambda = \beta \frac{I}{N} \) is the force of infection, which means that each susceptible individual has a probability \(\lambda\) of becoming infected per unit time. The FOI is defined as as the per capita rate at which susceptible individuals contract the disease. Essentially, it quantifies the risk that a susceptible individual faces of becoming infected at a given time, depending on the current prevalence and contagiousness of the disease in the population. The force of infection is directly proportional to the number of infectious individuals in the population. As \( I \) increases, so does \( \lambda \), increasing the risk of infection among susceptibles. A higher \( \beta \) increases \( \lambda \), indicating that more contacts (or more effective transmission per contact) raise the likelihood of infection. 
+
+There is an important quantity \(R_0 =  \frac{\beta}{\gamma}\), called the basic reproduction number. An infectious individual contacts \( \beta \) individuals per unit time, and the proportion of susceptibles in the population is \( \frac{S}{N} \). Therefore, the effective contacts that can result in a new infection are \( \beta \frac{S}{N} \). An infectious individual remains infectious for \( \frac{1}{\gamma} \) units of time, on average (since \( \gamma \) is the rate at which individuals recover and cease being infectious).  The _basic reproduction number_ \( R_0 \) can be calculated as the product of the infection rate per contact, the number of contacts per unit time, and the duration of infectiousness:
+   \[
+   R_0 = \beta \frac{S}{N} \frac{1}{\gamma} = \frac{\beta}{\gamma}.
+   \]
+Therefore \(R_0\) is the average number of secondary cases of disease caused by a single infected individual over his or her infectious period. [@coriNewFrameworkSoftware2013] discusses the subtleties in defining and estimating the reproductive number.
+   
+At the start of an epidemic, assuming almost the whole population is susceptible (\( S \approx N \)), this simplifies to \( R_0 = \frac{\beta}{\gamma} \). If \(R_0 > 1\), each infectious individual, on average, infects more than one other person, leading to the potential for an epidemic. Conversely, if \(R_0 < 1\), the disease will likely die out in the population over time. Understanding \( R_0 \) helps in predicting disease behavior and controlling outbreaks. For instance if we can reduce \( \beta \) (e.g., through vaccination, social distancing, or wearing masks), or increase \( \gamma \) (e.g., through faster diagnosis and treatment), \( R_0 \) can be brought below 1, aiming to control the spread of the disease. The proportion of the population that needs to be immune (via recovery or vaccination) to stop disease spread is estimated by \( 1 - \frac{1}{R_0} \).
+
+### Numerical solutions of discrete time compartmental models {#Numerical-solutions-of-discrete-time-compartmental-models}
+Compartmental models for infectious diseases are usually formulated as a system of differential equations. They can run with ordinary differential equations, whose trajectory is deterministic in the sense of being entirely determined by the model parameters. Given a model \(M\), state space \(X\), and parameters \(P = (p_1, \dots, p_n)\), the system's evolution is tracked by solving the differential equations numerically. This process involves choosing an initial state \(X_0\) from the state space \(X\), and then applying numerical integration techniques, such as the Euler method or Runge-Kutta methods, to compute the state \(X(t)\) at future times \(t\). The trajectory \(X(t)\) for \(t = 0, 1, 2, \dots, T\) represents the evolution of the compartments in the model. 
+
+For the SIR model  \(X(t) = (S(t), I(t), R(t))\). For any discrete time step \( t \), the state \( X(t+1) \) at time \( t+1 \) can be derived from the state \( X(t) \) at time \( t \) using the model's parameters \( P = (\beta, \gamma) \). In the context of the SIR model, these updates can be described by the following set of _difference equations_, which approximate the continuous model's dynamics:
+
+\[
+\begin{aligned}
+S(t+1) & = S(t) - \Delta t \cdot \beta \cdot I(t) \cdot S(t), \\
+I(t+1) & = I(t) + \Delta t \cdot (\beta \cdot I(t) \cdot S(t) - \gamma \cdot I(t)), \\
+R(t+1) & = R(t) + \Delta t \cdot \gamma \cdot I(t),
+\end{aligned}
+\]
+
+Difference equations are  discrete models that directly approximate changes in a system's state at discrete time steps. These do not require the computation of derivatives.
+
+The Euler method is a numerical technique used to solve ordinary differential equations (ODEs) by approximating the solution at successive time steps.  The Euler method takes these derivatives and uses them to estimate the states at the next time step. The general form of the Euler update for a variable \( x \) is:
+
+\[
+x(t+\Delta t) = x(t) + \Delta t \cdot f(t, x(t))
+\]
+
+where \( f(t, x(t)) \) is the derivative \( \frac{dx}{dt} \) at time \( t \).
+
+In the context of an SIR model described by ODEs, the _Euler method_ would use the current state to estimate the derivative and then step forward in small increments \( \Delta t \) to update the state:
+
+\begin{equation}
+\begin{aligned}
+S(t+\Delta t) &= S(t) - \Delta t \cdot \beta \cdot I(t) \cdot S(t), \\
+I(t+\Delta t) &= I(t) + \Delta t \cdot (\beta \cdot I(t) \cdot S(t) - \gamma \cdot I(t)), \\
+R(t+\Delta t) &= R(t) + \Delta t \cdot \gamma \cdot I(t).
+\end{aligned}
+\label{eq:euler_sir}
+\end{equation}
+
+See [@devriesgerdaandhillenthomasandlewismarkandmullerjohannesandschonfischbirgitCourseMathematicalBiology2006] for more information regarding numerical analysis in mathematical epidemiology. 
+
+

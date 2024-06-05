@@ -1,0 +1,43 @@
+\acswitchoff 
+\babel@toc {english}{}\relax 
+\contentsline {chapter}{Abstract}{iv}{section*.2}%
+\contentsline {chapter}{Acknowledgements}{v}{section*.2}%
+\contentsline {chapter}{Declaration of Authorship}{x}{chapter*.5}%
+\contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.6}%
+\contentsline {chapter}{\numberline {2}Background}{3}{chapter.7}%
+\contentsline {section}{\numberline {2.1}Smoothers}{3}{section.8}%
+\contentsline {subsection}{\numberline {2.1.1}Natural cubic splines}{4}{subsection.9}%
+\contentsline {subsection}{\numberline {2.1.2}Cubic smoothing splines}{4}{subsection.11}%
+\contentsline {subsection}{\numberline {2.1.3}Cubic regression splines}{5}{subsection.13}%
+\contentsline {subsection}{\numberline {2.1.4}B-splines}{6}{subsection.16}%
+\contentsline {subsection}{\numberline {2.1.5}P-splines}{7}{subsection.17}%
+\contentsline {subsection}{\numberline {2.1.6}Thin plate regression splines}{7}{subsection.18}%
+\contentsline {subsection}{\numberline {2.1.7}Cyclic regression splines}{9}{subsection.19}%
+\contentsline {subsection}{\numberline {2.1.8}General definition of a penalized spline}{9}{subsection.20}%
+\contentsline {subsection}{\numberline {2.1.9}The duality of smooths and random effects}{10}{subsection.24}%
+\contentsline {subsection}{\numberline {2.1.10}A Bayesian perspective of smoothing}{12}{subsection.27}%
+\contentsline {subsection}{\numberline {2.1.11}Gaussian processes regression smoothers}{12}{subsection.29}%
+\contentsline {subsection}{\numberline {2.1.12}Ornstein--Uhlenbeck process}{14}{subsection.30}%
+\contentsline {section}{\numberline {2.2}Compartmental models}{15}{section.31}%
+\contentsline {subsection}{\numberline {2.2.1}The SIR and SIRS models}{15}{subsection.32}%
+\contentsline {subsection}{\numberline {2.2.2}Force of Infection (FOI) and the Basic Reproduction Number (\(R_0\))}{17}{subsection.36}%
+\contentsline {subsection}{\numberline {2.2.3}Numerical solutions of discrete time compartmental models}{18}{subsection.37}%
+\contentsline {chapter}{\numberline {3}Materials and methods}{20}{chapter.39}%
+\contentsline {section}{\numberline {3.1}Software}{20}{section.40}%
+\contentsline {section}{\numberline {3.2}Time varying transmission rate}{21}{section.41}%
+\contentsline {section}{\numberline {3.3}Time-varying effective reproduction number}{24}{section.43}%
+\contentsline {section}{\numberline {3.4}Inititial conditions and parameters}{25}{section.44}%
+\contentsline {section}{\numberline {3.5}Model formulation}{29}{section.47}%
+\contentsline {section}{\numberline {3.6}Model comparison and selection}{31}{section.48}%
+\contentsline {chapter}{\numberline {4}Results}{34}{chapter.50}%
+\contentsline {section}{\numberline {4.1}SIRS model with simulated data}{34}{section.51}%
+\contentsline {section}{\numberline {4.2}Scarlet Fever in Ontario 1929-1931}{42}{section.57}%
+\contentsline {section}{\numberline {4.3}Covid-19 Ireland 2020}{45}{section.62}%
+\contentsline {section}{\numberline {4.4}Measles London UK 1944-1984}{51}{section.67}%
+\contentsline {chapter}{\numberline {5}Discussion}{56}{chapter.70}%
+\contentsline {chapter}{\numberline {A}Proofs, sketches and derivations}{60}{appendix.71}%
+\contentsline {section}{\numberline {A.1}Matrix formulations and basis functions for cubic smoothing splines}{60}{section.72}%
+\contentsline {section}{\numberline {A.2}Laplace approximation}{63}{section.78}%
+\contentsline {section}{\numberline {A.3}Akaike information criterion (AIC)}{64}{section.81}%
+\contentsline {chapter}{\numberline {B}SIRS model with simualted data (cylic basis)}{70}{appendix.86}%
+\contentsline {chapter}{References}{74}{appendix*.90}%

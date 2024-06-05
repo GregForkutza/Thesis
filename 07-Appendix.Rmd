@@ -1,0 +1,417 @@
+`r if(knitr:::is_latex_output()) '\\appendix'`
+
+`r if(!knitr:::is_latex_output()) '# (APPENDIX) Appendix {-}'` 
+
+# Proofs, sketches and derivations {#Appendix}
+
+## Matrix formulations and basis functions for cubic smoothing splines {#A1}
+The following sketch of a proof is taken from [@orfanidis1989optimum], where the reader can find the full proof. 
+
+To determine the function \( f \) that minimizes \( J_2(f) \), we apply the Euler-Lagrange equation to a more general functional form \( J(x) = \int L(x, x', x'', t) \, dt \). The Euler-Lagrange equation for this functional becomes:
+
+\begin{equation}
+\frac{\partial L}{\partial x} - \frac{d}{dt} \frac{\partial L}{\partial x'} + \frac{d^2}{dt^2} \frac{\partial L}{\partial x''} = 0.
+\label{eq:expanded Euler-Lagrange equation}
+\end{equation}
+
+When the function \( f(x) \) extends beyond the range of the data points, or knots, we avoid imposing fixed boundary values for \( x \) and \( x' \) at the domain boundaries (i.e., \( x(t_a) \), \( x(t_b) \), \( x'(t_a) \), and \( x'(t_b) \)). Instead, we use _natural boundary conditions_.
+
+Natural boundary conditions are designed to ensure that the contributions from the boundary conditions to the first-order variation \( \delta J = J(x + \delta x) - J(x) \) vanish, thus optimizing the solution. In standard scenarios, fixed values might be set for \( \delta x \) and \( \delta x' \), where \( \delta \) represents an infinitesimal change. However, this could potentially lead to undesirable behavior at the boundary points, especially outside the region defined by the knots.
+
+From the application of the Euler-Lagrange equation \ref{eq:expanded Euler-Lagrange equation} and the principle that the first-order variation \( \delta J \) should vanish at the optimal solution, we derive two critical _natural boundary conditions_:
+
+\[
+\frac{\partial L}{\partial \dot{x}} - \frac{d}{dt} \frac{\partial L}{\partial \ddot{x}} = 0 \quad \text{and} \quad \frac{\partial L}{\partial \ddot{x}} = 0,
+\]
+
+where these conditions are each evaluated at \( t_a \) and \( t_b \). These conditions help ensure that the function \( f(x) \) not only fits the data within the knot range but also behaves optimally at the boundaries without artificial constraints. 
+
+Now, we can express Equation \ref{eq:min_smoothness_obj} in a variational form as follows:
+\[
+J = \sum_{n=0}^{N-1} w_n (y_n - x(t_n))^2 + \lambda \int_{t_a}^{t_b} x''(t)^2 \, dt,
+\]
+where the Lagrangian \(L\) is defined by:
+\[
+L = \sum_{n=0}^{N-1} w_n(y_n - x(t))^2 \delta(t - t_n) + \lambda x''(t)^2.
+\]
+
+Applying the Euler-Lagrange equation to this formulation yields:
+\begin{equation}
+\frac{\partial L}{\partial x} - \frac{d}{dt} \frac{\partial L}{\partial x'} + \frac{d^2}{dt^2} \frac{\partial L}{\partial x''} = -2 \sum_{n=0}^{N-1} w_{n}(y_n - x(t)) \delta(t - t_n) + 2\lambda x^{(4)}(t) = 0.
+\label{eq: Euler-Lagrange equation 2}
+\end{equation}
+
+The natural boundary conditions for this setup are:
+\[
+x^{(3)}(t_a) = 0, \quad x''(t_a) = 0, \quad x^{(3)}(t_b) = 0, \quad x''(t_b) = 0.
+\]
+
+By rearranging Equation \ref{eq: Euler-Lagrange equation 2} to solve for \(x^{(4)}(t)\), we derive:
+
+\begin{equation}
+x^{(4)}(t) = \lambda^{-1} \sum_{n=0}^{N-1} w_n (y_n - x(t_n)) \delta(t - t_n),
+\label{eq:EL x4}
+\end{equation}
+
+This equation indicates that the third derivative of the spline function, \( x(t) \), is zero except at the designated knot points \( t_n \). Consequently, within each interval between knots, \( x(t) \) must be represented as a cubic polynomial. The coefficients of these cubic polynomials may vary between intervals. The spline function transitions to first-degree polynomials in the endpoint intervals \([t_a, t_0]\) and \([t_{N-1}, t_b]\), defining what is meant by 'natural' in the context of natural cubic splines.
+
+The explicit form of \( x(t) \) is given by:
+\begin{equation}
+x(t) = 
+\begin{cases} 
+p_{-1}(t) = a_{-1} + b_{-1}(t - t_a), & t_a \leq t \leq t_0 \\
+p_n(t) = a_n + b_n(t - t_n) + \frac{1}{2} c_n(t - t_n)^2 + \frac{1}{6} d_n(t - t_n)^3, & t_n \leq t \leq t_{n+1} \\
+p_{N-1}(t) = a_{N-1} + b_{N-1}(t - t_{N-1}), & t_{N-1} \leq t \leq t_b
+\end{cases}
+\label{eq:cubic_spline_form}
+\end{equation}
+
+The coefficients are determined as follows:
+\[
+\begin{aligned}
+a_n &= x(t_n) = p_n(t_n), \\
+b_n &= p'_n(t_n), \\
+c_n &= p''_n(t_n), \\
+d_n &= p'''_n(t_n), & \text{for } n = 0, 1, \ldots, N-1.
+\end{aligned}
+\]
+
+From Equation \ref{eq:EL x4}, we can establish the continuity and discontinuity conditions at the knots in terms of Equation \ref{eq:cubic_spline_form}:
+
+\begin{equation}
+\begin{aligned}
+p_n(t_n) &= p_{n-1}(t_n), & \text{for } n = 0, 1, \ldots, N-1, \\
+p_n'(t_n) &= p_{n-1}'(t_n), \\
+p_n''(t_n) &= p_{n-1}''(t_n), \\
+p_n'''(t_n) - p_{n-1}'''(t_n) &= \lambda^{-1} w_n (y_n - a_n).
+\end{aligned}
+\label{eq:continuity_conditions}
+\end{equation}
+
+These conditions ensure that each spline segment smoothly transitions into the next, preserving the continuity of the first, second, and third derivatives, except at the knots, where the third derivative may be discontinuous.
+
+For the cubic spline model, there are \(N-1\) cubic polynomials—one for each interval between knots—and two linear polynomials for the intervals at the domain boundaries, leading to a total of \(4(N-1) + 4 = 4N\) coefficients to solve in equations \ref{eq:cubic_spline_form}. The equations derived using the constraints in equations \ref{eq:continuity_conditions} form the basis functions for a cubic spline between knots \(x_j\) and \(x_{j+1}\), with each interval defined by \(h_j = x_{j+1} - x_j\). These basis functions are defined as:
+
+\[
+\begin{aligned}
+a_{j}(x) &= \frac{x_{j+1} - x}{h_j}, \\
+b_{j}(x) &= \frac{(x_{j+1} - x)^3 / h_j - h_j (x_{j+1} - x)}{6}, \\
+c_{j}(x) &= \frac{x - x_j}{h_j}, \\
+d_{j}(x) &= \frac{(x - x_j)^3 / h_j - h_j (x - x_j)}{6}.
+\end{aligned}
+\label{eq:spline basis functions}
+\]
+
+The matrix elements for the non-cyclic spline are defined as follows:
+
+\[
+\mathbf{B} =
+\frac{1}{6} 
+\begin{bmatrix}
+2(h_0 + h_1) & h_1 & 0 & 0 \\
+h_1 & 2(h_1 + h_2) & h_2 & 0 \\
+0 & h_2 & 2(h_2 + h_3) & h_3 \\
+0 & 0 & h_3 & 2(h_3 + h_4)
+\end{bmatrix}
+\]
+
+and
+
+\[
+\mathbf{D} =
+\begin{bmatrix}
+h^{-1}_0 & 0 & 0 & 0 & 0 \\
+-(h^{-1}_0 + h^{-1}_1) & h^{-1}_1 & 0 & 0 & 0 \\
+0 & h^{-1}_1 & -(h^{-1}_1 + h^{-1}_2) & h^{-1}_2 & 0 \\
+0 & 0 & h^{-1}_2 & -(h^{-1}_2 + h^{-1}_3) & h^{-1}_3 \\
+0 & 0 & 0 & h^{-1}_3 & -(h^{-1}_3 + h^{-1}_4) \\
+0 & 0 & 0 & 0 & h^{-1}_4
+\end{bmatrix}.
+\]
+
+
+Thus, these matrix formulations and the associated spline basis functions emerge from the process of optimizing the objective function outlined in Equation \ref{eq:min_smoothness_obj}.
+
+## Laplace approximation {#Laplace-approximation}
+The following proof sketch is adapted from [@kristensenTMBAutomaticDifferentiation2016].
+
+Let \( f(u, \theta) \) denote the negative joint log-likelihood of the data and the random effects, where \( u \in \mathbb{R}^n \) represents the unknown random effects and \( \theta \in \mathbb{R}^n \) represents the model parameters. The MLE, in terms of the model parameters \( \theta \), is the marginal likelihood expressed as:
+
+\[
+L(\theta) = \int_{\mathbb{R}^n} \exp(-f(u, \theta)) \, du.
+\]
+
+In this expression, the random effects are integrated out. Define \(\hat{u}\) as the value that minimizes \( f(u, \theta) \), leading to the Hessian \( \mathbf{H}(\theta) \), which is the second partial derivative of \( f(u, \theta) \) with respect to \( u \), evaluated at \(\hat{u}(\theta)\):
+
+\[
+\mathbf{H}(\theta) = \frac{\partial^2 f}{\partial u^2}(\hat{u}(\theta), \theta).
+\]
+
+Since \( f \) is approximated by a second-order Taylor expansion centered around \(\hat{u}\), the first-order term disappears, resulting in the approximation:
+
+\[
+f(u, \theta) \approx f(\hat{u}, \theta) - \frac{1}{2} (u - \hat{u})^T \mathbf{H}(\hat{u}) (u - \hat{u}).
+\]
+
+The Laplace approximation of \( L(\theta) \) is then given by:
+
+\[
+L^*(\theta) = (\sqrt{2\pi})^n \det(\mathbf{H}(\theta))^{-\frac{1}{2}} \exp(-f(\hat{u}, \theta)).
+\]
+
+Taking the negative log of this approximation yields the objective function form used by `TMB` to estimate \( \theta \):
+
+\begin{equation}
+-\text{log}L^*(\theta) = -\text{n} \text{log}\sqrt{2\pi} + \frac{1}{2} \text{log} \text{det}(\mathbf{H}(\theta)) +f(\hat{u},\theta).
+\label{eq:neg laplace}
+\end{equation}
+
+This formulation of the objective function and its derivatives allows `TMB` to employ standard nonlinear optimization algorithms such as BFGS. 
+
+Uncertainty estimates for \(\hat{\theta}\) or any differential function \(\phi(\hat{\theta})\) are obtained through the delta method:
+
+\begin{equation}
+\text{VAR}(\phi(\hat{\theta})) = -\left(\frac{\partial \phi}{\partial \theta}(\hat{\theta})\right) \left(\frac{\partial^2 \log L^*}{\partial \theta^2}(\hat{\theta})\right)^{-1} \left(\frac{\partial \phi}{\partial \theta}(\hat{\theta})\right)^T.
+\label{eq:delta method}
+\end{equation}
+
+## Akaike information criterion (AIC) {#AIC}
+The following derivation of AIC is adapted from the proof sketch from [@woodGeneralizedAdditiveModels2017a].
+
+Suppose we have two possible models \(P\) and \(Q\) for a data vector \(\mathbf{X}\). We can think of these models as being a null hypothesis \(H\) and an alternative hypothesis \(A\). Let \(f_H(\mathbf{x})\) be the probability density of \(\mathbf{X}\) under \(H\) and \(f_A(\mathbf{x})\) under \(A\). Define the log-likelihood ratio as
+
+\[
+\eta(x) = \log \frac{f_A(x)}{f_H(x)} 
+\]
+
+Computing the expected value of \(\eta(x)\) with respect to \(A\) is
+
+\[
+\mathbb{E}_A[\eta(x)]= \int f_A(x) \log \frac{f_A(x)}{f_H(x)} \, dx.
+\]
+
+This expected log-likelihood ratio can be interpreted as having the same form as the Kullback-Leibler (KL) divergence defined from the density \(f_A\) to the density \(f_H\). When the alternative model \(f_A\) fits the data better than the wrong model \(f_H\), i.e., \(A\) is true, the two models are well separated and the log-likelihood ratio will be positive. The ratio will be negative when \(f_H\) fits the data better than \(f_A\), i.e., when \(H\) is true.
+
+Suppose we misspecify the alternative hypothesis for some other model \(Q\) with density \(f_Q(\mathbf{x})\). This leads to another interpretation of the KL divergence from \(f_A\) to \(f_Q\) as measuring how much power we lose with the likelihood ratio test if we misspecify the alternative hypothesis \(A\) as \(Q\). Dualistically we can also make the mistake of taking the null hypothesis \(f_H(\mathbf{x})\) to be \(f_Q(\mathbf{x})\). The dual of this interpretation now says that the KL divergence from \(f_H\) to \(f_Q\) is the loss of power if we misspecify the null hypothesis.
+
+Thus, the interpretation of the expected log-likelihood ratio statistic of two statistical models as the loss of power for specifying the model in terms of type one and type two error can be insightful for finding the solution of the problem of accounting for model complexity in model selection.
+
+If we were to judge between nested models on the basis of their fit to new data, not used in estimation, using the Likelihood Ratio Test (LRT), the model with the higher number of parameters will always have the higher likelihood. This is because the more complex model can better capture the nuances in the data. However, the Neyman-Pearson (NP) Lemma tells us that while the LRT is the most powerful test for simple hypotheses, in the context of model selection with multiple parameters (composite hypotheses), we need to balance model fit with complexity to avoid overfitting.
+
+The Akaike Information Criterion (AIC) addresses this by incorporating a penalty for the number of parameters. This penalty helps control overfitting by favoring models that generalize better to new data, not just those that fit the training data well. Therefore, while the LRT tends to favor more complex models due to higher likelihoods, AIC provides a more balanced approach by considering both fit and parsimony. It accomplishes this in the following way. 
+
+Consider a scenario where our data are actually generated from a true density \(f_{\theta_0}(y)\), while our model assumes a density \(f_\theta(y)\), where \(\theta\) represents the model parameters. Both \(y\) and \(\theta\) are typically vectors, with \(\theta\) having \(p\) dimensions. The Kullback-Leibler (KL) divergence between these densities is given by:
+
+\begin{equation}
+K(f_\theta, f_{\theta_0}) = \int [\log{f_{\theta_0}(y)} - \log{f_\theta(y)}] f_{\theta_0}(y) \, dy 
+\label{eq:KL}
+\end{equation}
+
+This divergence quantifies how much the model \(f_\theta\) deviates from the true density \(f_{\theta_0}\). When \(\hat{\theta}\) is the maximum likelihood estimate (MLE) of \(\theta\), the KL divergence \(K(f_{\hat{\theta}}, f_{\theta_0})\) serves as an indicator of the model's expected performance on new data, distinct from the data used to estimate \(\hat{\theta}\). It's important to note that, for the purpose of evaluating this divergence, \(\hat{\theta}\) is treated as a fixed value, independent of \(y\).
+
+We don't know what the density of the true model is. This can be overcome by constructing a truncated Taylor expansion of \(\log(f_{\theta_0})\) about the unknown parameters \(\theta_K\), as the minimizer to equation \ref{eq:KL}.
+
+\begin{equation}
+\log{f_{\hat{\theta}}(y)} \approx \log{f_{\theta_K}(y)} + (\hat{\theta} - \theta_K)^T g + \frac{1}{2} (\hat{\theta} - \theta_K)^T \mathbf{H} (\hat{\theta} - \theta_K) 
+\end{equation}
+\label{eq:taylor}
+   
+where \(g\) and \(\mathbf{H}\) are the gradient vector and Hessian matrix of the first and second derivatives of \(\log f_\theta(y)\) with respect to \(\theta\), evaluated at \(\theta_K\).
+
+Substitute the Taylor expansion of \(\log{f_{\hat{\theta}}(y)}\) into the KL divergence expression \ref{eq:KL}:
+ 
+\[
+K(f_{\hat{\theta}}, f_{\theta_0}) = \int \left[ \log{f_{\theta_0}(y)} - \left( \log{f_{\theta_K}(y)} + (\hat{\theta} - \theta_K)^T g + \frac{1}{2} (\hat{\theta} - \theta_K)^T \mathbf{H} (\hat{\theta} - \theta_K) \right) \right] f_{\theta_0}(y) \, dy
+\]
+
+Separate the terms in the integral:
+\[
+K(f_{\hat{\theta}}, f_{\theta_0}) = \int \left[ \log{f_{\theta_0}(y)} - \log{f_{\theta_K}(y)} \right] f_{\theta_0}(y) \, dy - \int (\hat{\theta} - \theta_K)^T g f_{\theta_0}(y) \, dy - \int \frac{1}{2} (\hat{\theta} - \theta_K)^T \mathbf{H} (\hat{\theta} - \theta_K) f_{\theta_0}(y) \, dy
+\]
+
+The first term is the KL divergence between \(f_{\theta_K}\) and \(f_{\theta_0}\):
+\[
+K(f_{\theta_K}, f_{\theta_0}) = \int \left[ \log{f_{\theta_0}(y)} - \log{f_{\theta_K}(y)} \right] f_{\theta_0}(y) \, dy
+\]
+
+Since \(\theta_K\) minimizes the KL divergence \(K(f_\theta, f_{\theta_0})\), the gradient vector \(g\) at \(\theta_K\) will integrate to zero:
+
+\[
+\int g f_{\theta_0}(y) \, dy = 0
+\]
+
+The remaining term involves the Hessian \(\mathbf{H}\):
+
+\[
+\int \frac{1}{2} (\hat{\theta} - \theta_K)^T \mathbf{H} (\hat{\theta} - \theta_K) f_{\theta_0}(y) \, dy
+\]
+   
+This term represents the second-order approximation of the KL divergence around \(\theta_K\). 
+
+Combining these results, we obtain:
+
+\[
+K(f_{\hat{\theta}}, f_{\theta_0}) \approx K(f_{\theta_K}, f_{\theta_0}) + \frac{1}{2} (\hat{\theta} - \theta_K)^T \mathbf{I}_K (\hat{\theta} - \theta_K) 
+\]
+
+Here, \(\mathbf{I}_K\) is the Fisher information matrix evaluated at \(\theta_K\), which is equivalent to the negative expected value of the Hessian matrix \(\mathbf{H}\). 
+
+Since we don't know \(\theta_K\), we take the expectation of the KL divergence approximation over the distribution of \(\hat{\theta}\). This yields:
+
+\[
+\mathbb{E}[K(f_{\hat{\theta}}, f_{\theta_0})] \approx K(f_{\theta_K}, f_{\theta_0}) + \mathbb{E}\left[\frac{1}{2} (\hat{\theta} - \theta_K)^T \mathbf{I}_K (\hat{\theta} - \theta_K)\right]
+\]
+
+Under the assumption that the model is correct or nearly correct, \(\hat{\theta}\) is approximately normally distributed around \(\theta_K\) with covariance matrix \(\mathbf{I}_K^{-1}\). Therefore, \((\hat{\theta} - \theta_K)^T \mathbf{I}_K (\hat{\theta} - \theta_K)\) follows a chi-squared distribution with \(p\) degrees of freedom (\(p\) being the number of parameters).
+  
+The expected value of a chi-squared distribution with \(p\) degrees of freedom is \(p\). Thus:
+
+\[
+\mathbb{E}\left[\frac{1}{2} (\hat{\theta} - \theta_K)^T \mathbf{I}_K (\hat{\theta} - \theta_K)\right] = \frac{1}{2} \mathbb{E}[\chi^2_p] = \frac{p}{2}
+\]
+
+Substituting this back into our expression, we get:
+
+\begin{equation}
+\mathbb{E}[K(f_{\hat{\theta}}, f_{\theta_0})] \approx K(f_{\theta_K}, f_{\theta_0}) + \frac{p}{2} 
+\label{eq:KL approx}
+\end{equation}
+
+The goal is to find an approximately unbiased estimator for \( K(f_{\theta_K}, f_{\theta_0}) \), which is the Kullback-Leibler (KL) divergence between the true distribution \( f_{\theta_0} \) and the model \( f_{\theta_K} \).
+
+Given the log-likelihood function \( l(\theta) = \log[f_{\theta}(y)] \), we start with
+
+\[
+E[-l(\hat{\theta})]
+\]
+
+where \( \hat{\theta} \) is the maximum likelihood estimator (MLE) of \( \theta \). We decompose \( E[-l(\hat{\theta})] \) as 
+
+\[
+E[-l(\hat{\theta})] = E[-l(\theta_K)] - E[l(\hat{\theta}) - l(\theta_K)].
+\]
+
+Next, we use the linearity of expectation:
+
+\[
+E[-l(\hat{\theta})] = E[-l(\theta_K)] - E[l(\hat{\theta}) - l(\theta_K)]. 
+\]
+
+The term \( E[-l(\theta_K)] \) corresponds to the expected log-likelihood under the true model, which can be linked to the KL divergence. Specifically,
+
+\[
+E[-l(\theta_K)] = -\int \log[f_{\theta_K}(y)] f_{\theta_0}(y) \, dy. 
+\]
+
+The second term, \( E[l(\hat{\theta}) - l(\theta_K)] \), needs a bias correction. Considering the large sample result that \( 2 (\log f_{\hat{\theta}} - \log f_{\theta_K}) \) is approximately chi-squared distributed with \( p \) degrees of freedom, we use:
+
+\[
+2 (\log f_{\hat{\theta}} - \log f_{\theta_K}) \sim \chi^2_p.
+\]
+
+Thus, the bias correction term is \( p/2 \), leading to:
+
+\[
+E[l(\hat{\theta}) - l(\theta_K)] \approx \frac{p}{2}. 
+\]
+
+So, we get:
+
+\[
+E[-l(\hat{\theta})] = E[-l(\theta_K)] - \frac{p}{2}.
+\]
+
+Recall the definition of the Kullback-Leibler (KL) divergence:
+
+\[ 
+K(f_{\theta_K}, f_{\theta_0}) = -\int \log[f_{\theta_K}(y)] f_{\theta_0}(y) \, dy - \int \log[f_{\theta_0}(y)] f_{\theta_0}(y) \, dy.
+\]
+
+Notice that the first term on the right-hand side of our expectation equation is the negative expected log-likelihood of the model evaluated at \(\theta_K\):
+
+\[ 
+E[-l(\theta_K)] = -\int \log[f_{\theta_K}(y)] f_{\theta_0}(y) \, dy. 
+\]
+
+So, we can express the KL divergence as:
+
+\[ 
+K(f_{\theta_K}, f_{\theta_0}) = E[-l(\theta_K)] + \int \log[f_{\theta_0}(y)] f_{\theta_0}(y) \, dy. 
+\]
+
+We have:
+
+\[
+E[-l(\hat{\theta})] \approx K(f_{\theta_K}, f_{\theta_0}) - \frac{p}{2} - \int \log[f_{\theta_0}(y)] f_{\theta_0}(y) \, dy. 
+\]
+
+Rearranging this for \( K(f_{\theta_K}, f_{\theta_0}) \):
+
+\[ 
+K(f_{\theta_K}, f_{\theta_0}) \approx E[-l(\hat{\theta})] + \frac{p}{2} + \int \log[f_{\theta_0}(y)] f_{\theta_0}(y) \, dy. 
+\]
+
+The log-likelihood evaluated at the MLE \(\hat{\theta}\) is a random variable that converges in probability to the log-likelihood evaluated at the true parameter value \(\theta\) because in this case the MLE is a consistent estimator. This means that The probability that the estimator is within an 
+\(\epsilon\)-neighborhood of the true parameter value approaches 1 as the sample size increases.  
+
+
+The expectation \( E[-l(\hat{\theta})] \) involves the distribution of \(\hat{\theta}\), which, for large samples, is concentrated around \(\theta\). Therefore we can approximate \( E[-l(\hat{\theta})] \) with \(-l(\hat{\theta})\) for large sample sizes. This approximation is justified because \(\hat{\theta}\) is close to \(\theta\), and the observed log-likelihood \(-l(\hat{\theta})\) will be close to its expected value. 
+
+Since \( E[-l(\hat{\theta})] \) is the expectation of the negative log-likelihood, we approximate it with the observed value \( -l(\hat{\theta}) \). We obtain the unbiased estimator for the KL divergence between the true distribution \( f_{\theta_0} \) and the model \( f_{\theta_K} \).
+
+\[ 
+\widehat{K(f_{\theta_K}, f_{\theta_0})}
+ \approx -l(\hat{\theta}) + \frac{p}{2} + \int \log[f_{\theta_0}(y)] f_{\theta_0}(y) \, dy. 
+\]
+
+Substituting this into \ref{eq:KL approx} we obtain:
+
+\[
+\mathbb{E}[K(f_{\hat{\theta}}, f_{\theta_0})] \approx  l({\hat{\theta}}) + p+ \int \log[f_{\theta_0}(y)] f_{\theta_0}(y) \, dy. .
+\]
+
+Since we don't have \(f_{\theta_0}(y)\), we drop the last term, as it is a constant across any set of models compared using the same data set:
+
+\[
+\mathbb{E}[K(f_{\hat{\theta}}, f_{\theta_0})] \approx -\log f_{\hat{\theta}} + p = -l(\hat{\theta}) + p
+\]
+
+Scaling the above equation by a factor of 2, the Akaike Information Criterion (AIC) is:
+
+\begin{equation}
+\text{AIC} = -2 \log \hat{L} + 2p
+\label{eq:AIC}
+\end{equation}
+
+# SIRS model with simualted data (cylic basis) {#Appendix-results}
+
+Figures \ref{fig:incidence20cc}, \ref{fig:transmission20cc} and \ref{fig:Rt20cc} show the results of the predicted incidence, transmission rate, and effective reproduction number for data simulated using a cyclic cubic (CC) regression smoother with varying numbers of knots (\(k = 8, 15, 20\)), from left to right. The variance \(b_{sd}\) in the Gaussian coefficients used to generate the simulation model and calibrating models are fixed at \(b\_sd = 2\). \(\gamma\) and \(\phi\) are fixed at \(\frac{1}{14}\) and \(10^{-3}\) respectively. 
+
+
+The SIRS model is used for the simulation, with compartment values initialized at the endemic equalibrium solutions. The figures use the following visual elements:
+
+- The red line represents the simulated trajectory with Gaussian noise.
+- The blue line (for incidence) or green line (for transmission rate and reproduction number) indicates the predicted values.
+- The light and dark colored bands represent the 95\% and 50\% confidence intervals, respectively.
+
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{figure/Simulated/simulation_cc_20_k(8,15,20)_bsd2_beta2_plot_incidence.png}
+\caption[Predicted Simulated Data (CC) Incidence]{\textbf{Predicted incidence for data simulated using a cyclic cubic (CC) regression smoother with varying numbers of knots (\(k = 8, 15, 20\)).} The plots show the predicted incidence fitted to data simulated from a SIRS model.}
+\label{fig:incidence20cc}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{figure/Simulated/simulation_cc_20_k(8,15,20)_bsd2_beta2_plot_beta.png}
+\caption[Estimated Simulated Data (CC) Transmission Rate]{\textbf{Estimated transmission rate for data simulated using a cyclic cubic (CC) regression smoother with varying numbers of knots (\(k = 8, 15, 20\)).} The plots show the predicted transmission rate fitted to data simulated from a SIRS model.}
+\label{fig:transmission20cc}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{figure/Simulated/simulation_cc_20_k(8,15,20)_bsd2_beta2_plot_R_t.png}
+\caption[Estimated Simulated Data (CC) Effective Reproduction Number]{\textbf{Estimated effective reproduction number for data simulated using a cyclic cubic (CC) regression smoother with varying numbers of knots (\(k = 8, 15, 20\)).} The plots show the predicted effective reproduction number fitted to data simulated from a SIRS model.}
+\label{fig:Rt20cc}
+\end{figure}
+
