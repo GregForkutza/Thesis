@@ -29,15 +29,17 @@
 \contentsline {section}{\numberline {3.4}Inititial conditions and parameters}{25}{section.44}%
 \contentsline {section}{\numberline {3.5}Model formulation}{29}{section.47}%
 \contentsline {section}{\numberline {3.6}Model comparison and selection}{31}{section.48}%
-\contentsline {chapter}{\numberline {4}Results}{34}{chapter.50}%
-\contentsline {section}{\numberline {4.1}SIRS model with simulated data}{34}{section.51}%
-\contentsline {section}{\numberline {4.2}Scarlet Fever in Ontario 1929-1931}{42}{section.57}%
-\contentsline {section}{\numberline {4.3}Covid-19 Ireland 2020}{45}{section.62}%
-\contentsline {section}{\numberline {4.4}Measles London UK 1944-1984}{51}{section.67}%
-\contentsline {chapter}{\numberline {5}Discussion}{56}{chapter.70}%
-\contentsline {chapter}{\numberline {A}Proofs, sketches and derivations}{60}{appendix.71}%
-\contentsline {section}{\numberline {A.1}Matrix formulations and basis functions for cubic smoothing splines}{60}{section.72}%
-\contentsline {section}{\numberline {A.2}Laplace approximation}{63}{section.78}%
-\contentsline {section}{\numberline {A.3}Akaike information criterion (AIC)}{64}{section.81}%
-\contentsline {chapter}{\numberline {B}SIRS model with simualted data (cylic basis)}{70}{appendix.86}%
-\contentsline {chapter}{References}{74}{appendix*.90}%
+\contentsline {chapter}{\numberline {4}Results}{33}{chapter.50}%
+\contentsline {section}{\numberline {4.1}SIRS model with simulated data}{33}{section.51}%
+\contentsline {section}{\numberline {4.2}Scarlet Fever in Ontario 1929-1931}{44}{section.61}%
+\contentsline {section}{\numberline {4.3}Covid-19 Ireland 2020}{48}{section.66}%
+\contentsline {section}{\numberline {4.4}Measles London UK 1944-1984}{54}{section.71}%
+\contentsline {chapter}{\numberline {5}Discussion}{59}{chapter.74}%
+\contentsline {chapter}{\numberline {A}Proofs, sketches and derivations}{63}{appendix.75}%
+\contentsline {section}{\numberline {A.1}Matrix formulations and basis functions for cubic smoothing splines}{63}{section.76}%
+\contentsline {section}{\numberline {A.2}Laplace approximation}{66}{section.82}%
+\contentsline {section}{\numberline {A.3}Akaike information criterion (AIC)}{67}{section.85}%
+\contentsline {chapter}{\numberline {B}Additional Simulation Results}{73}{appendix.90}%
+\contentsline {section}{\numberline {B.1}SIRS model with cylic basis}{73}{section.91}%
+\contentsline {section}{\numberline {B.2}Comparison of SIRS model using B-Spline (BS) basis unaggregated and aggregated data}{78}{section.95}%
+\contentsline {chapter}{References}{85}{appendix*.104}%

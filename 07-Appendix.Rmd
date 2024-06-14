@@ -383,7 +383,9 @@ Scaling the above equation by a factor of 2, the Akaike Information Criterion (A
 \label{eq:AIC}
 \end{equation}
 
-# SIRS model with simualted data (cylic basis) {#Appendix-results}
+# Additional Simulation Results {#Appendix-results}
+
+## SIRS model with cylic basis {#Appendix-results-sim}
 
 Figures \ref{fig:incidence20cc}, \ref{fig:transmission20cc} and \ref{fig:Rt20cc} show the results of the predicted incidence, transmission rate, and effective reproduction number for data simulated using a cyclic cubic (CC) regression smoother with varying numbers of knots (\(k = 8, 15, 20\)), from left to right. The variance \(b_{sd}\) in the Gaussian coefficients used to generate the simulation model and calibrating models are fixed at \(b\_sd = 2\). \(\gamma\) and \(\phi\) are fixed at \(\frac{1}{14}\) and \(10^{-3}\) respectively. 
 
@@ -414,4 +416,84 @@ The SIRS model is used for the simulation, with compartment values initialized a
 \caption[Estimated Simulated Data (CC) Effective Reproduction Number]{\textbf{Estimated effective reproduction number for data simulated using a cyclic cubic (CC) regression smoother with varying numbers of knots (\(k = 8, 15, 20\)).} The plots show the predicted effective reproduction number fitted to data simulated from a SIRS model.}
 \label{fig:Rt20cc}
 \end{figure}
+
+## Comparison of SIRS model using B-Spline (BS) basis unaggregated and aggregated data  {#Appendix-results-agg}
+
+
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{figure/Simulated/unaggregated/simulation_bs_20_k(5,10,20)_bsd1_beta1_plot_incidence.png}
+\caption[Predicted Simulated Data (BS) Incidence]{\textbf{Estimated Number of New Infections per day (Incidence) for data simulated using a B-Spline (BS) basis.} The columns are labelled according to the number of knots used to fit to the data. The red line represents the simulated trajectory with Gaussian noise. The blue line indicates the predicted incidence, with light and dark blue bands representing the 95\% and 50\% confidence intervals.}
+\label{fig:incidence20bs}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{figure/Simulated/unaggregated/simulation_bs_20_k(5,10,20)_bsd1_beta1_plot_beta.png}
+\caption[Estimated Simulated Data (BS) Transmission Rate]{\textbf{Estimated transmission rate \(\beta\) per day for data simulated using a B-Spline (BS) basis.} The columns are labelled according to the number of knots used to fit to the data. . The red line represents the true transmission rate function from the simulated data. The green line indicates the estimated transmission rate, with light and dark green bands representing the 95\% and 50\% confidence intervals.}
+\label{fig:transmission20bs}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{figure/Simulated/unaggregated/simulation_bs_20_k(5,10,20)_bsd1_beta1_plot_R_t.png}
+\caption[Estimated Simulated Data (BS) Effective Reproduction Number]{\textbf{Estimated effective reproduction \(R_t\) per day for data simulated using a B-Spline (BS) basis.} The columns are labelled according to the number of knots used to fit to the data. The black line represents the reproduction number from the simulated data. The purple line indicates the estimated reproduction number, with light and dark purple bands representing the 95\% and 50\% confidence intervals.}
+\label{fig:Rt20bs}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{figure/Simulated/aggregated/simulation_agg_bs_20_k(5,10,20)_bsd1_beta1_plot_incidence.png}
+\caption[Predicted Simulated and Aggregated Data (BS) Incidence]{\textbf{Estimated Number of New Infections per day (Incidence) for aggregated data simulated using a B-Spline (BS) basis.} The columns are labelled according to the number of knots used to fit to the data. The red line represents the simulated trajectory with Gaussian noise. The blue line indicates the predicted incidence, with light and dark blue bands representing the 95\% and 50\% confidence intervals.}
+\label{fig:incidence_agg_bs}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{figure/Simulated/aggregated/simulation_agg_bs_20_k(5,10,20)_bsd1_beta1_plot_beta.png}
+\caption[Estimated Simulated and Aggregated Data (BS) Transmission Rate]{\textbf{Estimated transmission rate \(\beta\) per day for aggregated data simulated using a B-Spline (BS) basis.} The columns are labelled according to the number of knots used to fit to the data. The red line represents the true transmission rate function from the simulated data. The green line indicates the estimated transmission rate, with light and dark green bands representing the 95\% and 50\% confidence intervals.}
+\label{fig:transmission_agg_bs}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{figure/Simulated/aggregated/simulation_agg_bs_20_k(5,10,20)_bsd1_beta1_plot_R_t.png}
+\caption[Estimated Simulated and Aggregated Data (BS) Effective Reproduction Number]{\textbf{Estimated effective reproduction \(R_t\) per day for aggregated data simulated using a B-Spline (BS) basis.} The columns are labelled according to the number of knots used to fit to the data. The black line represents the reproduction number from the simulated data. The purple line indicates the estimated reproduction number, with light and dark purple bands representing the 95\% and 50\% confidence intervals.}
+\label{fig:Rt20_agg_bs}
+\end{figure}
+
+
+```{r aic-table-sim-bs, echo=FALSE, message=FALSE, warning=FALSE}
+library(knitr)
+library(kableExtra)
+library(tidyr)
+
+# Load the saved R object
+aic_table <- readRDS("data/Tables/Simulated/simulation_bs_20_k(5,10,20)_bsd1_beta1.rds")
+
+# Generate and display the table with additional headers
+kable(aic_table, format = "latex", booktabs = TRUE, 
+      col.names = c("Smooth Type", "k = 8", "k = 15", "k = 20"),
+      caption = "\\textbf{Conditional AIC Scores of calibrating models with varying model granularity, fitted to data simulated using a B-Spline (BS) basis with \\(k=20\\) knots.} The degrees of freedom are defined as the model degrees of freedom, which is computed as the trace of penalized smoothing matrix.") %>%
+  add_header_above(c(" " = 1, "Knots" = 3)) %>%
+  kable_styling(latex_options = c("hold_position"))
+```
+
+```{r aic-table-sim-agg-bs, echo=FALSE, message=FALSE, warning=FALSE}
+library(knitr)
+library(kableExtra)
+library(tidyr)
+
+# Load the saved R object
+aic_table <- readRDS("data/Tables/Simulated/simulation_agg_bs_20_k(5,10,20)_bsd1_beta1.rds")
+
+# Generate and display the table with additional headers
+kable(aic_table, format = "latex", booktabs = TRUE, 
+      col.names = c("Smooth Type", "k = 8", "k = 15", "k = 20"),
+      caption = "\\textbf{Conditional AIC Scores of calibrating models with varying model granularity, fitted to aggregated data simulated using a B-Spline (BS) basis with \\(k=20\\) knots.} The degrees of freedom are defined as the model degrees of freedom, which is computed as the trace of penalized smoothing matrix.") %>%
+  add_header_above(c(" " = 1, "Knots" = 3)) %>%
+  kable_styling(latex_options = c("hold_position"))
+```
 

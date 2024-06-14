@@ -1237,9 +1237,9 @@ Here is an example of what the simulator object for an SIR model in \texttt{macp
 \end{Highlighting}
 \end{Shaded}
 
-Sometimes it is useful to simulate the trajectory for \(n\) time steps and then calibrate the model over a smaller time series by aggregating the data into \(\frac{n}{k}\) time steps by averaging the trajectory and data over a period of \(k\) steps. For example, in the case of the Ireland Covid-19 dataset (\ref{Ireland}), the reported incidence was inconsistent on a daily scale. By averaging the observations over a weekly scale, several statistical improvements are achieved. First, variance reduction occurs as the averaging process diminishes the day-to-day fluctuations caused by sporadic reporting. Secondly, this reduces noise by smoothing out the random variations. Additionally, stabilization of the data set is achieved; this makes the trends more reliable and the overall dataset less susceptible to the anomalies of daily reporting. However, upon calibrating the model to the aggregated data, the estimated transmission rate was double the value then what was estimated when fitting to the unaggregated (daily) data. The effective reproduction number was around four times smaller than expected as well. We were unable to fix this issue but it is suspected that since the trajectory uses Euler steps, the step size of a week is too large and causing the inaccuracy in magnitude. We plan to address this issue so that these models can be calibrated to aggregated data accurately.
+Sometimes it is useful to simulate the trajectory for \(n\) time steps and then calibrate the model over a smaller time series by aggregating the data into \(\frac{n}{k}\) time steps by averaging the trajectory and data over a period of \(k\) steps. For example, in the case of the Ireland Covid-19 dataset (\ref{Ireland}), the reported incidence was inconsistent on a daily scale. By averaging the observations over a weekly scale, several statistical improvements are achieved. First, variance reduction occurs as the averaging process diminishes the day-to-day fluctuations caused by sporadic reporting. Secondly, this reduces noise by smoothing out the random variations. Additionally, stabilization of the data set is achieved; this makes the trends more reliable and the overall dataset less susceptible to the anomalies of daily reporting.
 
-Extra care is needed to handle the uncertainty estimates of aggregated trajectory simulations. For unaggreggated data, \texttt{macpan2}, which has \texttt{TMB} for its optimization engine, uses the Laplace Approximation (see appendix \ref{Laplace-approximation}) to compute uncertainty estimates with the delta method. By averaging the trajectory over a time period of size \(k\), we are in effect making a transformation of a random variable. The uncertainty estimates are required to take this into account. The variance of a function \(h(\beta) = \mathbf{H} \beta\) of the random variable \(\beta\) is computed as
+Extra care is needed to handle the uncertainty estimates of aggregated trajectory simulations. For un-aggreggated data, \texttt{macpan2}, which has \texttt{TMB} for its optimization engine, uses the Laplace Approximation (see appendix \ref{Laplace-approximation}) to compute uncertainty estimates with the delta method. By averaging the trajectory over a time period of size \(k\), we are in effect making a transformation of a random variable. The uncertainty estimates are required to take this into account. The variance of a function \(h(\beta) = \mathbf{H} \beta\) of the random variable \(\beta\) is computed as
 
 \[
 Var(\mathbf{H} \beta) = \mathbf{H}^T Cov(\beta) \mathbf{H},
@@ -1302,26 +1302,21 @@ Consider a SIRS compartmental model with a fixed waning immunity parameter \(\ph
 
 We construct the data generating model as follows. The smoother type and the number of knots \(k\) are specified using a particular \texttt{mgcv} smooth. This determines the form of \(\mathbf{X}\) and the penalty matrix \(\mathbf{P}\). The smoothing coefficients \(b\), of dimension \(k-2\), are assumed to be multivariate Gaussian. Thus, \(b\) is initialized as random normal deviates at the \(k-2\) evenly spaced quantiles with a mean of 0 and a standard deviation specified as \(b_{sd}\). As the variation of this distribution increases, the true function describing the time-varying transmission rate for the data model will become more complex. An initial value for \(b_0\) is chosen as the log of the initial value of \(\beta\). The recovery rate \(\gamma\) is fixed. Initial values for the remaining parameter estimates are set to 1. See subsection \ref{Initial-conditions-and-parameters} for more details on initializing compartment values.
 
-The model trajectory is simulated from these initial conditions using Euler steps. Gaussian noise (\(sd = 800\)) is added to the simulated incidence vector. This vector is used to test the efficacy of the semi-mechanistic models. The models are calibrated using \texttt{macpan2}, which utilizes the Laplace approximation via \texttt{TMB} to optimize the objective function and update parameter estimates using quasi-Newton methods.
+The model trajectory is simulated from these initial conditions using Euler steps. Gaussian noise (\(sd = 0.2\)) is added to log transformed simulated incidence vector, to avoid negative values and then the inverse transformation is applied. This vector is used to test the efficacy of the semi-mechanistic models. The models are calibrated using \texttt{macpan2}, which utilizes the Laplace approximation via \texttt{TMB} to optimize the objective function and update parameter estimates using quasi-Newton methods.
 
-The calibration model is constructed it the same way, except that we can choose to vary the smoother and the model granularity by specifying the smoother type and the number of knots. In figure \ref{fig:basis20gp} we illustrate the shape of the basis functions for each of the univariate, non-cyclic smoothing basis used in this methodology.
+To investigate the effect of temporal aggregation on model performance, we conducted an additional study where we aggregated the simulated data on a weekly scale before fitting the model. This process involved summing the predicted incidence over each week and then fitting the model to these aggregated observations. Both the unaggregated and aggregated models use the same simulated trajectory with added noise, ensuring consistency between the two approaches.
 
-\begin{figure}
-\centering
-\includegraphics[width=\textwidth]{figure/Simulated/simulation_gp(-2,2,1)_k(20)_k(8,15,20)_bsd2_beta2_plot_basis.png}
-\caption[Basis Functions for Smoothing Basis.]{\textbf{Basis functions for calibrating smoothers}. Basis matrices are obtained via mgcv::smoothCon() with number of knots \(k=8\) and domain of \(n=200\) days. Each basis matrix is determined only by the input domain and the number of knots. Each basis function is a single column of the basis matrix. The acronyms for the smoothers are defined as follows: "gp" = Gaussian process, "tp" = thin plate regression spline, "cr" = cubic regression spline and "bs" = B-spline. Not included in this figure are the acronyms "ps" = P-spline, "ts" = cyclic thin plate regression spline, "cc" = cyclic cubic regression spline, and "cp" = cyclic P-spline.}
-\label{fig:basis20gp}
-\end{figure}
+The calibration model is constructed in the same way as the data generating model, except that we can choose to vary the smoother and the model granularity by specifying the smoother type and the number of knots. In figure \ref{fig:basis20gp} we illustrate the shape of the basis functions for each of the uni variate, non-cyclic smoothing basis used in this methodology.
 
 It is worth mentioning that we have kept \(\gamma\) fixed in the simulation study, but in the real-life data examples, we have used a log-normal prior to allow flexible deviation from the initialized starting value of \(\gamma\). The reason for this is that we were not able to get this to work owing to a possible error in the use of \texttt{macpan2} syntax.
 
-The calibration models vary the number of knots (\(k = 8, 15, 20\)) while keeping the variance \(b_{sd} = 2\) fixed for starting values. \(\gamma = 1/14\), which represents a two-week period of an infectious individual being capable of transmitting the disease to a susceptible individual. \(\phi = \frac{1}{300}\), which means that at each time point, that proportion of the recovered individuals lose immunity. An equivalent interpretation of the waning immunity parameter is that it represents the period of immunity for an individual, which in this case represents 300 days.
+The calibration models vary the number of knots, in order to illustrate the concept of overfitting, while keeping the variance \(b_{sd} = 1\) fixed for starting values. \(\gamma = 1/7\), which represents a two-week period of an infectious individual being capable of transmitting the disease to a susceptible individual. \(\phi = \frac{1}{300}\), which means that at each time point, that proportion of the recovered individuals lose immunity. An equivalent interpretation of the waning immunity parameter is that it represents the period of immunity for an individual, which in this case represents 300 days.
 
-In Figures \ref{fig:incidence20gp}, \ref{fig:transmission20gp}, and \ref{fig:Rt20gp}, we present the predicted incidence, transmission rate, and effective reproduction number for data simulated using a Gaussian process (GP) smoother with \(k=20\) knots. We have used the univariate non-cyclic smoothers in the calibration model: Gaussian process regression smoothers, thin plate regression splines, B-splines, and cubic regression splines. We have chosen to omit the results of the calibration models utilizing a P-spline basis as they show poor ability to both predict incidence and infer the underlying true transmission rate when the number of knots used is less than the number used to generate the data.
+In Figures \ref{fig:incidence20gp}, \ref{fig:transmission20gp}, and \ref{fig:Rt20gp}, we present the predicted incidence, transmission rate, and effective reproduction number for data simulated using a Gaussian process (GP) smoother with \(k=20\) knots. We have used the univariate non-cyclic smoothing basis in the calibration model: Gaussian process regression smoothers, thin plate regression splines, B-splines, and cubic regression splines. We have chosen to omit the results of the calibration models utilizing a P-spline basis as they show poor ability to both predict incidence and infer the underlying true transmission rate when the number of knots used is less than the number used to generate the data.
 
-Figure \ref{fig:incidence20gp} shows the predicted incidence for the best models, for each smoothing type, fitted to simulated data with added noise. As we move from left to right across each figure, we can observe the effect of increasing model granularity by increasing the number of basis functions, or knots, used by each smoother in constructing the unknown function, \(\beta\). In the leftmost and center columns, we see two degrees of underfitting, where the model smooths over the peaks and valleys. In the rightmost column, the model fully matches the incidence trajectory.
+Figure \ref{fig:incidence20gp} shows the predicted incidence for the best models, for each smoothing type, fitted to simulated data with added noise. As we move from left to right across each figure, we can observe the effect of increasing model granularity by increasing the number of basis functions, or knots, used by each smoother in constructing the unknown function, \(\beta\). In the leftmost column we see a representation of underfitting, where the model smooths over the peaks and valleys. In the rightmost column, the model fully matches the incidence trajectory, almost interpolating the data and therefore likely overfitting. The center column seems like a reasonable middle ground, capturing the trend of a single peak and valley in the oscillations over the first 100 days.
 
-We observe the same phenomenon in the estimated transmission rate and effective reproduction number in Figures \ref{fig:transmission20gp} and \ref{fig:Rt20gp}. In the rightmost column of these figures, for all bases, the model is able to recover the true shape of the unknown functions. However, it is only the Gaussian process basis that is capable of reasonably approximating the true shape of the unknown functions with low model granularity.
+We observe the same phenomenon in the estimated transmission rate and effective reproduction number in Figures \ref{fig:transmission20gp} and \ref{fig:Rt20gp}. In the rightmost column of these figures, for all bases, the model is able to recover the true shape of the unknown functions, although it is likely overfitting. Again, the middle column seems like a resonable estimate.
 
 In Table \ref{tab:aic-table-sim}, we present the comparison of the conditional AIC scores for the models corresponding to Figures \ref{fig:incidence20gp}, \ref{fig:transmission20gp}, and \ref{fig:Rt20gp}. We observe that the Gaussian process (GP) model consistently has the lowest AIC score across all evaluated models and levels of model granularity.
 
@@ -1329,27 +1324,57 @@ The AIC score, which balances model fit and complexity, suggests that the GP mod
 
 We also observed that when the data-generating model used a thin plate regression spline as the basis for the linear smoother, the GP model continued to have the lowest AIC score, even compared to the model using a thin plate regression spline basis. Notably, the AIC score heavily penalizes model complexity for the B-spline and cubic regression spline bases. For the GP and thin plate regression spline bases, the difference in AIC scores between models with lower and higher complexity increases by a negligible amount.
 
-In the appendix, Figures \ref{fig:incidence20cc}, \ref{fig:transmission20cc}, and \ref{fig:Rt20cc}, we simulated data using the cyclic cubic regression (CC) basis and fitted the data using models with cyclic bases. This demonstrated that the cyclic bases were capable of fitting cyclic data. Notably, the CC basis, unlike the TS or CP bases, was effective in fitting non-cyclic data. Not shown, the GP basis is able to also fit to the cyclic data well, while the other non-cyclic basis do not.
+In Figures \ref{fig:incidence_agg_20gp}, \ref{fig:transmission_agg_20gp}, and \ref{fig:Rt20_agg_gp}, we present the predicted incidence, transmission rate, and effective reproduction number for models calibrated to the same simulated data as in Figures \ref{fig:incidence20gp}, \ref{fig:transmission20gp}, and \ref{fig:Rt20gp}. The difference is that after simulating the trajectory, we aggregated the predicted incidence on a weekly scale and fitted the model to this aggregated data. We observe the same phenomena of fitting across model granularity as in the unaggregated case. For \(k=10\), the uncertainty estimates for the BS and CR basis blow up at the end of the trajectory for the estimated transmission rate and effective reproduction number. The same phenomena in comparing models using AIC in Table \ref{tab:aic-table-sim-agg} is also observed.
+
+We performed cross model comparison by varying the smoothing basis used to simulate the data. We fitted to both the un-aggregated and aggregated data. The results are consistent across all smoothers, with the GP basis generally having the smallest uncertainty estimates and the lowest AIC score. In Appendix \ref{Appendix-results-agg} we present some additional results for data generated using a B-spline basis. In appendix \ref{Appendix-results} we present the results of data generated using the cyclic cubic regression (CC) basis and fitted the data using models with cyclic bases.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{figure/Simulated/simulation_gp(-2,2,1)_k(20)_k(8,15,20)_bsd2_beta2_plot_incidence.png}
-\caption[Predicted Simulated Data (GP) Incidence]{\textbf{Estimated Number of New Infections per day (Incidence) for data simulated using a Gaussian process (GP) regression smoother.} The first column is calibrated using \(k=8\) knots, the second with \(k=15\) knots, and the third with \(k=20\) knots. The red line represents the simulated trajectory with Gaussian noise. The blue line indicates the predicted incidence, with light and dark blue bands representing the 95\% and 50\% confidence intervals.}
+\includegraphics[width=\textwidth]{figure/Simulated/unaggregated/simulation_gp_20_k(5,10,20)_bsd1_beta1_plot_basis.png}
+\caption[Basis Functions for Smoothing Basis.]{\textbf{Basis functions for calibrating smoothers}. Basis matrices are obtained via mgcv::smoothCon() with number of knots \(k=20\) and domain of \(n=200\) days. Each basis matrix is determined only by the input domain and the number of knots. Each basis function is a single column of the basis matrix. The acronyms for the smoothers are defined as follows: "gp" = Gaussian process, "tp" = thin plate regression spline, "cr" = cubic regression spline and "bs" = B-spline. Not included in this figure are the acronyms "ps" = P-spline, "ts" = cyclic thin plate regression spline, "cc" = cyclic cubic regression spline, and "cp" = cyclic P-spline.}
+\label{fig:basis20gp}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{figure/Simulated/unaggregated/simulation_gp_20_k(5,10,20)_bsd1_beta1_plot_incidence.png}
+\caption[Predicted Simulated Data (GP) Incidence]{\textbf{Estimated Number of New Infections per day (Incidence) for data simulated using a Gaussian process (GP) regression smoother.} The columns are labelled according to the number of knots used to fit to the data. The red line represents the simulated trajectory with Gaussian noise. The blue line indicates the predicted incidence, with light and dark blue bands representing the 95\% and 50\% confidence intervals.}
 \label{fig:incidence20gp}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{figure/Simulated/simulation_gp(-2,2,1)_k(20)_k(8,15,20)_bsd2_beta2_plot_beta.png}
-\caption[Estimated Simulated Data (GP) Transmission Rate]{\textbf{Estimated transmission rate \(\beta\) per day for data simulated using a Gaussian process (GP) regression smoother.} The first column is calibrated using \(k=8\) knots, the second with \(k=15\) knots, and the third with \(k=20\) knots. The red line represents the true transmission rate function from the simulated data. The green line indicates the estimated transmission rate, with light and dark green bands representing the 95\% and 50\% confidence intervals.}
+\includegraphics[width=\textwidth]{figure/Simulated/unaggregated/simulation_gp_20_k(5,10,20)_bsd1_beta1_plot_beta.png}
+\caption[Estimated Simulated Data (GP) Transmission Rate]{\textbf{Estimated transmission rate \(\beta\) per day for data simulated using a Gaussian process (GP) regression smoother.} The columns are labelled according to the number of knots used to fit to the data. . The red line represents the true transmission rate function from the simulated data. The green line indicates the estimated transmission rate, with light and dark green bands representing the 95\% and 50\% confidence intervals.}
 \label{fig:transmission20gp}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{figure/Simulated/simulation_gp(-2,2,1)_k(20)_k(8,15,20)_bsd2_beta2_plot_R_t.png}
-\caption[Estimated Simulated Data (GP) Effective Reproduction Number]{\textbf{Estimated effective reproduction \(R_t\) per day for data simulated using a Gaussian process (GP) regression smoother.} The first column is calibrated using \(k=8\) knots, the second with \(k=15\) knots, and the third with \(k=20\) knots. The black line represents the reproduction number from the simulated data. The purple line indicates the estimated reproduction number, with light and dark purple bands representing the 95\% and 50\% confidence intervals.}
+\includegraphics[width=\textwidth]{figure/Simulated/unaggregated/simulation_gp_20_k(5,10,20)_bsd1_beta1_plot_R_t.png}
+\caption[Estimated Simulated Data (GP) Effective Reproduction Number]{\textbf{Estimated effective reproduction \(R_t\) per day for data simulated using a Gaussian process (GP) regression smoother.} The columns are labelled according to the number of knots used to fit to the data. The black line represents the reproduction number from the simulated data. The purple line indicates the estimated reproduction number, with light and dark purple bands representing the 95\% and 50\% confidence intervals.}
 \label{fig:Rt20gp}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{figure/Simulated/aggregated/simulation_agg_gp_20_k(5,10,20)_bsd1_beta1_plot_incidence.png}
+\caption[Predicted Simulated and Aggregated Data (GP) Incidence]{\textbf{Estimated Number of New Infections per day (Incidence) for aggregated data simulated using a Gaussian process (GP) regression smoother.} The columns are labelled according to the number of knots used to fit to the data. The red line represents the simulated trajectory with Gaussian noise. The blue line indicates the predicted incidence, with light and dark blue bands representing the 95\% and 50\% confidence intervals.}
+\label{fig:incidence_agg_20gp}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{figure/Simulated/aggregated/simulation_agg_gp_20_k(5,10,20)_bsd1_beta1_plot_beta.png}
+\caption[Estimated Simulated and Aggregated Data (GP) Transmission Rate]{\textbf{Estimated transmission rate \(\beta\) per day for aggregated data simulated using a Gaussian process (GP) regression smoother.} The columns are labelled according to the number of knots used to fit to the data. The red line represents the true transmission rate function from the simulated data. The green line indicates the estimated transmission rate, with light and dark green bands representing the 95\% and 50\% confidence intervals.}
+\label{fig:transmission_agg_20gp}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{figure/Simulated/aggregated/simulation_agg_gp_20_k(5,10,20)_bsd1_beta1_plot_R_t.png}
+\caption[Estimated Simulated and Aggregated Data (GP) Effective Reproduction Number]{\textbf{Estimated effective reproduction \(R_t\) per day for aggregated data simulated using a Gaussian process (GP) regression smoother.} The columns are labelled according to the number of knots used to fit to the data. The black line represents the reproduction number from the simulated data. The purple line indicates the estimated reproduction number, with light and dark purple bands representing the 95\% and 50\% confidence intervals.}
+\label{fig:Rt20_agg_gp}
 \end{figure}
 
 \begin{table}[!h]
@@ -1362,30 +1387,50 @@ In the appendix, Figures \ref{fig:incidence20cc}, \ref{fig:transmission20cc}, an
 \cmidrule(l{3pt}r{3pt}){2-4}
 Smooth Type & k = 8 & k = 15 & k = 20\\
 \midrule
-gp & -14.96674 & -14.86925 & -14.74068\\
-tp & -12.95091 & -12.81223 & -12.60562\\
-cr & -12.25615 & -9.445058 & -7.025796\\
-bs & -12.28378 & -10.16051 & -6.892706\\
+gp & -14.93302 & -14.89308 & -14.78105\\
+tp & -12.96236 & -12.85809 & -12.64009\\
+cr & -12.82997 & -10.42685 & -5.250867\\
+bs & -12.60004 & -10.60162 & -5.598548\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[!h]
+\centering
+\caption{\label{tab:aic-table-sim-agg}\textbf{Conditional AIC Scores of calibrating models with varying model granularity, fitted to aggregated data simulated using a GP smoother with \(k=20\) knots.} The degrees of freedom are defined as the model degrees of freedom, which is computed as the trace of penalized smoothing matrix.}
+\centering
+\begin{tabular}[t]{llll}
+\toprule
+\multicolumn{1}{c}{ } & \multicolumn{3}{c}{Knots} \\
+\cmidrule(l{3pt}r{3pt}){2-4}
+Smooth Type & k = 8 & k = 15 & k = 20\\
+\midrule
+gp & -11.4694 & -11.36178 & -10.83139\\
+tp & -9.500022 & -9.121774 & -7.58319\\
+cr & -9.399277 & -7.211729 & -2.299669\\
+bs & -8.851101 & -7.432424 & -2.553817\\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \section{Scarlet Fever in Ontario 1929-1931}\label{scarlet}
 
-This example showcases the varying efficacy of the smoother bases from \texttt{mgcv}. We consider an outbreak of scarlet fever in Ontario from 1929 to 1930. The dataset comes from the International Infectious Disease Data Archives (iidda) {[}20{]}.
+We consider an epidemic of scarlet fever in Ontario from 1929 to 1930. The dataset comes from the International Infectious Disease Data Archives (iidda) {[}20{]}.
 
-The calibration model is constructed using the basic SIR model, with a starting recovery rate of \(\gamma = 1/7\).
+The calibration model is constructed using the basic SIR model, with an initial recovery rate of \(\gamma = 1/7\).
 
 We present the results of the best models using the Ornstein-Uhlenbeck (OU), thin plate regression spline (TPRS), cubic regression spline (CR), and cyclic cubic regression spline (CC) bases for the linear smoother component. The other bases, as in Figure \ref{fig:basis20gp}, did not perform well enough to be included; their incidence predictions were inaccurate, leading to inflated uncertainty estimates of the transmission rate, or the optimization did not converge.
 
-In Figures \ref{fig:scarlet_inc}, \ref{fig:scarlet_trans}, and \ref{fig:scarlet_rt}, we show the predicted incidence, transmission rate, and effective reproduction number for the best models. We varied the model granularity by increasing the number of knots. The third column of all three figures, where the number of knots \(k=10\), shows overfitting, introducing unnecessary inflection points into the estimates. The leftmost column, calibrated with \(k=5\) knots, shows a smooth, simple fit to the data and estimates.
+In Figures \ref{fig:scarlet_inc}, \ref{fig:scarlet_trans}, and \ref{fig:scarlet_rt}, we show the predicted incidence, transmission rate, and effective reproduction number for the best models. We varied the model granularity by increasing the number of knots. The third column of all three figures, where the number of knots \(k=9\), shows overfitting, introducing unnecessary inflection points into the estimates. The leftmost column, calibrated with \(k=5\) knots, shows a smooth, simple fit to the data and estimates. The maximum height of \(\beta\) and \(R_t\) increase as the number of knots increase.
 
 As model granularity increases, the TPRS and CR bases perform poorly, indicated by the apparent width of the uncertainty estimates compared to the GP and CC bases. This is reflected in the conditional AIC scores of the nine models in Table \ref{tab:aic-table-scarlet}. Notice that the AIC score for the GP basis increases very little as model granularity increases. In contrast, the CC, TPRS, and CR bases show a significant increase in AIC score with higher model granularity. This behavior, observed in the simulation study, leads to the hypothesis that the GP prior, of which the OU basis is a special case, is generally the most robust of the univariate smoothing bases available in the \texttt{mgcv} package for this type of model.
 
+The shape of the estimated transmission rate and reproduction number vary across the smoothing basis for this example. The GP and CC basis have a positive slope as the degree of transmission reaches its maximum, whereas the TP and CR basis start at or very near the maximum.
+
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth, height = \textwidth]{figure/Scarlet/Scarlet_plot_gp(-2,2,1)_k(5,8,10)_gamma(014)_I0(100)_plot_incidence.png}
-\caption[Predicted Scarlet Fever Incidence (1929-1930)]{\textbf{Predicted incidence for weekly observed scarlet fever cases in Ontario, from 1929 to 1930.} The linear smoother component of the semi-mechanistic compartmental model has model granularity increasing from right to left \(k= 5,8,10\).
+\includegraphics[width=\textwidth, height = \textwidth]{figure/Scarlet/Scarlet_agg_k(5,8,10)_bsd1_beta1_gamma7_sd01_plot_incidence.png}
+\caption[Predicted Scarlet Fever Incidence (1929-1930)]{\textbf{Predicted incidence for weekly observed scarlet fever cases in Ontario, from 1929 to 1930.} The linear smoother component of the semi-mechanistic compartmental model has model granularity increasing from right to left \(k= 5,6,9\).
 The covariance function of the GP basis uses a power exponential kernel, with power parameter \(\kappa = 1\) and range parameter \(\ell = 2\).
 The figures display 95\% and 50\% confidence intervals.}
 \label{fig:scarlet_inc}
@@ -1393,15 +1438,15 @@ The figures display 95\% and 50\% confidence intervals.}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth, height = \textwidth]{figure/Scarlet/Scarlet_plot_gp(-2,2,1)_k(5,8,10)_gamma(014)_I0(100)_plot_beta.png}
-\caption[Estimated Scarlet Fever Transmission Rate (1929-1930)]{\textbf{Estimated transmission rate for weekly observed scarlet fever cases in Ontario, from 1929 to 1930.} The linear smoother component of the semi-mechanistic compartmental model has model granularity increasing from right to left \(k= 5,8,10\). The covariance function of the GP basis uses a power exponential kernel, with power parameter \(\kappa = 1\) and range parameter \(\ell = 2\). The figures display 95\% and 50\% confidence intervals.}
+\includegraphics[width=\textwidth, height = \textwidth]{figure/Scarlet/Scarlet_agg_k(5,8,10)_bsd1_beta1_gamma7_sd01_plot_beta.png}
+\caption[Estimated Scarlet Fever Transmission Rate (1929-1930)]{\textbf{Estimated transmission rate for weekly observed scarlet fever cases in Ontario, from 1929 to 1930.} The linear smoother component of the semi-mechanistic compartmental model has model granularity increasing from right to left \(k= 5,6,9\). The covariance function of the GP basis uses a power exponential kernel, with power parameter \(\kappa = 1\) and range parameter \(\ell = 2\). The figures display 95\% and 50\% confidence intervals.}
 \label{fig:scarlet_trans}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth, height = \textwidth]{figure/Scarlet/Scarlet_plot_gp(-2,2,1)_k(5,8,10)_gamma(014)_I0(100)_plot_R_t.png}
-\caption[Estimated Scarlet Fever Effective Reproduction Number (1929-1930)]{\textbf{Estimated effective reproduction number for weekly observed scarlet cases in Ontario, from 1929 to 1930.} The linear smoother component of the semi-mechanistic compartmental model has model granularity increasing from right to left \(k= 5,8,10\). The covariance function of the GP basis uses a power exponential kernel, with power parameter \(\kappa = 1\) and range parameter \(\ell = 2\). The figures display 95\% and 50\% confidence intervals.}
+\includegraphics[width=\textwidth, height = \textwidth]{figure/Scarlet/Scarlet_agg_k(5,8,10)_bsd1_beta1_gamma7_sd01_plot_R_t.png}
+\caption[Estimated Scarlet Fever Effective Reproduction Number (1929-1930)]{\textbf{Estimated effective reproduction number for weekly observed scarlet cases in Ontario, from 1929 to 1930.} The linear smoother component of the semi-mechanistic compartmental model has model granularity increasing from right to left \(k= 5,6,9\). The covariance function of the GP basis uses a power exponential kernel, with power parameter \(\kappa = 1\) and range parameter \(\ell = 2\). The figures display 95\% and 50\% confidence intervals.}
 \label{fig:scarlet_rt}
 \end{figure}
 
@@ -1413,12 +1458,12 @@ The figures display 95\% and 50\% confidence intervals.}
 \toprule
 \multicolumn{1}{c}{ } & \multicolumn{3}{c}{Knots} \\
 \cmidrule(l{3pt}r{3pt}){2-4}
-Smooth Type & k = 5 & k = 8 & k = 10\\
+Smooth Type & k = 6 & k = 8 & k = 9\\
 \midrule
-gp & -12.75613 & -12.69357 & -12.66127\\
-tp & -10.8087 & -10.65266 & -10.56183\\
-cr & -10.74505 & -9.142717 & -7.634613\\
-cc & -12.84522 & -11.9573 & -10.65248\\
+gp & -12.79458 & -12.77155 & -12.6805\\
+tp & -10.79134 & -10.75523 & -10.58854\\
+cr & -10.69813 & -10.39427 & -8.444944\\
+cc & -12.96922 & -12.75434 & -11.47424\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1427,23 +1472,23 @@ cc & -12.84522 & -11.9573 & -10.65248\\
 
 Next, we fit to observations of the daily number of COVID-19 cases in Ireland from the onset of the outbreak, spanning February 20, 2020, to May 9, 2020. This data is sourced from the publication by Andrade and Duggan {[}21{]}.
 
-The calibration model is constructed using the basic SIR model, with an initial recovery rate of \(\gamma = 1/14\).
+Andrade and Duggan (2022) used COVID-19 data to infer the effective reproduction number by employing an SEIR model with three different data-generating processes for the transmission rate. One of the processes they used was Geometric Brownian Motion (GBM). GBM is similar to the Ornstein-Uhlenbeck (OU) process that we used, but it is non-stationary, non-mean-reverting, and the response is log-normally distributed. In our thesis, we implemented the OU process as a special case of a Gaussian Process (GP) with an exponential covariance function, which differs from defining an OU process as a stochastic differential equation (SDE). By viewing the OU process as a GP, we focus on the joint distribution of values at different times, characterized by the mean and covariance functions. These functions describe the decay rate of the covariance and the process variance, respectively, emphasizing the correlation structure. Computationally, this approach allows us to use linear algebra, while the SDE formulation involves solving differential equations. Andrade and Duggan define the transmission rate using GBM formulated as an SDE. They also assume that the response, the incidence data, follows Poisson and Negative Binomial distributions. Additionally, they use Apple mobility data to adjust the transmission rate by assuming that the effect of social distancing is correlated with the transmission rate.
+
+We compared our results, using the OU process basis for our linear smoother, with those of Andrade and Duggan. They aggregated their incidence data to a weekly scale to account for irregularities in daily reporting. We implemented this by computing the trajectory on a daily scale, aggregating the predicted incidence to a weekly scale, and then fitting the model to the weekly aggregated observed data. Then the daily trajectory of the transmission rate and reproduction number estimates are averaged over each week.
+
+The calibration model is constructed using the basic SIR model, with an initial recovery rate of \(\gamma = 1/6\), which is obtained from the results of Park et al {[}22{]}.
 
 Figures \ref{fig:ireland_inc}, \ref{fig:ireland_trans}, and \ref{fig:ireland_rt} present the results of the best models, which utilize the GP, CC, TPRS and CR basis functions. The BS and PS basis functions exhibited very large uncertainty estimates, while the CP and TS basis functions showed both larger uncertainty estimates and lower conditional AIC scores than the CC basis. We chose not to include the latter basis. To illustrate again the concept of overfitting, model granularity is varied.
 
 All basis displayed excellent fit to the observed data with appropriately sized uncertainty estimates.
 
-Table \ref{tab:aic-table-ireland} provides the conditional AIC scores. The CC and GP smoothers perform the best, although the AIC score for the GP basis does not increase as dramatically as for the CC basis. The TP basis demonstrates resilience to overfitting as model granularity increases but still maintains a higher AIC score compared to the GP and CC bases. The CR basis performs the worst.
+Table \ref{tab:aic-table-ireland} provides the conditional AIC scores. The CC and GP smoother perform the best, although the AIC score for the GP basis does not increase as dramatically as for the CC basis. The TP basis demonstrates resilience to overfitting as model granularity increases but still maintains a higher AIC score compared to the GP and CC bases. The CR basis shows the worst performance with regard to this metric.
 
 Notably, there is a difference in the functional shape of the transmission rate for the CC and GP bases versus the CR and TP bases. The former display a near-zero transmission rate at time zero with a sharp peak and large amplitude. In contrast, the latter have an estimated transmission rate of approximately \(0.2\) at time zero and a more rounded peak with a smaller amplitude. Additionally, the uncertainty bounds are much larger at the beginning of the curve for the CR and TP bases, even with appropriate model granularity (\(k=5\)). The uncertainty estimates for the CR and TP bases increase significantly near the origin as model granularity rises. Although the GP basis also shows this trend, it is not as pronounced as for the CP and TP bases. Surprisingly, despite the CC basis displaying overfitting (as indicated by the AIC score) when model granularity increases, it visually retains the tightest uncertainty estimates among all the smoothers. This behavior is also observed in the estimates for the effective reproduction number.
 
 The model's sensitivity to changes in the starting value of \(\gamma\) (ranging from 7 to 14 days) does not alter the shape of the functional form of \(\beta\), but it changes the amplitude of the peak, leading to an increase in \(R_t\). Increasing the variance of the log-normal prior on \(\gamma\) causes the model to tend to select a larger \(\gamma\). However, this also results in a dramatic increase in uncertainty estimates. We observed that when the starting value of \(\gamma\) is lowered and the variance of the log-normal prior is increased simultaneously, the model still predicts larger values of \(\gamma\).
 
-Andrade and Duggan (2022) used COVID-19 data to infer the effective reproduction number by employing an SEIR model with three different data-generating processes for the transmission rate. One of the processes they used was Geometric Brownian Motion (GBM). GBM is similar to the Ornstein-Uhlenbeck (OU) process that we used, but it is non-stationary, non-mean-reverting, and the response is log-normally distributed. In our thesis, we implemented the OU process as a special case of a Gaussian Process (GP) with an exponential covariance function, which differs from defining an OU process as a stochastic differential equation (SDE). By viewing the OU process as a GP, we focus on the joint distribution of values at different times, characterized by the mean and covariance functions. These functions describe the decay rate of the covariance and the process variance, respectively, emphasizing the correlation structure. Computationally, this approach allows us to use linear algebra, while the SDE formulation involves solving differential equations. Andrade and Duggan define the transmission rate using GBM formulated as an SDE. They also assume that the response, the incidence data, follows Poisson and Negative Binomial distributions. Additionally, they use Apple mobility data to adjust the transmission rate by assuming that the effect of social distancing is correlated with the transmission rate.
-
-We compared our results, using the OU process basis for our linear smoother, with those of Andrade and Duggan. They aggregated their incidence data to a weekly scale to account for irregularities in daily reporting. We implemented this by computing the trajectory on a daily scale, aggregating the predicted incidence to a weekly scale, and then fitting the model to the weekly aggregated observed data. The shape of the inferred transmission rate and effective reproduction number were as expected, but the magnitude was lower than anticipated. We hypothesize that this is due to the use of too large Euler steps, on the order of one week. Therefore, we can only compare the results of our fit using daily observations to their fit using the aggregated weekly data.
-
-In Figure \ref{fig:ireland_inc}, the predicted incidence fits the data well, with very reasonable uncertainty bounds, and the shape is very similar to Andrade and Duggan's results. In Figure \ref{fig:ireland_trans}, we present the estimated transmission rates. Andrade and Duggan did not include the rates at time zero in their plots, but we have. Ignoring the first week in our plots, both results show approximately the same shape, an exponential decay. The magnitude of the transmission rate is about twice as large for Andrade and Duggan. This could be attributed to their use of an SEIR model, which partitions the susceptible population by those exposed to the disease, informed by the mobility data. The difference could be explained by the fact that the disease would need to be more infectious to infect the same number of people in a portion of the total susceptible population. Our SIR model does not make any such assumptions. The estimated effective reproduction number, which is the transmission rate scaled by the recovery rate and the proportion of susceptibles at any time \(t\), also shows a similar pattern. Although Andrade and Duggan compute an analytical expression for the basic reproduction number and we compute ours as the transmission rate scaled by the recovery rate, we both scale the basic reproduction number by the ratio \(\frac{S_t}{N_t}\) to obtain the effective reproduction number. Most notably, in Figure \ref{fig:ireland_rt}, we observe that the estimated effective reproduction number has not only the same shape as Andrade and Duggan's but also a similar shape and magnitude. The uncertainty estimates are tighter in our model, but our model is simpler.
+In Figure \ref{fig:ireland_inc}, the predicted incidence fits the data well, with very reasonable uncertainty bounds, and the shape is very similar to Andrade and Duggan's results. In Figure \ref{fig:ireland_trans}, we present the estimated transmission rates. Andrade and Duggan did not include the rates at time zero in their plots, but we have. Ignoring the first week in our plots, both results show approximately the same shape, an exponential decay. The magnitude of the transmission rate is about twice as large for Andrade and Duggan compared to our results. This could be attributed to their use of an SEIR model, which partitions the susceptible population by those exposed to the disease, informed by the mobility data. The difference could be explained by the fact that the disease would need to be more infectious to infect the same number of people in a portion of the total susceptible population. Our SIR model does not make any such assumptions. The estimated effective reproduction number, which is the transmission rate scaled by the recovery rate and the proportion of susceptibles at any time \(t\), also shows a similar pattern. Although Andrade and Duggan compute an analytical expression for the basic reproduction number and we compute ours as the transmission rate scaled by the recovery rate, we both scale the basic reproduction number by the ratio \(\frac{S_t}{N_t}\) to obtain the effective reproduction number. Most notably, in Figure \ref{fig:ireland_rt}, we observe that the estimated effective reproduction number has not only the same shape as Andrade and Duggan's but also a similar magnitude. The uncertainty estimates are tighter in our model, but our model is simpler.
 
 \begin{table}[!h]
 \centering
@@ -1455,40 +1500,40 @@ In Figure \ref{fig:ireland_inc}, the predicted incidence fits the data well, wit
 \cmidrule(l{3pt}r{3pt}){2-4}
 Smooth Type & k = 5 & k =6 & k = 7\\
 \midrule
-gp & -12.38633 & -12.3596 & -12.36127\\
-cc & -12.39882 & -12.27432 & -11.83989\\
-cr & -10.10928 & -9.864844 & -8.977689\\
-tp & -10.39501 & -10.34895 & -10.31064\\
+gp & -8.991943 & -8.845703 & -8.813426\\
+tp & -7.092172 & -6.854317 & -6.573223\\
+cr & -6.833125 & -6.531813 & -5.580974\\
+cc & -9.063395 & -8.819184 & -8.013571\\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth, height = \textwidth]{figure/Ireland/Ireland_plot_gp(-3,5)_k(5,6,7)_gamma(014)_I0(10)_plot_incidence.png}
-\caption[Predicted Covid-19 Incidence (2020)]{\textbf{Predicted incidence for weekly observed measles cases in Ireland 2020.} The linear smoother component of the semi-mechanistic compartmental model has model granularity increasing from right to left \(k= 5,6,7\). The covariance function of the GP basis uses an exponential kernel function, with exponent parameter \(\kappa = 1\) and range parameter \(\ell = 2\). The figures display 95\% and 50\% confidence intervals.}
+\includegraphics[width=\textwidth, height = \textwidth]{figure/Ireland/Ireland_agg_k(5,6,7)_bsd1_beta1_gamma6_sd01_plot_incidence.png}
+\caption[Predicted Covid-19 Incidence (2020)]{\textbf{Predicted incidence for weekly observed Covid-19 cases in Ireland 2020.} The linear smoother component of the semi-mechanistic compartmental model has model granularity increasing from right to left \(k= 5,6,7\). The covariance function of the GP basis uses an exponential kernel function, with exponent parameter \(\kappa = 1\) and range parameter \(\ell = 2\). The figures display 95\% and 50\% confidence intervals.}
 \label{fig:ireland_inc}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth, height = \textwidth]{figure/Ireland/Ireland_plot_gp(-3,5)_k(5,6,7)_gamma(014)_I0(10)_plot_beta.png}
-\caption[Estimated Covid-19 Transmission Rate (2020)]{\textbf{Estimated transmission rate for weekly observed measles cases in Ireland 2020.} The linear smoother component of the semi-mechanistic compartmental model has model granularity increasing from right to left \(k= 5,6,7\). The covariance function of the GP basis uses an exponential kernel function, with exponent parameter \(\kappa = 1\) and range parameter \(\ell = 2\). The figures display 95\% and 50\% confidence intervals.}
-\label{fig:ireland_trans}
+\includegraphics[width=\textwidth, height = \textwidth]{figure/Ireland/Ireland_agg_k(5,6,7)_bsd1_beta1_gamma6_sd01_plot_beta.png}
+\caption[Estimated Covid-19 Transmission Rate (2020)]{\textbf{Estimated transmission rate for weekly observed Covid-19 cases in Ireland 2020.} The linear smoother component of the semi-mechanistic compartmental model has model granularity increasing from right to left \(k= 5,6,7\). The covariance function of the GP basis uses an exponential kernel function, with exponent parameter \(\kappa = 1\) and range parameter \(\ell = 2\). The figures display 95\% and 50\% confidence intervals.}
+\label{fig:ireland_trans}r
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth, height = \textwidth]{figure/Ireland/Ireland_plot_gp(-3,5)_k(5,6,7)_gamma(014)_I0(10)_plot_R_t.png}
-\caption[Estimated Covid-19 Effective Reproduction Number (2020)]{\textbf{Estimated effective reproduction number for weekly observed measles cases in Ireland 2020.} The linear smoother component of the semi-mechanistic compartmental model has model granularity increasing from right to left \(k= 5,6,7\). The covariance function of the GP basis uses an exponential kernel function, with exponent parameter \(\kappa = 1\) and range parameter \(\ell = 2\). The figures display 95\% and 50\% confidence intervals.}
+\includegraphics[width=\textwidth, height = \textwidth]{figure/Ireland/Ireland_agg_k(5,6,7)_bsd1_beta1_gamma6_sd01_plot_R_t.png}
+\caption[Estimated Covid-19 Effective Reproduction Number (2020)]{\textbf{Estimated effective reproduction number for weekly observed Covid-19 cases in Ireland 2020.} The linear smoother component of the semi-mechanistic compartmental model has model granularity increasing from right to left \(k= 5,6,7\). The covariance function of the GP basis uses an exponential kernel function, with exponent parameter \(\kappa = 1\) and range parameter \(\ell = 2\). The figures display 95\% and 50\% confidence intervals.}
 \label{fig:ireland_rt}
 \end{figure}
 
 \section{Measles London UK 1944-1984}\label{Measles}
 
-We now present a more challenging problem than the previous examples. We consider weekly observed measles cases in London, UK, from 1944 to 1984. This dataset was first utilized in a publication by David Earn et al. {[}22{]}.
+We now present a more challenging problem than the previous examples. We consider weekly observed measles cases in London, UK, from 1944 to 1984. This dataset was first utilized in a publication by David Earn et al. {[}23{]}.
 
-The calibration model is constructed using the basic SIR model. The starting value for the recovery rate is \(\gamma = 1/8\), aligning with the initial value used in {[}22{]}. A key assumption we make is that the total population remains constant over time. This is due to the nature of the SIR model, which does not account for a time-varying total population component. We fixed the total population to \(N = 8,000,000\), which approximates the population of London at the start of this dataset, and then rounded down. This assumption is reasonable, as the population of London has fluctuated between six and ten million from then until the present day. However, since the disease predominantly affects children, a more sophisticated model could include a time-varying total population component, partitioned according to age and weighted by the incidence rate per age demographic. We initialize the number of infected individuals at \(I_0 = 250\).
+The calibration model is constructed using the basic SIR model. The starting value for the recovery rate is \(\gamma = 1/8\), aligning with the initial value used in {[}23{]}. A key assumption we make is that the total population remains constant over time. This is due to the nature of the SIR model, which does not account for a time-varying total population component. We fixed the total population to \(N = 8,000,000\), which approximates the population of London at the start of this dataset, and then rounded down. This assumption is reasonable, as the population of London has fluctuated between six and ten million from then until the present day. However, since the disease predominantly affects children, a more sophisticated model could include a time-varying total population component, partitioned according to age and weighted by the incidence rate per age demographic. We initialize the number of infected individuals at \(I_0 = 250\).
 
 The full dataset extends to 1984, but we had difficulty tuning the model to fit the last decade. During this period, the observed incidence was relatively flat compared to the previous years. We observed that the calibrated model inflated the predicted transmission rate to unreasonable levels. By truncating the last decade, reducing the observations from 2,660 to 2,140, we were able to calibrate the model more effectively.
 
@@ -1508,14 +1553,14 @@ To improve the alignment of our results with empirical findings, future work sho
 
 \begin{figure}
 \centering
-\includegraphics[width=\textwidth, height = \textwidth]{figure/Measles_combined_plot.png}
+\includegraphics[width=\textwidth, height = \textwidth]{figure/Measles/Measles_combined_plot.png}
 \caption[Predicted Measles Incidence and Estimated Transmission Rate and Effective Reproduction Number (1944-1984)]{\textbf{Predicted incidence and estimated transmission rate and effective reproduction number for weekly observed measles cases in London, UK, from 1944 to 1984 using a Gaussian Process smoother.} The linear smoother component of the semi-mechanistic compartmental model employs an Ornstein-Uhlenbeck (OU) process with a range parameter \(\ell = 20\) and \(k = 100\) knots. The model estimates a recovery rate of approximately \(\gamma = 11.84\) days and an initial number of infected individuals of approximately \(I_0 = 250\). The figures display 95\% and 50\% confidence intervals.}
 \label{fig:Measles_trans}
 \end{figure}
 
 \begin{figure}
 \centering
-\includegraphics[width=\textwidth, height = 0.5\textwidth]{figure/MeaslesCoefficentsPlot.png}
+\includegraphics[width=\textwidth, height = 0.5\textwidth]{figure/Measles/MeaslesCoefficentsPlot.png}
 \caption[Coefficients Plot Measles (1944-1984)]{\textbf{Coefficients plot of the optimized parameters (log-transformed) for the model with a GP basis calibrated to the UK London Measles (1944-1984) dataset.} Uncertainty estimates are obtained as the wald confidence intervals computed using the Delta method.}
 \label{fig:Measles_coefs}
 \end{figure}
@@ -1542,7 +1587,7 @@ The effective degrees of the calibrated models are computed as the model degrees
 \tau = \text{tr}2\mathbb{E}\left[\frac{1}{2} (\hat{\beta} - \beta_K)^T \mathbf{ \mathcal{I}}_K (\hat{\beta} - \beta_K)\right] = \text{tr}  \mathbb{E}[\chi^2_p] = p,
 \]
 
-where \(\beta_K\) is the coefficient vector minimizing the K-L divergence and \(\mathbf{ \mathcal{I}}_K\) is the expected negative Hessian of the log likelihood. In {[}23{]}, Wood et al defines the corrected AIC as
+where \(\beta_K\) is the coefficient vector minimizing the K-L divergence and \(\mathbf{ \mathcal{I}}_K\) is the expected negative Hessian of the log likelihood. In {[}24{]}, Wood et al defines the corrected AIC as
 
 \[
 \tau_2 = \text{tr}(\mathbf{V}'_{\beta}\hat{\mathbf{ \mathcal{I}}}),
@@ -1556,7 +1601,7 @@ where \(\mathbf{V}'\) is an approximation of the covariance matrix of the Bayesi
 
 and \(\mathbf{V}_{\beta} = (\hat{\mathbf{\mathcal{I}}} + \mathbf{P})^{-1}\). \(\hat{\mathbf{ \mathcal{I}}}\) is the is the Hessian of the negative log likelihood at \(\mathbf{ \mathcal{I}}_K\). The goal is to calculate a first-order adjustment to the posterior distribution of the model coefficients, taking into account the uncertainty in the smoothing parameter. After that, the penalty term in the AIC is represented using the Bayesian covariance matrix of the coefficients.
 
-It would be informative, in future work, to compute the corrected AIC for the best fitting models and reevaluate the performance of the smoothing basis. For more complex compartmental models this might be essential as the conditional AIC with the model degrees of freedom is too likely to select a model which includes a random effect that is not present in the true model {[}24{]}.
+It would be informative, in future work, to compute the corrected AIC for the best fitting models and reevaluate the performance of the smoothing basis. For more complex compartmental models this might be essential as the conditional AIC with the model degrees of freedom is too likely to select a model which includes a random effect that is not present in the true model {[}25{]}.
 
 The SIR and SIRS compartmental models we used in this work are very basic compartmental models. Theoretically, a compartmental model can be as complex as the modeler wishes, but in practice, certain assumptions are made to make the fitting process tractable. The models we used are essentially toy examples that allow for a proof of concept of the efficacy of the methodology presented in this thesis.
 
@@ -1566,11 +1611,11 @@ Despite their simplicity, our models effectively demonstrate the potential of th
 
 In compartmental models for infectious disease, the response is often assumed to follow a Poisson distribution. This is because the Poisson distribution is well-suited for modeling count data, such as the number of new infection cases within a given time period. However, if the data exhibit overdispersion (i.e., the variance exceeds the mean), a negative binomial distribution might be used instead.
 
-The objective function, as presented in Equation \ref{eq:obj eqn}, assumes that both the observations and the smoothing coefficients are normally distributed. Consequently, when fitting the model to the data, we are essentially performing univariate Gaussian regression with respect to the underlying linear smoother. This assumption simplifies the model for the purpose of demonstrating methodological efficacy. An extension of this approach would be to assume that the observations and the smoothing coefficients follow distributions from the exponential family, such as Poisson or negative binomial distributions. Gu {[}25{]} describes how to construct the likelihood and penalty functionals for implementing penalized likelihood regression with non-Gaussian responses.
+The objective function, as presented in Equation \ref{eq:obj eqn}, assumes that both the observations and the smoothing coefficients are normally distributed. Consequently, when fitting the model to the data, we are essentially performing univariate Gaussian regression with respect to the underlying linear smoother. This assumption simplifies the model for the purpose of demonstrating methodological efficacy. An extension of this approach would be to assume that the observations and the smoothing coefficients follow distributions from the exponential family, such as Poisson or negative binomial distributions. Gu {[}26{]} describes how to construct the likelihood and penalty functionals for implementing penalized likelihood regression with non-Gaussian responses.
 
 Assuming the unknown function is linear, as done in this thesis (when the smoother parameter is fixed for each iteration), is a step towards constructing more complex forms of the unknown function. If the modeler wishes to incorporate biological information about the transmission process into the model, they might impose qualitative conditions on the unknown function. For instance, if the unknown function is assumed to be logistic, the modeler can impose specific conditions of non-linearity and boundedness. Extending this methodology to include unknown functional forms other than linear allows the literature to guide the shape of the fitted unknown function by applying qualitative constraints to the smoothing functional.
 
-In summary, what we have accomplished here is the proof of concept for the ability to estimate time varying unknown functions in deterministic compartmental models. There are many possible avenues of extension, some which we have discussed above. More generally this thesis suggests that it should be possible to be able to adapt this methodology to be used within any optimization framework that fits mixed models by using the theory of the duality of smooths and random effects, to rewrite the smoothing basis as random effects matrices, as we discussed in subsection \ref{The-duality-of-smooths-and-random-effects}. Another avenue of research is to estimate more than one unknown function. All of the methods here are easily extensible to fitting models to data with more than one unknown function, with their own smoothing parameter. Wood {[}26{]} and Gu {[}25{]} describe how to formulate models with more than one smoothing parameter.
+In summary, what we have accomplished here is the proof of concept for the ability to estimate time varying unknown functions in deterministic compartmental models. There are many possible avenues of extension, some which we have discussed above. More generally this thesis suggests that it should be possible to be able to adapt this methodology to be used within any optimization framework that fits mixed models by using the theory of the duality of smooths and random effects, to rewrite the smoothing basis as random effects matrices, as we discussed in subsection \ref{The-duality-of-smooths-and-random-effects}. Another avenue of research is to estimate more than one unknown function. All of the methods here are easily extensible to fitting models to data with more than one unknown function, with their own smoothing parameter. Wood {[}27{]} and Gu {[}26{]} describe how to formulate models with more than one smoothing parameter.
 
 \appendix
 
@@ -1956,7 +2001,9 @@ Scaling the above equation by a factor of 2, the Akaike Information Criterion (A
 \label{eq:AIC}
 \end{equation}
 
-\chapter{SIRS model with simualted data (cylic basis)}\label{Appendix-results}
+\chapter{Additional Simulation Results}\label{Appendix-results}
+
+\section{SIRS model with cylic basis}\label{Appendix-results-sim}
 
 Figures \ref{fig:incidence20cc}, \ref{fig:transmission20cc} and \ref{fig:Rt20cc} show the results of the predicted incidence, transmission rate, and effective reproduction number for data simulated using a cyclic cubic (CC) regression smoother with varying numbers of knots (\(k = 8, 15, 20\)), from left to right. The variance \(b_{sd}\) in the Gaussian coefficients used to generate the simulation model and calibrating models are fixed at \(b\_sd = 2\). \(\gamma\) and \(\phi\) are fixed at \(\frac{1}{14}\) and \(10^{-3}\) respectively.
 
@@ -1992,6 +2039,86 @@ The SIRS model is used for the simulation, with compartment values initialized a
 \caption[Estimated Simulated Data (CC) Effective Reproduction Number]{\textbf{Estimated effective reproduction number for data simulated using a cyclic cubic (CC) regression smoother with varying numbers of knots (\(k = 8, 15, 20\)).} The plots show the predicted effective reproduction number fitted to data simulated from a SIRS model.}
 \label{fig:Rt20cc}
 \end{figure}
+
+\section{Comparison of SIRS model using B-Spline (BS) basis unaggregated and aggregated data}\label{Appendix-results-agg}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{figure/Simulated/unaggregated/simulation_bs_20_k(5,10,20)_bsd1_beta1_plot_incidence.png}
+\caption[Predicted Simulated Data (BS) Incidence]{\textbf{Estimated Number of New Infections per day (Incidence) for data simulated using a B-Spline (BS) basis.} The columns are labelled according to the number of knots used to fit to the data. The red line represents the simulated trajectory with Gaussian noise. The blue line indicates the predicted incidence, with light and dark blue bands representing the 95\% and 50\% confidence intervals.}
+\label{fig:incidence20bs}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{figure/Simulated/unaggregated/simulation_bs_20_k(5,10,20)_bsd1_beta1_plot_beta.png}
+\caption[Estimated Simulated Data (BS) Transmission Rate]{\textbf{Estimated transmission rate \(\beta\) per day for data simulated using a B-Spline (BS) basis.} The columns are labelled according to the number of knots used to fit to the data. . The red line represents the true transmission rate function from the simulated data. The green line indicates the estimated transmission rate, with light and dark green bands representing the 95\% and 50\% confidence intervals.}
+\label{fig:transmission20bs}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{figure/Simulated/unaggregated/simulation_bs_20_k(5,10,20)_bsd1_beta1_plot_R_t.png}
+\caption[Estimated Simulated Data (BS) Effective Reproduction Number]{\textbf{Estimated effective reproduction \(R_t\) per day for data simulated using a B-Spline (BS) basis.} The columns are labelled according to the number of knots used to fit to the data. The black line represents the reproduction number from the simulated data. The purple line indicates the estimated reproduction number, with light and dark purple bands representing the 95\% and 50\% confidence intervals.}
+\label{fig:Rt20bs}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{figure/Simulated/aggregated/simulation_agg_bs_20_k(5,10,20)_bsd1_beta1_plot_incidence.png}
+\caption[Predicted Simulated and Aggregated Data (BS) Incidence]{\textbf{Estimated Number of New Infections per day (Incidence) for aggregated data simulated using a B-Spline (BS) basis.} The columns are labelled according to the number of knots used to fit to the data. The red line represents the simulated trajectory with Gaussian noise. The blue line indicates the predicted incidence, with light and dark blue bands representing the 95\% and 50\% confidence intervals.}
+\label{fig:incidence_agg_bs}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{figure/Simulated/aggregated/simulation_agg_bs_20_k(5,10,20)_bsd1_beta1_plot_beta.png}
+\caption[Estimated Simulated and Aggregated Data (BS) Transmission Rate]{\textbf{Estimated transmission rate \(\beta\) per day for aggregated data simulated using a B-Spline (BS) basis.} The columns are labelled according to the number of knots used to fit to the data. The red line represents the true transmission rate function from the simulated data. The green line indicates the estimated transmission rate, with light and dark green bands representing the 95\% and 50\% confidence intervals.}
+\label{fig:transmission_agg_bs}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{figure/Simulated/aggregated/simulation_agg_bs_20_k(5,10,20)_bsd1_beta1_plot_R_t.png}
+\caption[Estimated Simulated and Aggregated Data (BS) Effective Reproduction Number]{\textbf{Estimated effective reproduction \(R_t\) per day for aggregated data simulated using a B-Spline (BS) basis.} The columns are labelled according to the number of knots used to fit to the data. The black line represents the reproduction number from the simulated data. The purple line indicates the estimated reproduction number, with light and dark purple bands representing the 95\% and 50\% confidence intervals.}
+\label{fig:Rt20_agg_bs}
+\end{figure}
+
+\begin{table}[!h]
+\centering
+\caption{\label{tab:aic-table-sim-bs}\textbf{Conditional AIC Scores of calibrating models with varying model granularity, fitted to data simulated using a B-Spline (BS) basis with \(k=20\) knots.} The degrees of freedom are defined as the model degrees of freedom, which is computed as the trace of penalized smoothing matrix.}
+\centering
+\begin{tabular}[t]{llll}
+\toprule
+\multicolumn{1}{c}{ } & \multicolumn{3}{c}{Knots} \\
+\cmidrule(l{3pt}r{3pt}){2-4}
+Smooth Type & k = 8 & k = 15 & k = 20\\
+\midrule
+gp & -14.89728 & -14.79238 & -14.74688\\
+tp & -12.90951 & -12.77454 & -12.5977\\
+cr & -12.85793 & -11.70811 & -4.380915\\
+bs & -12.73877 & -12.32108 & -4.818009\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[!h]
+\centering
+\caption{\label{tab:aic-table-sim-agg-bs}\textbf{Conditional AIC Scores of calibrating models with varying model granularity, fitted to aggregated data simulated using a B-Spline (BS) basis with \(k=20\) knots.} The degrees of freedom are defined as the model degrees of freedom, which is computed as the trace of penalized smoothing matrix.}
+\centering
+\begin{tabular}[t]{llll}
+\toprule
+\multicolumn{1}{c}{ } & \multicolumn{3}{c}{Knots} \\
+\cmidrule(l{3pt}r{3pt}){2-4}
+Smooth Type & k = 8 & k = 15 & k = 20\\
+\midrule
+gp & -11.42597 & -11.17483 & -10.82364\\
+tp & -9.448396 & -9.00675 & -7.25424\\
+cr & -9.420236 & -8.278513 & 0.1462451\\
+bs & -9.277407 & -8.788031 & -0.9498695\\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \backmatter
 
@@ -2092,24 +2219,28 @@ The SIRS model is used for the simulation, with compartment values initialized a
 \CSLLeftMargin{{[}21{]} }%
 \CSLRightInline{Andrade J, Duggan J. Inferring the effective reproductive number from deterministic and semi-deterministic compartmental models using incidence and mobility data. PLOS Computational Biology 2022;18:e1010206. \url{https://doi.org/10.1371/journal.pcbi.1010206}.}
 
-\bibitem[\citeproctext]{ref-earnSimpleModelComplex2000}
+\bibitem[\citeproctext]{ref-parkImportanceGenerationInterval2022}
 \CSLLeftMargin{{[}22{]} }%
+\CSLRightInline{Park SW, Bolker BM, Funk S, Metcalf CJE, Weitz JS, Grenfell BT, et al. The importance of the generation interval in investigating dynamics and control of new {SARS-CoV-2} variants. J R Soc Interface 2022;19:20220173. \url{https://doi.org/10.1098/rsif.2022.0173}.}
+
+\bibitem[\citeproctext]{ref-earnSimpleModelComplex2000}
+\CSLLeftMargin{{[}23{]} }%
 \CSLRightInline{Earn DJD, Rohani P, Bolker BM, Grenfell BT. \href{https://go-gale-com.libaccess.lib.mcmaster.ca/ps/i.do?p=AONE&sw=w&issn=00368075&v=2.1&it=r&id=GALE\%7CA59410262&sid=googleScholar&linkaccess=abs}{A {Simple Model} for {Complex Dynamical Transitions} in {Epidemics}}. Science 2000;287:667--7.}
 
 \bibitem[\citeproctext]{ref-woodSmoothingParameterModel2016}
-\CSLLeftMargin{{[}23{]} }%
+\CSLLeftMargin{{[}24{]} }%
 \CSLRightInline{Wood SN, Pya N, Säfken B. Smoothing {Parameter} and {Model Selection} for {General Smooth Models}. Journal of the American Statistical Association 2016;111:1548--63. \url{https://doi.org/10.1080/01621459.2016.1180986}.}
 
 \bibitem[\citeproctext]{ref-grevenBehaviourMarginalConditional2010}
-\CSLLeftMargin{{[}24{]} }%
+\CSLLeftMargin{{[}25{]} }%
 \CSLRightInline{Greven S, Kneib T. \href{https://www.jstor.org/stable/29777136}{On the behaviour of marginal and conditional {AIC} in linear mixed models}. Biometrika 2010;97:773--89.}
 
 \bibitem[\citeproctext]{ref-chongguSmoothingSplineANOVA2013}
-\CSLLeftMargin{{[}25{]} }%
+\CSLLeftMargin{{[}26{]} }%
 \CSLRightInline{Chong Gu. Smoothing {Spline ANOVA Models}. 1st ed. New York, NY: Springer; 2013.}
 
 \bibitem[\citeproctext]{ref-woodGeneralizedAdditiveModels2017}
-\CSLLeftMargin{{[}26{]} }%
+\CSLLeftMargin{{[}27{]} }%
 \CSLRightInline{Wood SN. Generalized additive models: An introduction with {R}. Second edition. Boca Raton: CRC Press/Taylor \& Francis Group; 2017.}
 
 \end{CSLReferences}
