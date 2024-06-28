@@ -113,7 +113,7 @@ load("data/unaggregated_table.RData")
 
 # Generate and display the table with additional headers
 # Generate and display the table with the revised caption
-kable(result_unaggregated, format = "latex", booktabs = TRUE, 
+kable(transposed_result, format = "latex", booktabs = TRUE, 
       caption = "\\textbf{Conditional AIC Scores for SIRS Model with Simulated Data}. The columns represent the smoothing basis used to fit the model, while the rows indicate the basis used to generate the simulated data. The degrees of freedom are computed as the trace of the penalized smoothing matrix.") %>%
   kable_styling(latex_options = c("hold_position"))
 
