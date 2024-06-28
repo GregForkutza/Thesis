@@ -1260,14 +1260,14 @@ tp & -12.655280 & -12.84670 & -12.633240 & -12.613210\\
 \centering
 \caption{\label{tab:aic-table-sim-agg}\textbf{Conditional AIC Scores for SIRS Model with Simulated Data Aggregated to a Weekly Scale}. The columns represent the smoothing basis used to fit the model, while the rows indicate the basis used to generate the simulated data. The trajectories were simulated on a daily scale and then aggregated to a weekly scale for model calibration. The degrees of freedom are computed as the trace of the penalized smoothing matrix.}
 \centering
-\begin{tabular}[t]{lrrlr}
+\begin{tabular}[t]{lrrrr}
 \toprule
-SmoothType & gp & cr & tp & bs\\
+SmoothType & gp & tp & cr & bs\\
 \midrule
-bs & -2.627495 & -2.446943 & NA & -1.028919\\
-cr & -2.372933 & -1.430775 & -6.110389 & 0.067092\\
-gp & -10.323190 & -10.370530 & -11.00475 & -10.313130\\
-tp & -7.765698 & -7.701646 & -8.981243 & -7.467689\\
+gp & -10.32319 & -7.765698 & -2.372933 & -2.627495\\
+cr & -10.37053 & -7.701646 & -1.430775 & -2.446943\\
+tp & -11.00475 & -8.981243 & -6.110389 & NA\\
+bs & -10.31313 & -7.467689 & 0.067092 & -1.028919\\
 \bottomrule
 \end{tabular}
 \end{table}

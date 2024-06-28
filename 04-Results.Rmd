@@ -125,11 +125,13 @@ library(kableExtra)
 library(tidyr)
 
 # Load the saved R object
+# Load the data
 load("data/aggregated_table_sim.RData")
 
-# Generate and display the table with additional headers
+
+
 # Generate and display the table with the revised caption
-kable(result, format = "latex", booktabs = TRUE, 
+kable(transposed_result, format = "latex", booktabs = TRUE, 
       caption = "\\textbf{Conditional AIC Scores for SIRS Model with Simulated Data Aggregated to a Weekly Scale}. The columns represent the smoothing basis used to fit the model, while the rows indicate the basis used to generate the simulated data. The trajectories were simulated on a daily scale and then aggregated to a weekly scale for model calibration. The degrees of freedom are computed as the trace of the penalized smoothing matrix.") %>%
   kable_styling(latex_options = c("hold_position"))
 ```
