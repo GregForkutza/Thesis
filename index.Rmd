@@ -6,7 +6,7 @@ university: 'McMaster University'
 faculty: 'Faculty of Science'
 department: 'Mathematics & Statistics'
 subject: 'Statistics'
-supervisor: 'Ben Bolker'
+supervisor: 'Benjamin Bolker'
 bdegree: 'B.Sc.' 
 mdegree: 'M.Sc.'   
 degree: 'Master of Science'
@@ -23,22 +23,20 @@ output:
 #  thesisdown::thesis_word: default
 #  thesisdown::thesis_epub: default
 lay_abstract: |
-  This thesis explores a new way to model how diseases spread using a deterministic mathematical framework. We focus on estimating the changing transmission rate and the effective reproduction number, key factors in understanding and controlling disease outbreaks. Our method, incorporated into the `macpan2` software, uses advanced techniques to smoothly estimate these changing rates over time. We first prove the effectiveness of our approach with simulations and then apply it to real data from Scarlet Fever, COVID-19, and Measles. We also compare model performance using statistical criteria and different smoothing methods. Our results show that this flexible and user-friendly approach is a valuable tool for modelers working on disease dynamics.
+  This thesis explores a new way to model how diseases spread using a deterministic mathematical framework. We focus on estimating the changing transmission rate and the effective reproduction number, key factors in understanding and controlling disease outbreaks. Our method, incorporated into the `macpan2` software, uses advanced techniques to estimate these changing rates over time. We first prove the effectiveness of our approach with simulations and then apply it to real data from Scarlet Fever, COVID-19, and Measles. We also compare the model performance. Our results show that this flexible and user-friendly approach is a valuable tool for modelers working on disease dynamics.
   
 abstract: |
-  This thesis presents a novel approach to ecological dynamic modeling using non-stochastic compartmental models. Estimating the transmission rate (\(\beta\)) and the effective reproduction number (\(R_t\)) is essential for understanding disease spread and guiding public health interventions. We extend this method to infectious disease models, where the transmission rate varies dynamically due to external factors. Using Simon Wood's partially specified modeling framework, we introduce penalized smoothing to estimate time-varying latent variables within the `R` package `macpan2`. This integration provides an accessible tool for complex estimations. The efficacy of our approach is first validated via a simulation study and then demonstrated with real-world datasets on Scarlet Fever, COVID-19, and Measles. Additionally, we infer the effective reproduction number (\(R_t\)) using the estimated \(\beta\) values, providing further insights into the dynamics of disease transmission. Model fit is compared using Akaike Information Criterion (AIC), and we evaluate the performance of different smoothing bases derived using the `mgcv` package. Our findings indicate that this methodology can be extended to various ecological and epidemiological contexts, offering a versatile and robust approach to parameter estimation in dynamic models.
+  This thesis presents a novel approach to ecological dynamic modeling using non-stochastic compartmental models. Estimating the transmission rate (\(\beta\)) and the effective reproduction number (\(R_t\)) is essential for understanding disease spread and guiding public health interventions. We extend this method to infectious disease models, where the transmission rate varies dynamically due to external factors. Using Simon Wood's partially specified modeling framework, we introduce penalized smoothing to estimate time-varying latent variables within the `R` package `macpan2`. This integration provides an accessible tool for complex estimation problems. The efficacy of our approach is first validated via a simulation study and then demonstrated with real-world datasets on Scarlet Fever, COVID-19, and Measles. We infer the effective reproduction number (\(R_t\)) using the estimated \(\beta\) values, providing further insights into the dynamics of disease transmission. Model fit is compared using the Akaike Information Criterion (AIC), and we evaluate the performance of different smoothing bases derived using the `mgcv` package. Our findings indicate that this methodology can be extended to various ecological and epidemiological contexts, offering a versatile and robust approach to parameter estimation in dynamic models.
 
 acknowledgements: |
-  Acknowledgements go here. TBD
-  
-declarations: |
-  I did most of the research.
-  
-  Also the writting. 
-  
-  Sometimes I pulled my hair out.
-  
-  But mostly I had fun.
+  I would like to thank my supervisor, Dr. Benjamin Bolker. Your mentoring, guidance, and support made this experience enjoyable and rewarding. Thank you for continuously pushing me to become a better statistician and a better programmer. I have grown tremendously because of working with you on this project.
+
+  I would like to thank the faculty and staff within the Department of Mathematics and Statistics at McMaster University. I would like to thank Dr. Anastasios Kratsios and Dr. Jonathan Dushoff for participating in my examination committee. I would also like to thank all of the professors I took classes from; it has been a privilege to learn from you all. Lastly, I would like to thank the department staff for always being friendly, helpful, and quick to respond.
+
+  I would like to thank my friends and office mates for their company and for taking the time to talk about research. I would like to thank my two dearest friends in the department, Abhiroop Chowdhury and Manan Mukherjee, for their endless conversations about all things statistics, mathematics, research, philosophy, and art.
+
+  Lastly, I would like to thank my partner, Melanie, for her endless support, patience, love and encouragement. I could not have done this without you.
+
 quotation: |
   "What is your aim in Philosophy?
   

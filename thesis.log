@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.4.30)  14 JUN 2024 13:50
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.4.30)  28 JUN 2024 00:56
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1485,12 +1485,6 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 [9
 
 ]
---------------------
- Declaration of Authorship
---------------------
-[10
-
-]
 Chapter 1.
 --------------------
  Master of Science-- Greg Forkutza; McMaster University-- Mathematics \& Statis
@@ -1511,260 +1505,218 @@ tics
 {/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}{/usr/loca
 l/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}] [4] [5] [6] [7] [8
 ] [9] [10] [11] [12] [13] [14] [15]
-<figure/sir_model.png, id=525, 460.72125pt x 129.48375pt>
+<figure/sir_model.png, id=449, 460.72125pt x 129.48375pt>
 File: figure/sir_model.png Graphic file (type png)
 <use figure/sir_model.png>
-Package pdftex.def Info: figure/sir_model.png  used on input line 885.
+Package pdftex.def Info: figure/sir_model.png  used on input line 869.
 (pdftex.def)             Requested size: 418.25545pt x 117.54784pt.
 [16 <./figure/sir_model.png>]
-<figure/sirs_model.png, id=535, 460.72125pt x 178.6675pt>
+<figure/sirs_model.png, id=459, 460.72125pt x 178.6675pt>
 File: figure/sirs_model.png Graphic file (type png)
 <use figure/sirs_model.png>
-Package pdftex.def Info: figure/sirs_model.png  used on input line 917.
+Package pdftex.def Info: figure/sirs_model.png  used on input line 889.
 (pdftex.def)             Requested size: 418.25545pt x 162.19781pt.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <12> on input line 922.
-[17 <./figure/sirs_model.png>] [18] [19]
+(Font)              <12> on input line 894.
+[17 <./figure/sirs_model.png>] [18]
 Chapter 3.
 --------------------
  Master of Science-- Greg Forkutza; McMaster University-- Mathematics \& Statis
 tics
 --------------------
-[20
+[19
 
-] [21]
+] [20]
 
-Package xcolor Warning: Incompatible color definition on input line 1006.
+Package xcolor Warning: Incompatible color definition on input line 939.
 
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <10.95> not available
-(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 1008.
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 941.
 
-Package xcolor Warning: Incompatible color definition on input line 1012.
-
-
-Package xcolor Warning: Incompatible color definition on input line 1012.
-
-[22] [23] [24] [25]
-<figure/Other/lognormal_prior.png, id=593, 722.7pt x 433.62pt>
-File: figure/Other/lognormal_prior.png Graphic file (type png)
-<use figure/Other/lognormal_prior.png>
-Package pdftex.def Info: figure/Other/lognormal_prior.png  used on input line 1
-121.
-(pdftex.def)             Requested size: 418.251pt x 209.1277pt.
-[26] [27 <./figure/Other/lognormal_prior.png>] [28] [29]
-
-Package xcolor Warning: Incompatible color definition on input line 1201.
+Package xcolor Warning: Incompatible color definition on input line 944.
 
 
-Package xcolor Warning: Incompatible color definition on input line 1238.
+Package xcolor Warning: Incompatible color definition on input line 944.
+
+[21] [22] [23] [24] [25]
+
+Package xcolor Warning: Incompatible color definition on input line 1097.
 
 
-Package xcolor Warning: Incompatible color definition on input line 1238.
+Package xcolor Warning: Incompatible color definition on input line 1133.
 
-[30] [31] [32]
+
+Package xcolor Warning: Incompatible color definition on input line 1133.
+
+
+Package xcolor Warning: Incompatible color definition on input line 1133.
+
+[26]
+
+Package xcolor Warning: Incompatible color definition on input line 1133.
+
+
+Package xcolor Warning: Incompatible color definition on input line 1133.
+
+[27]
 Chapter 4.
 --------------------
  Master of Science-- Greg Forkutza; McMaster University-- Mathematics \& Statis
 tics
 --------------------
-[33
+[28
 
-] [34] [35]
+] [29]
 <figure/Simulated/unaggregated/simulation_gp_20_k(5,10,20)_bsd1_beta1_plot_basi
-s.png, id=671, 361.35pt x 433.62pt>
+s.png, id=546, 361.35pt x 433.62pt>
 File: figure/Simulated/unaggregated/simulation_gp_20_k(5,10,20)_bsd1_beta1_plot
 _basis.png Graphic file (type png)
 <use figure/Simulated/unaggregated/simulation_gp_20_k(5,10,20)_bsd1_beta1_plot_
 basis.png>
 Package pdftex.def Info: figure/Simulated/unaggregated/simulation_gp_20_k(5,10,
-20)_bsd1_beta1_plot_basis.png  used on input line 1333.
+20)_bsd1_beta1_plot_basis.png  used on input line 1182.
 (pdftex.def)             Requested size: 418.25545pt x 501.90784pt.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 1334.
+(Font)              <10> on input line 1183.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 1334.
+(Font)              <7> on input line 1183.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 1334.
-[36]
-Overfull \vbox (19.64386pt too high) has occurred while \output is active []
+(Font)              <5> on input line 1183.
+[30]
+<figure/Simulated/unaggregated/sim_combined_gp.png, id=551, 361.35pt x 433.62pt
+>
+File: figure/Simulated/unaggregated/sim_combined_gp.png Graphic file (type png)
 
-[37 <./figure/Simulated/unaggregated/simulation_gp_20_k(5,10,20)_bsd1_beta1_plo
+<use figure/Simulated/unaggregated/sim_combined_gp.png>
+Package pdftex.def Info: figure/Simulated/unaggregated/sim_combined_gp.png  use
+d on input line 1189.
+(pdftex.def)             Requested size: 418.25545pt x 501.90784pt.
+[31 <./figure/Simulated/unaggregated/simulation_gp_20_k(5,10,20)_bsd1_beta1_plo
 t_basis.png>]
-<figure/Simulated/unaggregated/simulation_gp_20_k(5,10,20)_bsd1_beta1_plot_inci
-dence.png, id=681, 361.35pt x 433.62pt>
-File: figure/Simulated/unaggregated/simulation_gp_20_k(5,10,20)_bsd1_beta1_plot
-_incidence.png Graphic file (type png)
-<use figure/Simulated/unaggregated/simulation_gp_20_k(5,10,20)_bsd1_beta1_plot_
-incidence.png>
-Package pdftex.def Info: figure/Simulated/unaggregated/simulation_gp_20_k(5,10,
-20)_bsd1_beta1_plot_incidence.png  used on input line 1340.
+<figure/Simulated/unaggregated/sim_combined_tp_k8.png, id=556, 361.35pt x 433.6
+2pt>
+File: figure/Simulated/unaggregated/sim_combined_tp_k8.png Graphic file (type p
+ng)
+<use figure/Simulated/unaggregated/sim_combined_tp_k8.png>
+Package pdftex.def Info: figure/Simulated/unaggregated/sim_combined_tp_k8.png  
+used on input line 1196.
 (pdftex.def)             Requested size: 418.25545pt x 501.90784pt.
-<figure/Simulated/unaggregated/simulation_gp_20_k(5,10,20)_bsd1_beta1_plot_beta
-.png, id=682, 361.35pt x 433.62pt>
-File: figure/Simulated/unaggregated/simulation_gp_20_k(5,10,20)_bsd1_beta1_plot
-_beta.png Graphic file (type png)
-<use figure/Simulated/unaggregated/simulation_gp_20_k(5,10,20)_bsd1_beta1_plot_
-beta.png>
-Package pdftex.def Info: figure/Simulated/unaggregated/simulation_gp_20_k(5,10,
-20)_bsd1_beta1_plot_beta.png  used on input line 1347.
-(pdftex.def)             Requested size: 418.25545pt x 501.90784pt.
-[38 <./figure/Simulated/unaggregated/simulation_gp_20_k(5,10,20)_bsd1_beta1_plo
-t_incidence.png>]
-<figure/Simulated/unaggregated/simulation_gp_20_k(5,10,20)_bsd1_beta1_plot_R_t.
-png, id=687, 361.35pt x 433.62pt>
-File: figure/Simulated/unaggregated/simulation_gp_20_k(5,10,20)_bsd1_beta1_plot
-_R_t.png Graphic file (type png)
-<use figure/Simulated/unaggregated/simulation_gp_20_k(5,10,20)_bsd1_beta1_plot_
-R_t.png>
-Package pdftex.def Info: figure/Simulated/unaggregated/simulation_gp_20_k(5,10,
-20)_bsd1_beta1_plot_R_t.png  used on input line 1354.
-(pdftex.def)             Requested size: 418.25545pt x 501.90784pt.
-[39 <./figure/Simulated/unaggregated/simulation_gp_20_k(5,10,20)_bsd1_beta1_plo
-t_beta.png>]
-<figure/Simulated/aggregated/simulation_agg_gp_20_k(5,10,20)_bsd1_beta1_plot_in
-cidence.png, id=692, 361.35pt x 433.62pt>
-File: figure/Simulated/aggregated/simulation_agg_gp_20_k(5,10,20)_bsd1_beta1_pl
-ot_incidence.png Graphic file (type png)
-<use figure/Simulated/aggregated/simulation_agg_gp_20_k(5,10,20)_bsd1_beta1_plo
-t_incidence.png>
-Package pdftex.def Info: figure/Simulated/aggregated/simulation_agg_gp_20_k(5,1
-0,20)_bsd1_beta1_plot_incidence.png  used on input line 1361.
-(pdftex.def)             Requested size: 418.25545pt x 501.90784pt.
-[40 <./figure/Simulated/unaggregated/simulation_gp_20_k(5,10,20)_bsd1_beta1_plo
-t_R_t.png>]
-<figure/Simulated/aggregated/simulation_agg_gp_20_k(5,10,20)_bsd1_beta1_plot_be
-ta.png, id=698, 361.35pt x 433.62pt>
-File: figure/Simulated/aggregated/simulation_agg_gp_20_k(5,10,20)_bsd1_beta1_pl
-ot_beta.png Graphic file (type png)
-<use figure/Simulated/aggregated/simulation_agg_gp_20_k(5,10,20)_bsd1_beta1_plo
-t_beta.png>
-Package pdftex.def Info: figure/Simulated/aggregated/simulation_agg_gp_20_k(5,1
-0,20)_bsd1_beta1_plot_beta.png  used on input line 1368.
-(pdftex.def)             Requested size: 418.25545pt x 501.90784pt.
-[41 <./figure/Simulated/aggregated/simulation_agg_gp_20_k(5,10,20)_bsd1_beta1_p
-lot_incidence.png>]
-<figure/Simulated/aggregated/simulation_agg_gp_20_k(5,10,20)_bsd1_beta1_plot_R_
-t.png, id=704, 361.35pt x 433.62pt>
-File: figure/Simulated/aggregated/simulation_agg_gp_20_k(5,10,20)_bsd1_beta1_pl
-ot_R_t.png Graphic file (type png)
-<use figure/Simulated/aggregated/simulation_agg_gp_20_k(5,10,20)_bsd1_beta1_plo
-t_R_t.png>
-Package pdftex.def Info: figure/Simulated/aggregated/simulation_agg_gp_20_k(5,1
-0,20)_bsd1_beta1_plot_R_t.png  used on input line 1375.
-(pdftex.def)             Requested size: 418.25545pt x 501.90784pt.
-[42 <./figure/Simulated/aggregated/simulation_agg_gp_20_k(5,10,20)_bsd1_beta1_p
-lot_beta.png>] [43 <./figure/Simulated/aggregated/simulation_agg_gp_20_k(5,10,2
-0)_bsd1_beta1_plot_R_t.png>] [44]
-<figure/Scarlet/Scarlet_agg_k(5,8,10)_bsd1_beta1_gamma7_sd01_plot_incidence.png
-, id=723, 361.35pt x 433.62pt>
-File: figure/Scarlet/Scarlet_agg_k(5,8,10)_bsd1_beta1_gamma7_sd01_plot_incidenc
-e.png Graphic file (type png)
-<use figure/Scarlet/Scarlet_agg_k(5,8,10)_bsd1_beta1_gamma7_sd01_plot_incidence
-.png>
-Package pdftex.def Info: figure/Scarlet/Scarlet_agg_k(5,8,10)_bsd1_beta1_gamma7
-_sd01_plot_incidence.png  used on input line 1432.
-(pdftex.def)             Requested size: 418.25653pt x 418.27527pt.
-[45]
-<figure/Scarlet/Scarlet_agg_k(5,8,10)_bsd1_beta1_gamma7_sd01_plot_beta.png, id=
-728, 361.35pt x 433.62pt>
-File: figure/Scarlet/Scarlet_agg_k(5,8,10)_bsd1_beta1_gamma7_sd01_plot_beta.png
- Graphic file (type png)
-<use figure/Scarlet/Scarlet_agg_k(5,8,10)_bsd1_beta1_gamma7_sd01_plot_beta.png>
+[32 <./figure/Simulated/unaggregated/sim_combined_gp.png>]
+<figure/Simulated/unaggregated/sim_combined_cr.png, id=562, 361.35pt x 433.62pt
+>
+File: figure/Simulated/unaggregated/sim_combined_cr.png Graphic file (type png)
 
-Package pdftex.def Info: figure/Scarlet/Scarlet_agg_k(5,8,10)_bsd1_beta1_gamma7
-_sd01_plot_beta.png  used on input line 1441.
-(pdftex.def)             Requested size: 418.25653pt x 418.27527pt.
-[46 <./figure/Scarlet/Scarlet_agg_k(5,8,10)_bsd1_beta1_gamma7_sd01_plot_inciden
-ce.png>]
-<figure/Scarlet/Scarlet_agg_k(5,8,10)_bsd1_beta1_gamma7_sd01_plot_R_t.png, id=7
-33, 361.35pt x 433.62pt>
-File: figure/Scarlet/Scarlet_agg_k(5,8,10)_bsd1_beta1_gamma7_sd01_plot_R_t.png 
-Graphic file (type png)
-<use figure/Scarlet/Scarlet_agg_k(5,8,10)_bsd1_beta1_gamma7_sd01_plot_R_t.png>
-Package pdftex.def Info: figure/Scarlet/Scarlet_agg_k(5,8,10)_bsd1_beta1_gamma7
-_sd01_plot_R_t.png  used on input line 1448.
-(pdftex.def)             Requested size: 418.25653pt x 418.27527pt.
-[47 <./figure/Scarlet/Scarlet_agg_k(5,8,10)_bsd1_beta1_gamma7_sd01_plot_beta.pn
-g>]
+<use figure/Simulated/unaggregated/sim_combined_cr.png>
+Package pdftex.def Info: figure/Simulated/unaggregated/sim_combined_cr.png  use
+d on input line 1203.
+(pdftex.def)             Requested size: 418.25545pt x 501.90784pt.
+[33 <./figure/Simulated/unaggregated/sim_combined_tp_k8.png>]
+<figure/Simulated/unaggregated/sim_combined_bs.png, id=568, 361.35pt x 433.62pt
+>
+File: figure/Simulated/unaggregated/sim_combined_bs.png Graphic file (type png)
+
+<use figure/Simulated/unaggregated/sim_combined_bs.png>
+Package pdftex.def Info: figure/Simulated/unaggregated/sim_combined_bs.png  use
+d on input line 1210.
+(pdftex.def)             Requested size: 418.25545pt x 501.90784pt.
+[34 <./figure/Simulated/unaggregated/sim_combined_cr.png>]
+<figure/Simulated/aggregated/sim_agg_combined_gp.png, id=573, 361.35pt x 433.62
+pt>
+File: figure/Simulated/aggregated/sim_agg_combined_gp.png Graphic file (type pn
+g)
+<use figure/Simulated/aggregated/sim_agg_combined_gp.png>
+Package pdftex.def Info: figure/Simulated/aggregated/sim_agg_combined_gp.png  u
+sed on input line 1217.
+(pdftex.def)             Requested size: 418.25545pt x 501.90784pt.
+[35 <./figure/Simulated/unaggregated/sim_combined_bs.png>]
+<figure/Simulated/aggregated/sim_agg_combined_tp_k10.png, id=578, 361.35pt x 43
+3.62pt>
+File: figure/Simulated/aggregated/sim_agg_combined_tp_k10.png Graphic file (typ
+e png)
+<use figure/Simulated/aggregated/sim_agg_combined_tp_k10.png>
+Package pdftex.def Info: figure/Simulated/aggregated/sim_agg_combined_tp_k10.pn
+g  used on input line 1224.
+(pdftex.def)             Requested size: 418.25545pt x 501.90784pt.
+[36 <./figure/Simulated/aggregated/sim_agg_combined_gp.png>]
+<figure/Simulated/aggregated/sim_agg_combined_cr.png, id=583, 361.35pt x 433.62
+pt>
+File: figure/Simulated/aggregated/sim_agg_combined_cr.png Graphic file (type pn
+g)
+<use figure/Simulated/aggregated/sim_agg_combined_cr.png>
+Package pdftex.def Info: figure/Simulated/aggregated/sim_agg_combined_cr.png  u
+sed on input line 1231.
+(pdftex.def)             Requested size: 418.25545pt x 501.90784pt.
+[37 <./figure/Simulated/aggregated/sim_agg_combined_tp_k10.png>]
+<figure/Simulated/aggregated/sim_agg_combined_bs.png, id=588, 361.35pt x 433.62
+pt>
+File: figure/Simulated/aggregated/sim_agg_combined_bs.png Graphic file (type pn
+g)
+<use figure/Simulated/aggregated/sim_agg_combined_bs.png>
+Package pdftex.def Info: figure/Simulated/aggregated/sim_agg_combined_bs.png  u
+sed on input line 1238.
+(pdftex.def)             Requested size: 418.25545pt x 501.90784pt.
+[38 <./figure/Simulated/aggregated/sim_agg_combined_cr.png>]
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-[48 <./figure/Scarlet/Scarlet_agg_k(5,8,10)_bsd1_beta1_gamma7_sd01_plot_R_t.png
->] [49] [50]
-Underfull \hbox (badness 1158) in paragraph at lines 1495--1495
-[]\T1/lmr/m/sc/10 Table 4.4: |[]\T1/lmr/bx/n/10 Con-di-tional AIC Scores of cal
--i-brat-ing mod-els
- []
 
-<figure/Ireland/Ireland_agg_k(5,6,7)_bsd1_beta1_gamma6_sd01_plot_incidence.png,
- id=758, 361.35pt x 433.62pt>
-File: figure/Ireland/Ireland_agg_k(5,6,7)_bsd1_beta1_gamma6_sd01_plot_incidence
-.png Graphic file (type png)
-<use figure/Ireland/Ireland_agg_k(5,6,7)_bsd1_beta1_gamma6_sd01_plot_incidence.
-png>
-Package pdftex.def Info: figure/Ireland/Ireland_agg_k(5,6,7)_bsd1_beta1_gamma6_
-sd01_plot_incidence.png  used on input line 1513.
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+[39 <./figure/Simulated/aggregated/sim_agg_combined_bs.png>]
+<figure/Scarlet/scarlet_combined.png, id=600, 361.35pt x 433.62pt>
+File: figure/Scarlet/scarlet_combined.png Graphic file (type png)
+<use figure/Scarlet/scarlet_combined.png>
+Package pdftex.def Info: figure/Scarlet/scarlet_combined.png  used on input lin
+e 1289.
 (pdftex.def)             Requested size: 418.25653pt x 418.27527pt.
-[51]
-<figure/Ireland/Ireland_agg_k(5,6,7)_bsd1_beta1_gamma6_sd01_plot_beta.png, id=7
-63, 361.35pt x 433.62pt>
-File: figure/Ireland/Ireland_agg_k(5,6,7)_bsd1_beta1_gamma6_sd01_plot_beta.png 
-Graphic file (type png)
-<use figure/Ireland/Ireland_agg_k(5,6,7)_bsd1_beta1_gamma6_sd01_plot_beta.png>
-Package pdftex.def Info: figure/Ireland/Ireland_agg_k(5,6,7)_bsd1_beta1_gamma6_
-sd01_plot_beta.png  used on input line 1520.
+[40]
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+[41 <./figure/Scarlet/scarlet_combined.png>] [42]
+<figure/Ireland/ireland_combined.png, id=615, 361.35pt x 433.62pt>
+File: figure/Ireland/ireland_combined.png Graphic file (type png)
+<use figure/Ireland/ireland_combined.png>
+Package pdftex.def Info: figure/Ireland/ireland_combined.png  used on input lin
+e 1345.
 (pdftex.def)             Requested size: 418.25653pt x 418.27527pt.
-[52 <./figure/Ireland/Ireland_agg_k(5,6,7)_bsd1_beta1_gamma6_sd01_plot_incidenc
-e.png>]
-<figure/Ireland/Ireland_agg_k(5,6,7)_bsd1_beta1_gamma6_sd01_plot_R_t.png, id=76
-8, 361.35pt x 433.62pt>
-File: figure/Ireland/Ireland_agg_k(5,6,7)_bsd1_beta1_gamma6_sd01_plot_R_t.png G
-raphic file (type png)
-<use figure/Ireland/Ireland_agg_k(5,6,7)_bsd1_beta1_gamma6_sd01_plot_R_t.png>
-Package pdftex.def Info: figure/Ireland/Ireland_agg_k(5,6,7)_bsd1_beta1_gamma6_
-sd01_plot_R_t.png  used on input line 1527.
-(pdftex.def)             Requested size: 418.25653pt x 418.27527pt.
-[53 <./figure/Ireland/Ireland_agg_k(5,6,7)_bsd1_beta1_gamma6_sd01_plot_beta.png
->] [54 <./figure/Ireland/Ireland_agg_k(5,6,7)_bsd1_beta1_gamma6_sd01_plot_R_t.p
-ng>] [55]
-<figure/Measles/Measles_combined_plot.png, id=785, 1033.7019pt x 585.1461pt>
+[43] [44 <./figure/Ireland/ireland_combined.png>]
+<figure/Measles/Measles_combined_plot.png, id=627, 1033.7019pt x 585.1461pt>
 File: figure/Measles/Measles_combined_plot.png Graphic file (type png)
 <use figure/Measles/Measles_combined_plot.png>
 Package pdftex.def Info: figure/Measles/Measles_combined_plot.png  used on inpu
-t line 1556.
+t line 1364.
 (pdftex.def)             Requested size: 418.25266pt x 418.26915pt.
-<figure/Measles/MeaslesCoefficentsPlot.png, id=786, 361.35pt x 361.35pt>
-File: figure/Measles/MeaslesCoefficentsPlot.png Graphic file (type png)
-<use figure/Measles/MeaslesCoefficentsPlot.png>
-Package pdftex.def Info: figure/Measles/MeaslesCoefficentsPlot.png  used on inp
-ut line 1563.
-(pdftex.def)             Requested size: 418.25653pt x 209.1255pt.
-[56] [57 <./figure/Measles/Measles_combined_plot.png>] [58 <./figure/Measles/Me
-aslesCoefficentsPlot.png>]
+[45] [46 <./figure/Measles/Measles_combined_plot.png>]
 Chapter 5.
 --------------------
  Master of Science-- Greg Forkutza; McMaster University-- Mathematics \& Statis
 tics
 --------------------
-[59
+[47
 
-] [60] [61] [62]
+] [48] [49]
 Appendix A.
 --------------------
  Master of Science-- Greg Forkutza; McMaster University-- Mathematics \& Statis
 tics
 --------------------
-[63
+[50
 
-] [64] [65] [66] [67]
-Overfull \hbox (14.61998pt too wide) detected at line 1844
+] [51] [52]
+Overfull \hbox (18.13472pt too wide) detected at line 1528
+[][][]\OT1/lmr/bx/n/10.95 D \OT1/lmr/m/n/10.95 = [] \OML/lmm/m/it/10.95 :
+ []
+
+[53] [54]
+Overfull \hbox (14.61998pt too wide) detected at line 1580
 \OML/lmm/m/it/10.95 K\OT1/lmr/m/n/10.95 (\OML/lmm/m/it/10.95 f[]; f[]\OT1/lmr/m
 /n/10.95 ) = [] [] \OML/lmm/m/it/10.95 f[]\OT1/lmr/m/n/10.95 (\OML/lmm/m/it/10.
 95 y\OT1/lmr/m/n/10.95 ) \OML/lmm/m/it/10.95 dy
  []
 
-[68]
-Overfull \hbox (76.08588pt too wide) detected at line 1849
+
+Overfull \hbox (76.08588pt too wide) detected at line 1585
 \OML/lmm/m/it/10.95 K\OT1/lmr/m/n/10.95 (\OML/lmm/m/it/10.95 f[]; f[]\OT1/lmr/m
 /n/10.95 ) = [] [] \OML/lmm/m/it/10.95 f[]\OT1/lmr/m/n/10.95 (\OML/lmm/m/it/10.
 95 y\OT1/lmr/m/n/10.95 ) \OML/lmm/m/it/10.95 dy \OMS/lmsy/m/n/10.95 ^^@ []\OT1/
@@ -1777,113 +1729,10 @@ mm/m/it/10.95 ^^R[]\OT1/lmr/m/n/10.95 )\OML/lmm/m/it/10.95 f[]\OT1/lmr/m/n/10.9
 5 (\OML/lmm/m/it/10.95 y\OT1/lmr/m/n/10.95 ) \OML/lmm/m/it/10.95 dy
  []
 
-[69] [70] [71] [72]
-Appendix B.
---------------------
- Master of Science-- Greg Forkutza; McMaster University-- Mathematics \& Statis
-tics
---------------------
-<figure/Simulated/simulation_cc_20_k(8,15,20)_bsd2_beta2_plot_incidence.png, id
-=897, 361.35pt x 433.62pt>
-File: figure/Simulated/simulation_cc_20_k(8,15,20)_bsd2_beta2_plot_incidence.pn
-g Graphic file (type png)
-<use figure/Simulated/simulation_cc_20_k(8,15,20)_bsd2_beta2_plot_incidence.png
->
-Package pdftex.def Info: figure/Simulated/simulation_cc_20_k(8,15,20)_bsd2_beta
-2_plot_incidence.png  used on input line 2024.
-(pdftex.def)             Requested size: 418.25545pt x 501.90784pt.
-<figure/Simulated/simulation_cc_20_k(8,15,20)_bsd2_beta2_plot_beta.png, id=898,
- 361.35pt x 433.62pt>
-File: figure/Simulated/simulation_cc_20_k(8,15,20)_bsd2_beta2_plot_beta.png Gra
-phic file (type png)
-<use figure/Simulated/simulation_cc_20_k(8,15,20)_bsd2_beta2_plot_beta.png>
-Package pdftex.def Info: figure/Simulated/simulation_cc_20_k(8,15,20)_bsd2_beta
-2_plot_beta.png  used on input line 2031.
-(pdftex.def)             Requested size: 418.25545pt x 501.90784pt.
-<figure/Simulated/simulation_cc_20_k(8,15,20)_bsd2_beta2_plot_R_t.png, id=899, 
-361.35pt x 433.62pt>
-File: figure/Simulated/simulation_cc_20_k(8,15,20)_bsd2_beta2_plot_R_t.png Grap
-hic file (type png)
-<use figure/Simulated/simulation_cc_20_k(8,15,20)_bsd2_beta2_plot_R_t.png>
-Package pdftex.def Info: figure/Simulated/simulation_cc_20_k(8,15,20)_bsd2_beta
-2_plot_R_t.png  used on input line 2038.
-(pdftex.def)             Requested size: 418.25545pt x 501.90784pt.
-<figure/Simulated/unaggregated/simulation_bs_20_k(5,10,20)_bsd1_beta1_plot_inci
-dence.png, id=900, 361.35pt x 433.62pt>
-File: figure/Simulated/unaggregated/simulation_bs_20_k(5,10,20)_bsd1_beta1_plot
-_incidence.png Graphic file (type png)
-<use figure/Simulated/unaggregated/simulation_bs_20_k(5,10,20)_bsd1_beta1_plot_
-incidence.png>
-Package pdftex.def Info: figure/Simulated/unaggregated/simulation_bs_20_k(5,10,
-20)_bsd1_beta1_plot_incidence.png  used on input line 2047.
-(pdftex.def)             Requested size: 418.25545pt x 501.90784pt.
-[73
-
-] [74 <./figure/Simulated/simulation_cc_20_k(8,15,20)_bsd2_beta2_plot_incidence
-.png>] [75 <./figure/Simulated/simulation_cc_20_k(8,15,20)_bsd2_beta2_plot_beta
-.png>] [76 <./figure/Simulated/simulation_cc_20_k(8,15,20)_bsd2_beta2_plot_R_t.
-png>] [77]
-Overfull \vbox (30.48721pt too high) has occurred while \output is active []
-
-[78 <./figure/Simulated/unaggregated/simulation_bs_20_k(5,10,20)_bsd1_beta1_plo
-t_incidence.png>]
-<figure/Simulated/unaggregated/simulation_bs_20_k(5,10,20)_bsd1_beta1_plot_beta
-.png, id=927, 361.35pt x 433.62pt>
-File: figure/Simulated/unaggregated/simulation_bs_20_k(5,10,20)_bsd1_beta1_plot
-_beta.png Graphic file (type png)
-<use figure/Simulated/unaggregated/simulation_bs_20_k(5,10,20)_bsd1_beta1_plot_
-beta.png>
-Package pdftex.def Info: figure/Simulated/unaggregated/simulation_bs_20_k(5,10,
-20)_bsd1_beta1_plot_beta.png  used on input line 2054.
-(pdftex.def)             Requested size: 418.25545pt x 501.90784pt.
-<figure/Simulated/unaggregated/simulation_bs_20_k(5,10,20)_bsd1_beta1_plot_R_t.
-png, id=928, 361.35pt x 433.62pt>
-File: figure/Simulated/unaggregated/simulation_bs_20_k(5,10,20)_bsd1_beta1_plot
-_R_t.png Graphic file (type png)
-<use figure/Simulated/unaggregated/simulation_bs_20_k(5,10,20)_bsd1_beta1_plot_
-R_t.png>
-Package pdftex.def Info: figure/Simulated/unaggregated/simulation_bs_20_k(5,10,
-20)_bsd1_beta1_plot_R_t.png  used on input line 2061.
-(pdftex.def)             Requested size: 418.25545pt x 501.90784pt.
-[79 <./figure/Simulated/unaggregated/simulation_bs_20_k(5,10,20)_bsd1_beta1_plo
-t_beta.png>]
-<figure/Simulated/aggregated/simulation_agg_bs_20_k(5,10,20)_bsd1_beta1_plot_in
-cidence.png, id=934, 361.35pt x 433.62pt>
-File: figure/Simulated/aggregated/simulation_agg_bs_20_k(5,10,20)_bsd1_beta1_pl
-ot_incidence.png Graphic file (type png)
-<use figure/Simulated/aggregated/simulation_agg_bs_20_k(5,10,20)_bsd1_beta1_plo
-t_incidence.png>
-Package pdftex.def Info: figure/Simulated/aggregated/simulation_agg_bs_20_k(5,1
-0,20)_bsd1_beta1_plot_incidence.png  used on input line 2068.
-(pdftex.def)             Requested size: 418.25545pt x 501.90784pt.
-[80 <./figure/Simulated/unaggregated/simulation_bs_20_k(5,10,20)_bsd1_beta1_plo
-t_R_t.png>]
-<figure/Simulated/aggregated/simulation_agg_bs_20_k(5,10,20)_bsd1_beta1_plot_be
-ta.png, id=940, 361.35pt x 433.62pt>
-File: figure/Simulated/aggregated/simulation_agg_bs_20_k(5,10,20)_bsd1_beta1_pl
-ot_beta.png Graphic file (type png)
-<use figure/Simulated/aggregated/simulation_agg_bs_20_k(5,10,20)_bsd1_beta1_plo
-t_beta.png>
-Package pdftex.def Info: figure/Simulated/aggregated/simulation_agg_bs_20_k(5,1
-0,20)_bsd1_beta1_plot_beta.png  used on input line 2075.
-(pdftex.def)             Requested size: 418.25545pt x 501.90784pt.
-[81 <./figure/Simulated/aggregated/simulation_agg_bs_20_k(5,10,20)_bsd1_beta1_p
-lot_incidence.png>]
-<figure/Simulated/aggregated/simulation_agg_bs_20_k(5,10,20)_bsd1_beta1_plot_R_
-t.png, id=945, 361.35pt x 433.62pt>
-File: figure/Simulated/aggregated/simulation_agg_bs_20_k(5,10,20)_bsd1_beta1_pl
-ot_R_t.png Graphic file (type png)
-<use figure/Simulated/aggregated/simulation_agg_bs_20_k(5,10,20)_bsd1_beta1_plo
-t_R_t.png>
-Package pdftex.def Info: figure/Simulated/aggregated/simulation_agg_bs_20_k(5,1
-0,20)_bsd1_beta1_plot_R_t.png  used on input line 2082.
-(pdftex.def)             Requested size: 418.25545pt x 501.90784pt.
-[82 <./figure/Simulated/aggregated/simulation_agg_bs_20_k(5,10,20)_bsd1_beta1_p
-lot_beta.png>] [83 <./figure/Simulated/aggregated/simulation_agg_bs_20_k(5,10,2
-0)_bsd1_beta1_plot_R_t.png>] [84] [85
+[55] [56] [57] [58] [59
 
 
-] [86] 
+] [60] [61] 
 enddocument/afterlastpage: lastpage setting LastPage.
 (./thesis.aux)
  ***********
@@ -1891,19 +1740,19 @@ LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2020/03/25>
  ***********
 Package rerunfilecheck Info: File `thesis.out' has not changed.
-(rerunfilecheck)             Checksum: DD30E3B5A4BEEA2FB8F7731D708E5317;8549.
+(rerunfilecheck)             Checksum: 7D871B9CA7FB9174F71670CC6320B7C2;6508.
 Package logreq Info: Writing requests to 'thesis.run.xml'.
 \openout1 = `thesis.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 51517 strings out of 474104
- 1217367 string characters out of 5743467
- 2131788 words of memory out of 5000000
- 72895 multiletter control sequences out of 15000+600000
- 684841 words of font info for 118 fonts, out of 8000000 for 9000
+ 51344 strings out of 474104
+ 1206723 string characters out of 5743467
+ 2135680 words of memory out of 5000000
+ 72768 multiletter control sequences out of 15000+600000
+ 678464 words of font info for 115 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 115i,12n,121p,1746b,2806s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 115i,12n,121p,1608b,2834s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmbsy10.pfb></usr/l
 ocal/texlive/2024/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></usr/local/texli
 ve/2024/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></usr/local/texlive/2024/te
@@ -1912,25 +1761,24 @@ nts/type1/public/lm/lmcsc10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1
 /public/lm/lmex10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm
 /lmmi10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmmi12.pf
 b></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmmi6.pfb></usr/loc
-al/texlive/2024/texmf-dist/fonts/type1/public/lm/lmmi7.pfb></usr/local/texlive/
-2024/texmf-dist/fonts/type1/public/lm/lmmi8.pfb></usr/local/texlive/2024/texmf-
-dist/fonts/type1/public/lm/lmmib10.pfb></usr/local/texlive/2024/texmf-dist/font
-s/type1/public/lm/lmr10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/pub
-lic/lm/lmr12.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmr6
-.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmr7.pfb></usr/l
-ocal/texlive/2024/texmf-dist/fonts/type1/public/lm/lmr8.pfb></usr/local/texlive
-/2024/texmf-dist/fonts/type1/public/lm/lmri10.pfb></usr/local/texlive/2024/texm
-f-dist/fonts/type1/public/lm/lmri12.pfb></usr/local/texlive/2024/texmf-dist/fon
-ts/type1/public/lm/lmro10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/p
-ublic/lm/lmsy10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/l
-msy6.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmsy8.pfb></
-usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmtk10.pfb></usr/local/
-texlive/2024/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></usr/local/texlive/20
-24/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on thesis.pdf (104 pages, 9576290 bytes).
+al/texlive/2024/texmf-dist/fonts/type1/public/lm/lmmi8.pfb></usr/local/texlive/
+2024/texmf-dist/fonts/type1/public/lm/lmmib10.pfb></usr/local/texlive/2024/texm
+f-dist/fonts/type1/public/lm/lmr10.pfb></usr/local/texlive/2024/texmf-dist/font
+s/type1/public/lm/lmr12.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/pub
+lic/lm/lmr6.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmr7.
+pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmr8.pfb></usr/lo
+cal/texlive/2024/texmf-dist/fonts/type1/public/lm/lmri10.pfb></usr/local/texliv
+e/2024/texmf-dist/fonts/type1/public/lm/lmri12.pfb></usr/local/texlive/2024/tex
+mf-dist/fonts/type1/public/lm/lmro10.pfb></usr/local/texlive/2024/texmf-dist/fo
+nts/type1/public/lm/lmsy10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/
+public/lm/lmsy6.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/l
+msy8.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmtk10.pfb><
+/usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></usr/local
+/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
+Output written on thesis.pdf (78 pages, 5795678 bytes).
 PDF statistics:
- 1203 PDF objects out of 1440 (max. 8388607)
- 999 compressed objects within 10 object streams
- 237 named destinations out of 1000 (max. 500000)
- 492 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 961 PDF objects out of 1000 (max. 8388607)
+ 801 compressed objects within 9 object streams
+ 194 named destinations out of 1000 (max. 500000)
+ 355 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -2,12 +2,17 @@
 
 `r if(!knitr:::is_latex_output()) '# (APPENDIX) Appendix {-}'` 
 
-# Proofs, sketches and derivations {#Appendix}
+# Mathematical derivations {#Appendix}
 
 ## Matrix formulations and basis functions for cubic smoothing splines {#A1}
-The following sketch of a proof is taken from [@orfanidis1989optimum], where the reader can find the full proof. 
+The following is adapted from the proof in [@orfanidis1989optimum] for deriving the basis functions and matrix elements of a natural cubic spline. We extract the key equations and essential conceptual steps, omitting computational details and expanding on the equations' meanings. This approach highlights how the natural boundary conditions and continuity conditions at the knots constrain the solution of the Euler-Lagrange equation over each continuous interval to be a cubic spline which vanishes outside the endpoints of its domain. 
 
-To determine the function \( f \) that minimizes \( J_2(f) \), we apply the Euler-Lagrange equation to a more general functional form \( J(x) = \int L(x, x', x'', t) \, dt \). The Euler-Lagrange equation for this functional becomes:
+To determine the function \( f \) that minimizes 
+
+\[
+J_{2}(f) = \sum_{i=1}^n (y_i - g(x_i))^2 + \lambda \int g''(x)^2 \, dx,
+\]
+we apply the Euler-Lagrange equation to a more general functional form \( J(x) = \int L(x, x', x'', t) \, dt \). The Euler-Lagrange equation for this functional becomes:
 
 \begin{equation}
 \frac{\partial L}{\partial x} - \frac{d}{dt} \frac{\partial L}{\partial x'} + \frac{d^2}{dt^2} \frac{\partial L}{\partial x''} = 0.
@@ -23,7 +28,6 @@ From the application of the Euler-Lagrange equation \ref{eq:expanded Euler-Lagra
 \[
 \frac{\partial L}{\partial \dot{x}} - \frac{d}{dt} \frac{\partial L}{\partial \ddot{x}} = 0 \quad \text{and} \quad \frac{\partial L}{\partial \ddot{x}} = 0,
 \]
-
 where these conditions are each evaluated at \( t_a \) and \( t_b \). These conditions help ensure that the function \( f(x) \) not only fits the data within the knot range but also behaves optimally at the boundaries without artificial constraints. 
 
 Now, we can express Equation \ref{eq:min_smoothness_obj} in a variational form as follows:
@@ -56,6 +60,7 @@ x^{(4)}(t) = \lambda^{-1} \sum_{n=0}^{N-1} w_n (y_n - x(t_n)) \delta(t - t_n),
 This equation indicates that the third derivative of the spline function, \( x(t) \), is zero except at the designated knot points \( t_n \). Consequently, within each interval between knots, \( x(t) \) must be represented as a cubic polynomial. The coefficients of these cubic polynomials may vary between intervals. The spline function transitions to first-degree polynomials in the endpoint intervals \([t_a, t_0]\) and \([t_{N-1}, t_b]\), defining what is meant by 'natural' in the context of natural cubic splines.
 
 The explicit form of \( x(t) \) is given by:
+
 \begin{equation}
 x(t) = 
 \begin{cases} 
@@ -92,91 +97,50 @@ These conditions ensure that each spline segment smoothly transitions into the n
 
 For the cubic spline model, there are \(N-1\) cubic polynomials—one for each interval between knots—and two linear polynomials for the intervals at the domain boundaries, leading to a total of \(4(N-1) + 4 = 4N\) coefficients to solve in equations \ref{eq:cubic_spline_form}. The equations derived using the constraints in equations \ref{eq:continuity_conditions} form the basis functions for a cubic spline between knots \(x_j\) and \(x_{j+1}\), with each interval defined by \(h_j = x_{j+1} - x_j\). These basis functions are defined as:
 
-\[
+\begin{equation}
 \begin{aligned}
 a_{j}(x) &= \frac{x_{j+1} - x}{h_j}, \\
 b_{j}(x) &= \frac{(x_{j+1} - x)^3 / h_j - h_j (x_{j+1} - x)}{6}, \\
 c_{j}(x) &= \frac{x - x_j}{h_j}, \\
 d_{j}(x) &= \frac{(x - x_j)^3 / h_j - h_j (x - x_j)}{6}.
 \end{aligned}
-\label{eq:spline basis functions}
-\]
+\label{eq:spline_basis_functions}
+\end{equation}
 
 The matrix elements for the non-cyclic spline are defined as follows:
 
-\[
-\mathbf{B} =
-\frac{1}{6} 
+\begin{equation}
+\mathbf{B} = 
 \begin{bmatrix}
-2(h_0 + h_1) & h_1 & 0 & 0 \\
-h_1 & 2(h_1 + h_2) & h_2 & 0 \\
-0 & h_2 & 2(h_2 + h_3) & h_3 \\
-0 & 0 & h_3 & 2(h_3 + h_4)
+\frac{h_1 + h_2}{3} & \frac{h_2}{6} & 0 & \cdots & 0 \\
+\frac{h_2}{6} & \frac{h_2 + h_3}{3} & \frac{h_3}{6} & \cdots & 0 \\
+0 & \frac{h_3}{6} & \frac{h_3 + h_4}{3} & \frac{h_4}{6} & \cdots \\
+\vdots & & \ddots & \ddots & \ddots \\
+0 & \cdots & 0 & \frac{h_{k-2}}{6} & \frac{h_{k-2} + h_{k-1}}{3}
 \end{bmatrix}
-\]
+\label{eq: spline_matrix_element_B}
+\end{equation}
 
 and
 
-\[
-\mathbf{D} =
+\begin{equation}
+\mathbf{D} = 
 \begin{bmatrix}
-h^{-1}_0 & 0 & 0 & 0 & 0 \\
--(h^{-1}_0 + h^{-1}_1) & h^{-1}_1 & 0 & 0 & 0 \\
-0 & h^{-1}_1 & -(h^{-1}_1 + h^{-1}_2) & h^{-1}_2 & 0 \\
-0 & 0 & h^{-1}_2 & -(h^{-1}_2 + h^{-1}_3) & h^{-1}_3 \\
-0 & 0 & 0 & h^{-1}_3 & -(h^{-1}_3 + h^{-1}_4) \\
-0 & 0 & 0 & 0 & h^{-1}_4
+\frac{1}{h_1} & -\left(\frac{1}{h_1} + \frac{1}{h_2}\right) & \frac{1}{h_2} & 0 & \cdots & 0 \\
+0 & \frac{1}{h_2} & -\left(\frac{1}{h_2} + \frac{1}{h_3}\right) & \frac{1}{h_3} & \cdots & 0 \\
+0 & 0 & \frac{1}{h_3} & -\left(\frac{1}{h_3} + \frac{1}{h_4}\right) & \cdots & 0 \\
+\vdots & & \ddots & \ddots & \ddots & \vdots \\
+0 & \cdots & 0 & \frac{1}{h_{k-3}} & -\left(\frac{1}{h_{k-3}} + \frac{1}{h_{k-2}}\right) & \frac{1}{h_{k-2}} \\
+0 & \cdots & 0 & 0 & \frac{1}{h_{k-2}} & -\left(\frac{1}{h_{k-2}} + \frac{1}{h_{k-1}}\right)
 \end{bmatrix}.
-\]
+\label{eq: spline_matrix_element_D}
+\end{equation}
 
 
 Thus, these matrix formulations and the associated spline basis functions emerge from the process of optimizing the objective function outlined in Equation \ref{eq:min_smoothness_obj}.
 
-## Laplace approximation {#Laplace-approximation}
-The following proof sketch is adapted from [@kristensenTMBAutomaticDifferentiation2016].
-
-Let \( f(u, \theta) \) denote the negative joint log-likelihood of the data and the random effects, where \( u \in \mathbb{R}^n \) represents the unknown random effects and \( \theta \in \mathbb{R}^n \) represents the model parameters. The MLE, in terms of the model parameters \( \theta \), is the marginal likelihood expressed as:
-
-\[
-L(\theta) = \int_{\mathbb{R}^n} \exp(-f(u, \theta)) \, du.
-\]
-
-In this expression, the random effects are integrated out. Define \(\hat{u}\) as the value that minimizes \( f(u, \theta) \), leading to the Hessian \( \mathbf{H}(\theta) \), which is the second partial derivative of \( f(u, \theta) \) with respect to \( u \), evaluated at \(\hat{u}(\theta)\):
-
-\[
-\mathbf{H}(\theta) = \frac{\partial^2 f}{\partial u^2}(\hat{u}(\theta), \theta).
-\]
-
-Since \( f \) is approximated by a second-order Taylor expansion centered around \(\hat{u}\), the first-order term disappears, resulting in the approximation:
-
-\[
-f(u, \theta) \approx f(\hat{u}, \theta) - \frac{1}{2} (u - \hat{u})^T \mathbf{H}(\hat{u}) (u - \hat{u}).
-\]
-
-The Laplace approximation of \( L(\theta) \) is then given by:
-
-\[
-L^*(\theta) = (\sqrt{2\pi})^n \det(\mathbf{H}(\theta))^{-\frac{1}{2}} \exp(-f(\hat{u}, \theta)).
-\]
-
-Taking the negative log of this approximation yields the objective function form used by `TMB` to estimate \( \theta \):
-
-\begin{equation}
--\text{log}L^*(\theta) = -\text{n} \text{log}\sqrt{2\pi} + \frac{1}{2} \text{log} \text{det}(\mathbf{H}(\theta)) +f(\hat{u},\theta).
-\label{eq:neg laplace}
-\end{equation}
-
-This formulation of the objective function and its derivatives allows `TMB` to employ standard nonlinear optimization algorithms such as BFGS. 
-
-Uncertainty estimates for \(\hat{\theta}\) or any differential function \(\phi(\hat{\theta})\) are obtained through the delta method:
-
-\begin{equation}
-\text{VAR}(\phi(\hat{\theta})) = -\left(\frac{\partial \phi}{\partial \theta}(\hat{\theta})\right) \left(\frac{\partial^2 \log L^*}{\partial \theta^2}(\hat{\theta})\right)^{-1} \left(\frac{\partial \phi}{\partial \theta}(\hat{\theta})\right)^T.
-\label{eq:delta method}
-\end{equation}
-
 ## Akaike information criterion (AIC) {#AIC}
-The following derivation of AIC is adapted from the proof sketch from [@woodGeneralizedAdditiveModels2017a].
+The following derivation of AIC is adapted from the proof sketch in [@woodGeneralizedAdditiveModels2017a], which omits many steps and lacks clarity in some areas. To address these issues, we have filled in the missing computations, expanded on the derivations, and added explanations where needed. Our goal is to provide a comprehensive and clear explanation of how AIC works. This detailed derivation is included in the appendix of this thesis for reference.
 
 Suppose we have two possible models \(P\) and \(Q\) for a data vector \(\mathbf{X}\). We can think of these models as being a null hypothesis \(H\) and an alternative hypothesis \(A\). Let \(f_H(\mathbf{x})\) be the probability density of \(\mathbf{X}\) under \(H\) and \(f_A(\mathbf{x})\) under \(A\). Define the log-likelihood ratio as
 
@@ -192,7 +156,7 @@ Computing the expected value of \(\eta(x)\) with respect to \(A\) is
 
 This expected log-likelihood ratio can be interpreted as having the same form as the Kullback-Leibler (KL) divergence defined from the density \(f_A\) to the density \(f_H\). When the alternative model \(f_A\) fits the data better than the wrong model \(f_H\), i.e., \(A\) is true, the two models are well separated and the log-likelihood ratio will be positive. The ratio will be negative when \(f_H\) fits the data better than \(f_A\), i.e., when \(H\) is true.
 
-Suppose we misspecify the alternative hypothesis for some other model \(Q\) with density \(f_Q(\mathbf{x})\). This leads to another interpretation of the KL divergence from \(f_A\) to \(f_Q\) as measuring how much power we lose with the likelihood ratio test if we misspecify the alternative hypothesis \(A\) as \(Q\). Dualistically we can also make the mistake of taking the null hypothesis \(f_H(\mathbf{x})\) to be \(f_Q(\mathbf{x})\). The dual of this interpretation now says that the KL divergence from \(f_H\) to \(f_Q\) is the loss of power if we misspecify the null hypothesis.
+Let's consider the scenario where the alternative hypothesis is misspecified for a model \( Q \) with density \( f_Q(x) \). This misspecification can be interpreted through the Kullback-Leibler (KL) divergence from \( f_A \) to \( f_Q \), representing the loss of power in a likelihood ratio test due to the incorrect specification of the alternative hypothesis \( A \) as \( Q \). Similarly, if we mistakenly assume the null hypothesis \( f_H(x) \) to be \( f_Q(x) \), the KL divergence from \( f_H \) to \( f_Q \) reflects the power loss resulting from this misspecification of the null hypothesis [@eguchiInterpretingKullbackLeibler2006].
 
 Thus, the interpretation of the expected log-likelihood ratio statistic of two statistical models as the loss of power for specifying the model in terms of type one and type two error can be insightful for finding the solution of the problem of accounting for model complexity in model selection.
 
@@ -383,117 +347,4 @@ Scaling the above equation by a factor of 2, the Akaike Information Criterion (A
 \label{eq:AIC}
 \end{equation}
 
-# Additional Simulation Results {#Appendix-results}
-
-## SIRS model with cylic basis {#Appendix-results-sim}
-
-Figures \ref{fig:incidence20cc}, \ref{fig:transmission20cc} and \ref{fig:Rt20cc} show the results of the predicted incidence, transmission rate, and effective reproduction number for data simulated using a cyclic cubic (CC) regression smoother with varying numbers of knots (\(k = 8, 15, 20\)), from left to right. The variance \(b_{sd}\) in the Gaussian coefficients used to generate the simulation model and calibrating models are fixed at \(b\_sd = 2\). \(\gamma\) and \(\phi\) are fixed at \(\frac{1}{14}\) and \(10^{-3}\) respectively. 
-
-
-The SIRS model is used for the simulation, with compartment values initialized at the endemic equalibrium solutions. The figures use the following visual elements:
-
-- The red line represents the simulated trajectory with Gaussian noise.
-- The blue line (for incidence) or green line (for transmission rate and reproduction number) indicates the predicted values.
-- The light and dark colored bands represent the 95\% and 50\% confidence intervals, respectively.
-
-\begin{figure}
-\centering
-\includegraphics[width=\textwidth]{figure/Simulated/simulation_cc_20_k(8,15,20)_bsd2_beta2_plot_incidence.png}
-\caption[Predicted Simulated Data (CC) Incidence]{\textbf{Predicted incidence for data simulated using a cyclic cubic (CC) regression smoother with varying numbers of knots (\(k = 8, 15, 20\)).} The plots show the predicted incidence fitted to data simulated from a SIRS model.}
-\label{fig:incidence20cc}
-\end{figure}
-
-\begin{figure}
-\centering
-\includegraphics[width=\textwidth]{figure/Simulated/simulation_cc_20_k(8,15,20)_bsd2_beta2_plot_beta.png}
-\caption[Estimated Simulated Data (CC) Transmission Rate]{\textbf{Estimated transmission rate for data simulated using a cyclic cubic (CC) regression smoother with varying numbers of knots (\(k = 8, 15, 20\)).} The plots show the predicted transmission rate fitted to data simulated from a SIRS model.}
-\label{fig:transmission20cc}
-\end{figure}
-
-\begin{figure}
-\centering
-\includegraphics[width=\textwidth]{figure/Simulated/simulation_cc_20_k(8,15,20)_bsd2_beta2_plot_R_t.png}
-\caption[Estimated Simulated Data (CC) Effective Reproduction Number]{\textbf{Estimated effective reproduction number for data simulated using a cyclic cubic (CC) regression smoother with varying numbers of knots (\(k = 8, 15, 20\)).} The plots show the predicted effective reproduction number fitted to data simulated from a SIRS model.}
-\label{fig:Rt20cc}
-\end{figure}
-
-## Comparison of SIRS model using B-Spline (BS) basis unaggregated and aggregated data  {#Appendix-results-agg}
-
-
-
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{figure/Simulated/unaggregated/simulation_bs_20_k(5,10,20)_bsd1_beta1_plot_incidence.png}
-\caption[Predicted Simulated Data (BS) Incidence]{\textbf{Estimated Number of New Infections per day (Incidence) for data simulated using a B-Spline (BS) basis.} The columns are labelled according to the number of knots used to fit to the data. The red line represents the simulated trajectory with Gaussian noise. The blue line indicates the predicted incidence, with light and dark blue bands representing the 95\% and 50\% confidence intervals.}
-\label{fig:incidence20bs}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{figure/Simulated/unaggregated/simulation_bs_20_k(5,10,20)_bsd1_beta1_plot_beta.png}
-\caption[Estimated Simulated Data (BS) Transmission Rate]{\textbf{Estimated transmission rate \(\beta\) per day for data simulated using a B-Spline (BS) basis.} The columns are labelled according to the number of knots used to fit to the data. . The red line represents the true transmission rate function from the simulated data. The green line indicates the estimated transmission rate, with light and dark green bands representing the 95\% and 50\% confidence intervals.}
-\label{fig:transmission20bs}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{figure/Simulated/unaggregated/simulation_bs_20_k(5,10,20)_bsd1_beta1_plot_R_t.png}
-\caption[Estimated Simulated Data (BS) Effective Reproduction Number]{\textbf{Estimated effective reproduction \(R_t\) per day for data simulated using a B-Spline (BS) basis.} The columns are labelled according to the number of knots used to fit to the data. The black line represents the reproduction number from the simulated data. The purple line indicates the estimated reproduction number, with light and dark purple bands representing the 95\% and 50\% confidence intervals.}
-\label{fig:Rt20bs}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{figure/Simulated/aggregated/simulation_agg_bs_20_k(5,10,20)_bsd1_beta1_plot_incidence.png}
-\caption[Predicted Simulated and Aggregated Data (BS) Incidence]{\textbf{Estimated Number of New Infections per day (Incidence) for aggregated data simulated using a B-Spline (BS) basis.} The columns are labelled according to the number of knots used to fit to the data. The red line represents the simulated trajectory with Gaussian noise. The blue line indicates the predicted incidence, with light and dark blue bands representing the 95\% and 50\% confidence intervals.}
-\label{fig:incidence_agg_bs}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{figure/Simulated/aggregated/simulation_agg_bs_20_k(5,10,20)_bsd1_beta1_plot_beta.png}
-\caption[Estimated Simulated and Aggregated Data (BS) Transmission Rate]{\textbf{Estimated transmission rate \(\beta\) per day for aggregated data simulated using a B-Spline (BS) basis.} The columns are labelled according to the number of knots used to fit to the data. The red line represents the true transmission rate function from the simulated data. The green line indicates the estimated transmission rate, with light and dark green bands representing the 95\% and 50\% confidence intervals.}
-\label{fig:transmission_agg_bs}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{figure/Simulated/aggregated/simulation_agg_bs_20_k(5,10,20)_bsd1_beta1_plot_R_t.png}
-\caption[Estimated Simulated and Aggregated Data (BS) Effective Reproduction Number]{\textbf{Estimated effective reproduction \(R_t\) per day for aggregated data simulated using a B-Spline (BS) basis.} The columns are labelled according to the number of knots used to fit to the data. The black line represents the reproduction number from the simulated data. The purple line indicates the estimated reproduction number, with light and dark purple bands representing the 95\% and 50\% confidence intervals.}
-\label{fig:Rt20_agg_bs}
-\end{figure}
-
-
-```{r aic-table-sim-bs, echo=FALSE, message=FALSE, warning=FALSE}
-library(knitr)
-library(kableExtra)
-library(tidyr)
-
-# Load the saved R object
-aic_table <- readRDS("data/Tables/Simulated/simulation_bs_20_k(5,10,20)_bsd1_beta1.rds")
-
-# Generate and display the table with additional headers
-kable(aic_table, format = "latex", booktabs = TRUE, 
-      col.names = c("Smooth Type", "k = 8", "k = 15", "k = 20"),
-      caption = "\\textbf{Conditional AIC Scores of calibrating models with varying model granularity, fitted to data simulated using a B-Spline (BS) basis with \\(k=20\\) knots.} The degrees of freedom are defined as the model degrees of freedom, which is computed as the trace of penalized smoothing matrix.") %>%
-  add_header_above(c(" " = 1, "Knots" = 3)) %>%
-  kable_styling(latex_options = c("hold_position"))
-```
-
-```{r aic-table-sim-agg-bs, echo=FALSE, message=FALSE, warning=FALSE}
-library(knitr)
-library(kableExtra)
-library(tidyr)
-
-# Load the saved R object
-aic_table <- readRDS("data/Tables/Simulated/simulation_agg_bs_20_k(5,10,20)_bsd1_beta1.rds")
-
-# Generate and display the table with additional headers
-kable(aic_table, format = "latex", booktabs = TRUE, 
-      col.names = c("Smooth Type", "k = 8", "k = 15", "k = 20"),
-      caption = "\\textbf{Conditional AIC Scores of calibrating models with varying model granularity, fitted to aggregated data simulated using a B-Spline (BS) basis with \\(k=20\\) knots.} The degrees of freedom are defined as the model degrees of freedom, which is computed as the trace of penalized smoothing matrix.") %>%
-  add_header_above(c(" " = 1, "Knots" = 3)) %>%
-  kable_styling(latex_options = c("hold_position"))
-```
 
