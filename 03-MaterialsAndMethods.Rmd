@@ -89,7 +89,7 @@ When the sum-to-zero constraints are absorbed into the basis matrix, this also s
 The effective reproductive number
 
 \[
-R_t = R_0 \times \frac{S(t)}{N} = \frac{\beta}{\gamma} \times \frac{S(t)}{N},
+R_t = R_0 \times \frac{S}{N} = \frac{\beta}{\gamma} \times \frac{S}{N},
 \]
 dynamically reflects the average number of secondary infections that an infectious individual can cause at a specific time \( t \) in a population where not all members are susceptible. This equation implies that \( R_t \) will decrease over time as \( S(t) \) decreases. It also implies that \( R_t \) can be effectively reduced by decreasing the contact rate \(\beta(t)\) through interventions. Unlike \( R_0 \), which assumes that the entire population is susceptible, \( R_t \) adjusts for changes in susceptibility due to factors such as immunity from previous infections or vaccinations.
 

@@ -448,7 +448,7 @@ This thesis presents a novel approach to ecological dynamic modeling using non-s
 
 Ecological dynamic models describe how ecological processes drive populations to change over time by estimating the parameters of the deterministic process, observation error, and process error from a single time series {[}1{]}. However, estimating parameters for dynamic models is challenging. One simplification is to assume that the dynamic model only has observation error, which can be implemented by starting with the initial conditions of the system and computing the entire trajectory over the domain at once. This approach assumes there is no uncertainty in the predicted values of the states at each time step, meaning there is no process error. Since the trajectory at every time step is determined solely by the starting parameters and initial conditions, the model is deterministic. The only error accounted for is the difference between observed and predicted values.
 
-To fit the model to data and compute the maximum likelihood estimate (MLE) for a given set of parameters, one assumes independent observations and sums the likelihood for each observation based on the chosen model of observation error. Using a quasi-Newton method, parameter estimates are updated basek on the current iteration of trajectory matching until convergence is achieved. If the observation error is normally distributed with constant variance, this process simplifies to least squares fitting.
+To fit the model to data and compute the maximum likelihood estimate (MLE) for a given set of parameters, one assumes independent observations and sums the likelihood for each observation based on the chosen model of observation error. Using a quasi-Newton method, parameter estimates are updated based on the current iteration of trajectory matching until convergence is achieved. If the observation error is normally distributed with constant variance, this process simplifies to least squares fitting.
 
 In modeling infectious diseases, for example, one may be interested in estimating the unobserved process of the transmission rate between an infectious individual and a susceptible one. Assuming a fixed value for the transmission rate at every time step is often inaccurate because many diseases have dynamic transmission rates influenced by factors such as seasonality or non-pharmaceutical interventions (e.g., social distancing, masking, and changes in mobility patterns). Therefore, it is reasonable to assume that the transmission rate is a time-varying parameter, computed at each observed data point.
 
@@ -895,9 +895,9 @@ The basic SIR model can be modified to include a process where recovered individ
 
 In equation \ref{eq:sir ode}, for \(\frac{dS}{dt}\), the term \(\beta \frac{I}{N} S\) represents the rate at which susceptible are becoming infected. Here, \(\lambda = \beta \frac{I}{N}\) is the \emph{force of infection}, which means that each susceptible individual has a probability \(\lambda\) of becoming infected per unit time. The force of infection is defined as as the per capita rate at which susceptible individuals contract the disease. Essentially, it quantifies the risk that a susceptible individual faces of becoming infected at a given time, depending on the current prevalence and contagiousness of the disease in the population. The force of infection is directly proportional to the number of infectious individuals in the population.
 
-An infectious individual contacts \(\beta\) individuals per unit time, and the proportion of susceptibles in the population is \(\frac{S}{N}\). Therefore, the effective contacts that can result in a new infection are \(\beta \frac{S}{N}\). An infectious individual remains infectious for \(\frac{1}{\gamma}\) units of time, on average (since \(\gamma\) is the rate at which individuals recover and cease being infectious). The \emph{basic reproduction number} \(R_0\) can be calculated as the product of the infection rate per contact, the number of contacts per unit time, and the duration of infectiousness:
+An infectious individual contacts \(\beta\) individuals per unit time, and the proportion of susceptibles in the population is \(\frac{S}{N}\). Therefore, the effective contacts that can result in a new infection are \(\beta \frac{S}{N}\). An infectious individual remains infectious for \(\frac{1}{\gamma}\) units of time, on average (since \(\gamma\) is the rate at which individuals recover and cease being infectious). The \emph{basic reproduction number} \(R_0\) is defined as:
 \[
-   R_0 = \beta \frac{S}{N} \frac{1}{\gamma} = \frac{\beta}{\gamma}.
+   R_0 = \frac{\beta}{\gamma}.
    \]
 Therefore \(R_0\) is the average number of secondary cases of disease caused by a single infected individual overtheir infectious period. {[}21{]} discusses the subtleties in defining and estimating the reproductive number.
 
@@ -996,7 +996,7 @@ When the sum-to-zero constraints are absorbed into the basis matrix, this also s
 The effective reproductive number
 
 \[
-R_t = R_0 \times \frac{S(t)}{N} = \frac{\beta}{\gamma} \times \frac{S(t)}{N},
+R_t = R_0 \times \frac{S}{N} = \frac{\beta}{\gamma} \times \frac{S}{N},
 \]
 dynamically reflects the average number of secondary infections that an infectious individual can cause at a specific time \(t\) in a population where not all members are susceptible. This equation implies that \(R_t\) will decrease over time as \(S(t)\) decreases. It also implies that \(R_t\) can be effectively reduced by decreasing the contact rate \(\beta(t)\) through interventions. Unlike \(R_0\), which assumes that the entire population is susceptible, \(R_t\) adjusts for changes in susceptibility due to factors such as immunity from previous infections or vaccinations.
 
