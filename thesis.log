@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.4.30)  1 JUL 2024 12:04
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.4.30)  16 JUL 2024 10:16
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1505,19 +1505,19 @@ tics
 {/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}{/usr/loca
 l/texlive/2024/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}] [4] [5] [6] [7] [8
 ] [9] [10] [11] [12] [13] [14] [15]
-<figure/sir_model.png, id=449, 460.72125pt x 129.48375pt>
+<figure/sir_model.png, id=458, 460.72125pt x 129.48375pt>
 File: figure/sir_model.png Graphic file (type png)
 <use figure/sir_model.png>
-Package pdftex.def Info: figure/sir_model.png  used on input line 869.
+Package pdftex.def Info: figure/sir_model.png  used on input line 868.
 (pdftex.def)             Requested size: 418.25545pt x 117.54784pt.
 [16 <./figure/sir_model.png>]
-<figure/sirs_model.png, id=459, 460.72125pt x 178.6675pt>
+<figure/sirs_model.png, id=468, 460.72125pt x 178.6675pt>
 File: figure/sirs_model.png Graphic file (type png)
 <use figure/sirs_model.png>
-Package pdftex.def Info: figure/sirs_model.png  used on input line 889.
+Package pdftex.def Info: figure/sirs_model.png  used on input line 888.
 (pdftex.def)             Requested size: 418.25545pt x 162.19781pt.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <12> on input line 894.
+(Font)              <12> on input line 893.
 [17 <./figure/sirs_model.png>] [18]
 Chapter 3.
 --------------------
@@ -1528,35 +1528,35 @@ tics
 
 ] [20]
 
-Package xcolor Warning: Incompatible color definition on input line 939.
+Package xcolor Warning: Incompatible color definition on input line 940.
 
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <10.95> not available
-(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 941.
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 942.
 
-Package xcolor Warning: Incompatible color definition on input line 944.
+Package xcolor Warning: Incompatible color definition on input line 945.
 
 
-Package xcolor Warning: Incompatible color definition on input line 944.
+Package xcolor Warning: Incompatible color definition on input line 945.
 
 [21] [22] [23] [24] [25]
 
-Package xcolor Warning: Incompatible color definition on input line 1097.
+Package xcolor Warning: Incompatible color definition on input line 1096.
 
 
-Package xcolor Warning: Incompatible color definition on input line 1133.
+Package xcolor Warning: Incompatible color definition on input line 1132.
 
 
-Package xcolor Warning: Incompatible color definition on input line 1133.
+Package xcolor Warning: Incompatible color definition on input line 1132.
 
 
-Package xcolor Warning: Incompatible color definition on input line 1133.
+Package xcolor Warning: Incompatible color definition on input line 1132.
 
 [26]
 
-Package xcolor Warning: Incompatible color definition on input line 1133.
+Package xcolor Warning: Incompatible color definition on input line 1132.
 
 
-Package xcolor Warning: Incompatible color definition on input line 1133.
+Package xcolor Warning: Incompatible color definition on input line 1132.
 
 [27]
 Chapter 4.
@@ -1566,157 +1566,163 @@ tics
 --------------------
 [28
 
-] [29]
+] [29] [30]
 <figure/Simulated/unaggregated/simulation_gp_20_k(5,10,20)_bsd1_beta1_plot_basi
-s.png, id=546, 361.35pt x 433.62pt>
+s.png, id=561, 361.35pt x 433.62pt>
 File: figure/Simulated/unaggregated/simulation_gp_20_k(5,10,20)_bsd1_beta1_plot
 _basis.png Graphic file (type png)
 <use figure/Simulated/unaggregated/simulation_gp_20_k(5,10,20)_bsd1_beta1_plot_
 basis.png>
 Package pdftex.def Info: figure/Simulated/unaggregated/simulation_gp_20_k(5,10,
-20)_bsd1_beta1_plot_basis.png  used on input line 1182.
+20)_bsd1_beta1_plot_basis.png  used on input line 1183.
 (pdftex.def)             Requested size: 418.25545pt x 501.90784pt.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 1183.
+(Font)              <10> on input line 1184.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 1183.
+(Font)              <7> on input line 1184.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 1183.
-[30]
-<figure/Simulated/unaggregated/sim_combined_gp.png, id=551, 361.35pt x 433.62pt
+(Font)              <5> on input line 1184.
+[31]
+<figure/Simulated/unaggregated/sim_combined_gp.png, id=567, 361.35pt x 433.62pt
 >
 File: figure/Simulated/unaggregated/sim_combined_gp.png Graphic file (type png)
 
 <use figure/Simulated/unaggregated/sim_combined_gp.png>
 Package pdftex.def Info: figure/Simulated/unaggregated/sim_combined_gp.png  use
-d on input line 1189.
+d on input line 1190.
 (pdftex.def)             Requested size: 418.25545pt x 501.90784pt.
-[31 <./figure/Simulated/unaggregated/simulation_gp_20_k(5,10,20)_bsd1_beta1_plo
+[32 <./figure/Simulated/unaggregated/simulation_gp_20_k(5,10,20)_bsd1_beta1_plo
 t_basis.png>]
-<figure/Simulated/unaggregated/sim_combined_tp_k8.png, id=556, 361.35pt x 433.6
+<figure/Simulated/unaggregated/sim_combined_tp_k8.png, id=573, 361.35pt x 433.6
 2pt>
 File: figure/Simulated/unaggregated/sim_combined_tp_k8.png Graphic file (type p
 ng)
 <use figure/Simulated/unaggregated/sim_combined_tp_k8.png>
 Package pdftex.def Info: figure/Simulated/unaggregated/sim_combined_tp_k8.png  
-used on input line 1196.
+used on input line 1197.
 (pdftex.def)             Requested size: 418.25545pt x 501.90784pt.
-[32 <./figure/Simulated/unaggregated/sim_combined_gp.png>]
-<figure/Simulated/unaggregated/sim_combined_cr.png, id=562, 361.35pt x 433.62pt
+[33 <./figure/Simulated/unaggregated/sim_combined_gp.png>]
+<figure/Simulated/unaggregated/sim_combined_cr.png, id=578, 361.35pt x 433.62pt
 >
 File: figure/Simulated/unaggregated/sim_combined_cr.png Graphic file (type png)
 
 <use figure/Simulated/unaggregated/sim_combined_cr.png>
 Package pdftex.def Info: figure/Simulated/unaggregated/sim_combined_cr.png  use
-d on input line 1203.
+d on input line 1204.
 (pdftex.def)             Requested size: 418.25545pt x 501.90784pt.
-[33 <./figure/Simulated/unaggregated/sim_combined_tp_k8.png>]
-<figure/Simulated/unaggregated/sim_combined_bs.png, id=568, 361.35pt x 433.62pt
+[34 <./figure/Simulated/unaggregated/sim_combined_tp_k8.png>]
+<figure/Simulated/unaggregated/sim_combined_bs.png, id=583, 361.35pt x 433.62pt
 >
 File: figure/Simulated/unaggregated/sim_combined_bs.png Graphic file (type png)
 
 <use figure/Simulated/unaggregated/sim_combined_bs.png>
 Package pdftex.def Info: figure/Simulated/unaggregated/sim_combined_bs.png  use
-d on input line 1210.
+d on input line 1211.
 (pdftex.def)             Requested size: 418.25545pt x 501.90784pt.
-[34 <./figure/Simulated/unaggregated/sim_combined_cr.png>]
-<figure/Simulated/aggregated/sim_agg_combined_gp.png, id=573, 361.35pt x 433.62
+[35 <./figure/Simulated/unaggregated/sim_combined_cr.png>]
+<figure/Simulated/aggregated/sim_agg_combined_gp.png, id=588, 361.35pt x 433.62
 pt>
 File: figure/Simulated/aggregated/sim_agg_combined_gp.png Graphic file (type pn
 g)
 <use figure/Simulated/aggregated/sim_agg_combined_gp.png>
 Package pdftex.def Info: figure/Simulated/aggregated/sim_agg_combined_gp.png  u
-sed on input line 1217.
+sed on input line 1218.
 (pdftex.def)             Requested size: 418.25545pt x 501.90784pt.
-[35 <./figure/Simulated/unaggregated/sim_combined_bs.png>]
-<figure/Simulated/aggregated/sim_agg_combined_tp_k10.png, id=578, 361.35pt x 43
+[36 <./figure/Simulated/unaggregated/sim_combined_bs.png>]
+<figure/Simulated/aggregated/sim_agg_combined_tp_k10.png, id=593, 361.35pt x 43
 3.62pt>
 File: figure/Simulated/aggregated/sim_agg_combined_tp_k10.png Graphic file (typ
 e png)
 <use figure/Simulated/aggregated/sim_agg_combined_tp_k10.png>
 Package pdftex.def Info: figure/Simulated/aggregated/sim_agg_combined_tp_k10.pn
-g  used on input line 1224.
+g  used on input line 1225.
 (pdftex.def)             Requested size: 418.25545pt x 501.90784pt.
-[36 <./figure/Simulated/aggregated/sim_agg_combined_gp.png>]
-<figure/Simulated/aggregated/sim_agg_combined_cr.png, id=583, 361.35pt x 433.62
+[37 <./figure/Simulated/aggregated/sim_agg_combined_gp.png>]
+<figure/Simulated/aggregated/sim_agg_combined_cr.png, id=598, 361.35pt x 433.62
 pt>
 File: figure/Simulated/aggregated/sim_agg_combined_cr.png Graphic file (type pn
 g)
 <use figure/Simulated/aggregated/sim_agg_combined_cr.png>
 Package pdftex.def Info: figure/Simulated/aggregated/sim_agg_combined_cr.png  u
-sed on input line 1231.
+sed on input line 1232.
 (pdftex.def)             Requested size: 418.25545pt x 501.90784pt.
-[37 <./figure/Simulated/aggregated/sim_agg_combined_tp_k10.png>]
-<figure/Simulated/aggregated/sim_agg_combined_bs.png, id=588, 361.35pt x 433.62
+[38 <./figure/Simulated/aggregated/sim_agg_combined_tp_k10.png>]
+<figure/Simulated/aggregated/sim_agg_combined_bs.png, id=604, 361.35pt x 433.62
 pt>
 File: figure/Simulated/aggregated/sim_agg_combined_bs.png Graphic file (type pn
 g)
 <use figure/Simulated/aggregated/sim_agg_combined_bs.png>
 Package pdftex.def Info: figure/Simulated/aggregated/sim_agg_combined_bs.png  u
-sed on input line 1238.
+sed on input line 1239.
 (pdftex.def)             Requested size: 418.25545pt x 501.90784pt.
-[38 <./figure/Simulated/aggregated/sim_agg_combined_cr.png>]
+[39 <./figure/Simulated/aggregated/sim_agg_combined_cr.png>]
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-[39 <./figure/Simulated/aggregated/sim_agg_combined_bs.png>]
-<figure/Scarlet/scarlet_combined.png, id=600, 361.35pt x 433.62pt>
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+[40 <./figure/Simulated/aggregated/sim_agg_combined_bs.png>] [41]
+<figure/Scarlet/scarlet_combined.png, id=619, 361.35pt x 433.62pt>
 File: figure/Scarlet/scarlet_combined.png Graphic file (type png)
 <use figure/Scarlet/scarlet_combined.png>
 Package pdftex.def Info: figure/Scarlet/scarlet_combined.png  used on input lin
-e 1289.
+e 1322.
 (pdftex.def)             Requested size: 418.25653pt x 418.27527pt.
-[40]
+[42]
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-[41 <./figure/Scarlet/scarlet_combined.png>] [42]
-<figure/Ireland/ireland_combined.png, id=615, 361.35pt x 433.62pt>
+[43 <./figure/Scarlet/scarlet_combined.png>] [44]
+<figure/Ireland/ireland_combined.png, id=635, 361.35pt x 433.62pt>
 File: figure/Ireland/ireland_combined.png Graphic file (type png)
 <use figure/Ireland/ireland_combined.png>
 Package pdftex.def Info: figure/Ireland/ireland_combined.png  used on input lin
-e 1345.
+e 1378.
 (pdftex.def)             Requested size: 418.25653pt x 418.27527pt.
-[43] [44 <./figure/Ireland/ireland_combined.png>]
-<figure/Measles/Measles_combined_plot.png, id=627, 1033.7019pt x 585.1461pt>
+[45] [46 <./figure/Ireland/ireland_combined.png>]
+<figure/Measles/Measles_combined_plot.png, id=646, 1033.7019pt x 585.1461pt>
 File: figure/Measles/Measles_combined_plot.png Graphic file (type png)
 <use figure/Measles/Measles_combined_plot.png>
 Package pdftex.def Info: figure/Measles/Measles_combined_plot.png  used on inpu
-t line 1364.
+t line 1397.
 (pdftex.def)             Requested size: 418.25266pt x 418.26915pt.
-[45] [46 <./figure/Measles/Measles_combined_plot.png>]
+[47] [48 <./figure/Measles/Measles_combined_plot.png>]
 Chapter 5.
 --------------------
  Master of Science-- Greg Forkutza; McMaster University-- Mathematics \& Statis
 tics
 --------------------
-[47
+[49
 
-] [48] [49]
+] [50] [51]
 Appendix A.
 --------------------
  Master of Science-- Greg Forkutza; McMaster University-- Mathematics \& Statis
 tics
 --------------------
-[50
+[52
 
-] [51] [52]
-Overfull \hbox (18.13472pt too wide) detected at line 1528
+] [53] [54]
+Overfull \hbox (18.13472pt too wide) detected at line 1561
 [][][]\OT1/lmr/bx/n/10.95 D \OT1/lmr/m/n/10.95 = [] \OML/lmm/m/it/10.95 :
  []
 
-[53] [54]
-Overfull \hbox (14.61998pt too wide) detected at line 1580
+[55] [56]
+Overfull \hbox (14.61998pt too wide) detected at line 1613
 \OML/lmm/m/it/10.95 K\OT1/lmr/m/n/10.95 (\OML/lmm/m/it/10.95 f[]; f[]\OT1/lmr/m
 /n/10.95 ) = [] [] \OML/lmm/m/it/10.95 f[]\OT1/lmr/m/n/10.95 (\OML/lmm/m/it/10.
 95 y\OT1/lmr/m/n/10.95 ) \OML/lmm/m/it/10.95 dy
  []
 
 
-Overfull \hbox (76.08588pt too wide) detected at line 1585
+Overfull \hbox (76.08588pt too wide) detected at line 1618
 \OML/lmm/m/it/10.95 K\OT1/lmr/m/n/10.95 (\OML/lmm/m/it/10.95 f[]; f[]\OT1/lmr/m
 /n/10.95 ) = [] [] \OML/lmm/m/it/10.95 f[]\OT1/lmr/m/n/10.95 (\OML/lmm/m/it/10.
 95 y\OT1/lmr/m/n/10.95 ) \OML/lmm/m/it/10.95 dy \OMS/lmsy/m/n/10.95 ^^@ []\OT1/
@@ -1729,10 +1735,10 @@ mm/m/it/10.95 ^^R[]\OT1/lmr/m/n/10.95 )\OML/lmm/m/it/10.95 f[]\OT1/lmr/m/n/10.9
 5 (\OML/lmm/m/it/10.95 y\OT1/lmr/m/n/10.95 ) \OML/lmm/m/it/10.95 dy
  []
 
-[55] [56] [57] [58] [59
+[57] [58] [59] [60] [61
 
 
-] [60] [61] 
+] [62] [63] 
 enddocument/afterlastpage: lastpage setting LastPage.
 (./thesis.aux)
  ***********
@@ -1740,17 +1746,17 @@ LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2020/03/25>
  ***********
 Package rerunfilecheck Info: File `thesis.out' has not changed.
-(rerunfilecheck)             Checksum: 7D871B9CA7FB9174F71670CC6320B7C2;6508.
+(rerunfilecheck)             Checksum: 30D6D8C27703CD143F8D773DE94E31AB;6508.
 Package logreq Info: Writing requests to 'thesis.run.xml'.
 \openout1 = `thesis.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 51344 strings out of 474104
- 1206723 string characters out of 5743467
- 2134681 words of memory out of 5000000
- 72768 multiletter control sequences out of 15000+600000
- 678464 words of font info for 115 fonts, out of 8000000 for 9000
+ 51364 strings out of 474104
+ 1206962 string characters out of 5743467
+ 2136361 words of memory out of 5000000
+ 72777 multiletter control sequences out of 15000+600000
+ 696404 words of font info for 121 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  115i,12n,121p,1608b,2834s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmbsy10.pfb></usr/l
@@ -1775,10 +1781,10 @@ public/lm/lmsy6.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/l
 msy8.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmtk10.pfb><
 /usr/local/texlive/2024/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></usr/local
 /texlive/2024/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on thesis.pdf (78 pages, 5795555 bytes).
+Output written on thesis.pdf (80 pages, 5799682 bytes).
 PDF statistics:
- 961 PDF objects out of 1000 (max. 8388607)
- 801 compressed objects within 9 object streams
- 194 named destinations out of 1000 (max. 500000)
+ 980 PDF objects out of 1000 (max. 8388607)
+ 818 compressed objects within 9 object streams
+ 199 named destinations out of 1000 (max. 500000)
  355 words of extra memory for PDF output out of 10000 (max. 10000000)
 

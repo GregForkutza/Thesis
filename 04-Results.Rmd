@@ -10,15 +10,15 @@ This chapter presents examples demonstrating the application of semi-mechanistic
 ## SIRS Model with Simulated Data {#simulation}
 One challenge in epidemiological modeling is the lack of direct observation of the transmission rate within datasets containing incidence or prevalence data. Consequently, the true shape of the function used to estimate the transmission rate remains unknown. Our goal is to develop a compartmental model, formulated as a deterministic system of ordinary differential equations, incorporating a linear smoother component. If this model can accurately predict population dynamics based on the time-varying transmission rate, it should enable us to infer the transmission rate by fitting the model to the data. This approach allows us to validate the effectiveness of the smoothing parameter estimation methodology and demonstrate the applicability of these methods with models formulated as discrete systems of ordinary differential equations.
 
-Consider the time-varying transmission rate \(\beta\) as a latent variable. 'Time-varying' means that at each observation \(x_i\) in the dataset, the model—comprising a system of ordinary differential equations—contains an estimated value for the transmission rate for each \(1 \leq i \leq n\), where \(n\) is the number of observations.
+Consider the time-varying transmission rate \(\boldsymbol{\beta}\) as a latent process. 'Time-varying' means that at each observation \(x_i\) in the dataset, the model—comprising a system of ordinary differential equations—contains an estimated value for the transmission rate for each \(1 \leq i \leq n\), where \(n\) is the number of observations.
 
-\(\beta\) is constructed as the linear smoother \(b_0 + \mathbf{X}b\), where \(b_0\) is the intercept, \(\mathbf{X}\) is the model matrix associated with the particular smoother, and \(b\) is the vector of smoothing coefficients. Both \(b_0\) and \(b\) are parameters that need to be estimated. This linear smoother, which estimates \(\beta\), is a non-parametric component inside a deterministic system of differential equations, whose trajectory is determined entirely by the starting parameters. This is why the model is called semi-mechanistic or partially specified. Some components of the model contain unknown functions, while the rest of the model comprises conventional elements with only unknown scalar parameters.
+\(\boldsymbol{\beta}\) is constructed as the linear smoother \(b_0 + \mathbf{X}\mathbf{b}\), where \(b_0\) is the intercept, \(\mathbf{X}\) is the model matrix associated with the particular smoother, and \(\mathbf{b}\) is the vector of smoothing coefficients. Both \(b_0\) and \(\mathbf{b}\) are parameters that need to be estimated. This linear smoother, which estimates \(\boldsymbol{\beta}\), is a non-parametric component inside a deterministic system of differential equations, whose trajectory is determined entirely by the starting parameters. This is why the model is called semi-mechanistic or partially specified. Some components of the model contain unknown functions, while the rest of the model comprises conventional elements with only unknown scalar parameters.
 
 To prove that semi-mechanistic models within the `macpan2` modeling framework are capable for this problem, we conduct a simulation study. For a chosen smooth, we simulate data and add Gaussian noise to the incidence. The simulated data is used to calibrate the model using various smoothers available in the `mgcv` package. In Figure \ref{fig:sim_basis}, we illustrate the shape of the basis functions for each of the univariate smoothing bases used in this methodology.
 
 Consider a SIRS compartmental model with a fixed waning immunity parameter \(\phi\). The total number of individuals in the population is given by \(N\). The initial values of \(S\), \(I\), and \(R\) are fixed at the endemic equilibrium solutions.
 
-We construct the data-generating model as follows. The smoother type and the number of knots \(k\) are specified using a particular `mgcv` smooth. This determines the form of \(\mathbf{X}\) and the penalty matrix \(\mathbf{P}\). The smoothing coefficients \(b\), of dimension \(k-2\), are assumed to be multivariate Gaussian. Thus, \(b\) is defined as random normal deviates at the \(k-2\) evenly spaced quantiles with a mean of 0 and a standard deviation specified as \(b_{sd}\). As the variation of this distribution increases, the true function describing the time-varying transmission rate for the data model will become more complex. An initial value for \(b_0\) is chosen as the log of the initial value of \(\beta\). The recovery rate \(\gamma\) is fixed. Initial values for the remaining parameter estimates are set to 1. 
+We construct the data-generating model as follows. The smoother type and the number of knots \(k\) are specified using a particular `mgcv` smooth. This determines the form of \(\mathbf{X}\) and the penalty matrix \(\mathbf{P}\). The smoothing coefficients \(\mathbf{b}\), of dimension \(k-2\), are assumed to be multivariate Gaussian. Thus, \(\mathbf{b}\) is defined as random normal deviates at the \(k-2\) evenly spaced quantiles with a mean of 0 and a standard deviation specified as \(b_{sd}\). As the variation of this distribution increases, the true function describing the time-varying transmission rate for the data model will become more complex. An initial value for \(b_0\) is chosen as the log of the initial value of \(\beta\). The recovery rate \(\gamma\) is fixed. Initial values for the remaining parameter estimates are set to . 
 
 The model trajectory is simulated from these initial conditions using Euler steps. Gaussian noise (\(sd = 0.2\)) is added to the log-transformed simulated incidence vector, and then the inverse transformation is applied. This vector is used to test the efficacy of the semi-mechanistic models. The models are calibrated using `macpan2`, which uses the Laplace approximation via `TMB` to optimize the objective function and update parameter estimates using Quasi-Newton methods.
 
@@ -36,7 +36,9 @@ For the estimated effective reproduction number \(R_t\), the black line represen
 
 The number of knots used to calibrate the models was \(k =20\) for simulated data sets, except the TP basis for both the unaggregated and aggregated data. For the GP, CR, and BS data, the value \(k =20\) was chosen as the smallest value of \(k\) to fit the predicted and estimated values without introducing overfitting. This was evaluated by visually inspecting the results of the figures below. For the TP basis, the optimization procedure for the model calibration did not converge for values of \(k \geq 10\). None of the bases were able to match the highly oscillating trajectory observed in the last 75 days of Figures \ref{fig:sim_tp} and \ref{fig:sim_agg_tp}.
 
-In Table \ref{tab:aic-table-sim}, we present the comparison of the conditional AIC scores for all eight models. We observe that the Gaussian process (GP) model consistently has the lowest AIC score across all datasets. The AIC score, which balances model fit and complexity, suggests that the GP model provides the best trade-off between these two aspects among the models compared. A lower AIC score indicates that the GP model is relatively the best fit for the data, taking into account the effect of penalization on the number of knots used, i.e., effective degrees of freedom. Thus, the GP model is the most likely to minimize information loss when approximating the true data-generating process, compared to the other models tested.
+In Tables \ref{tab:aic-table-sim} and \ref{tab:aic-table-sim-agg}, we present a comparison of the conditional AIC scores for all sixteen models for the unaggregated and aggregated data sets, respectively. We observe that the cubic regression spline (CR) model consistently has the lowest AIC score across all datasets. A lower conditional AIC score indicates that the model is relatively the best fit for the data, taking into account the effect of penalization on the number of knots used, i.e., effective degrees of freedom. The best model is the most likely to minimize information loss when approximating the true data-generating process, compared to the other models tested. The AIC score, which balances model fit and complexity, suggests that the CR model provides the best trade-off between these two aspects among the models compared. However, the \(\Delta\text{AIC}\) values are within two points of each other, indicating that this difference is negligible and one model is not significantly better than the others.
+
+In Tables \ref{tab:mse-table-sim} and \ref{tab:mse-table-sim-agg}, we present a comparison of the mean square error (MSE) for all sixteen models for the unaggregated and aggregated data sets, respectively. For the unaggregated data, we observe that models using the same basis for generation and fitting have the lowest MSE for all bases except the B-spline basis. For the aggregated data, the models using the same basis for generation and fitting have the lowest MSE for all bases except the thin plate spline basis.
 
 \begin{figure}[H]
 \centering
@@ -109,12 +111,28 @@ library(kableExtra)
 library(tidyr)
 
 # Load the saved R object
-load("data/unaggregated_table.RData")
+load("data/Tables/Simulated/unaggregated_table.RData")
 
 # Generate and display the table with additional headers
 # Generate and display the table with the revised caption
-kable(transposed_result, format = "latex", booktabs = TRUE, 
-      caption = "\\textbf{Conditional AIC Scores for SIRS Model with Simulated Data}. The columns represent the smoothing basis used to fit the model, while the rows indicate the basis used to generate the simulated data. The degrees of freedom are computed as the trace of the penalized smoothing matrix.") %>%
+kable(final_result, format = "latex", booktabs = TRUE, 
+      caption = "\\textbf{Conditional AIC Scores for SIRS Model with Simulated Data}. The columns represent the smoothing basis used to fit the model, while the rows indicate the basis used to generate the simulated data. \\(\\Delta \\text{cAIC}\\) values are calculated relative to the best score within each row.") %>%
+  kable_styling(latex_options = c("hold_position"))
+
+```
+
+```{r mse-table-sim, echo=FALSE, message=FALSE, warning=FALSE}
+library(knitr)
+library(kableExtra)
+library(tidyr)
+
+# Load the saved R object
+load("data/Tables/Simulated/MSE_unaggregated.RData")
+
+
+# Generate and display the table with the revised caption
+kable(adjusted_df, format = "latex", booktabs = TRUE, 
+      caption = "\\textbf{Mean Square Error (MSE) for SIRS Model with Simulated Data}. The columns represent the smoothing basis used to fit the model, while the rows indicate the basis used to generate the simulated data.  \\(\\Delta \\text{MSE}\\) values are calculated relative to the best score within each row.") %>%
   kable_styling(latex_options = c("hold_position"))
 
 ```
@@ -126,15 +144,33 @@ library(tidyr)
 
 # Load the saved R object
 # Load the data
-load("data/aggregated_table_sim.RData")
+load("data/Tables/Simulated/aggregated_table.RData")
 
 
 
 # Generate and display the table with the revised caption
-kable(transposed_result, format = "latex", booktabs = TRUE, 
-      caption = "\\textbf{Conditional AIC Scores for SIRS Model with Simulated Data Aggregated to a Weekly Scale}. The columns represent the smoothing basis used to fit the model, while the rows indicate the basis used to generate the simulated data. The trajectories were simulated on a daily scale and then aggregated to a weekly scale for model calibration. The degrees of freedom are computed as the trace of the penalized smoothing matrix.") %>%
+kable(final_result, format = "latex", booktabs = TRUE, 
+      caption = "\\textbf{Conditional AIC Scores for SIR Model with Simulated Data Aggregated to a Weekly Scale}. The columns represent the smoothing basis used to fit the model, while the rows indicate the basis used to generate the simulated data. The trajectories were simulated on a daily scale and then aggregated to a weekly scale for model calibration. \\(\\Delta \\text{cAIC}\\) values are calculated relative to the best score within each row.") %>%
   kable_styling(latex_options = c("hold_position"))
 ```
+
+```{r mse-table-sim-agg, echo=FALSE, message=FALSE, warning=FALSE}
+library(knitr)
+library(kableExtra)
+library(tidyr)
+
+# Load the saved R object
+# Load the data
+load("data/Tables/Simulated/MSE_aggregated.RData")
+# Remove row names
+rownames(final_result) <- NULL
+
+# Generate and display the table with the revised caption
+kable(final_result, format = "latex", booktabs = TRUE, 
+      caption = "\\textbf{Mean Square Error (MSE) for SIR Model with Simulated Data Aggregated to a Weekly Scale}. The columns represent the smoothing basis used to fit the model, while the rows indicate the basis used to generate the simulated data. The trajectories were simulated on a daily scale and then aggregated to a weekly scale for model calibration. \\(\\Delta \\text{MSE}\\) values are calculated relative to the best score within each row.") %>%
+  kable_styling(latex_options = c("hold_position"))
+```
+
 
 ## Scarlet Fever in Ontario 1929-1931 {#scarlet}
 We consider an epidemic of scarlet fever in Ontario from 1929 to 1930. The dataset comes from the International Infectious Disease Data Archives (IIDDA) [@walkerCanmodIiddaInternational2024].
@@ -145,7 +181,7 @@ In Figure \ref{fig:scarlet_combined}, we show the predicted incidence, estimated
 
 The shape of the estimated transmission rate and reproduction number varies across the smoothing bases for this example. The GP basis shows a positive slope as the rate of transmission reaches its maximum, whereas the TPRS, CR, and CC bases start at or very near the maximum.
 
-In the conditional AIC scores of the four models in Table \ref{tab:aic-table-scarlet}, we see that the AIC score for the GP basis is the lowest compared to the other bases. 
+In Table \ref{tab:aic-table-scarlet}, we present the conditional AIC scores and MSE calculations for the four models. We provide the delta values, which are calculated by subtracting the best score from each result for both the AIC and MSE calculations. The AIC score for the cubic regression spline (CR) basis is the lowest compared to the other bases. However, the difference in AIC scores between the bases is less than 2, implying that no single model should be chosen over the others based solely on the AIC. In the same table, we observe that the mean square error (MSE) is lowest for the thin plate spline (TP) model rather than the CR model.
 
 \begin{figure}[H]
 \centering
@@ -162,13 +198,15 @@ library(kableExtra)
 library(tidyr)
 
 # Load the saved R object
-aic_table <- readRDS("data/Scarlet_combined_k9.rds")
+load("data/Tables/ScarletFever/MSE_AIC_Scarlet.RData")
 
 # Generate and display the table with additional headers
-kable(aic_table, format = "latex", booktabs = TRUE, 
-      col.names = c("Smooth Type","cAIC"),
-      caption = "\\textbf{Conditional AIC Scores of calibrating models with varying smoothing basis, calibrated to Ontario scarlet fever (1929-1930.} The degrees of freedom are defined as the model degrees of freedom which is computed as the trace of penalized smoothing matrix.") %>%
+# Generate and display the table with additional headers
+kable(combined_df, format = "latex", booktabs = TRUE, 
+      col.names = c("Basis Type", "Delta MSE", "Delta cAIC"),
+      caption = "\\textbf{\\(\\Delta \\text{cAIC}\\) and \\(\\Delta \\text{MSE}\\) Scores for Ontario Scarlet Fever (1929-1930).} \\(\\Delta \\text{cAIC}\\) and \\(\\Delta \\text{MSE}\\) values are calculated relative to the best score.") %>%
   kable_styling(latex_options = c("hold_position", "float_placement"))
+
 ```
 
 ## Covid-19 in Ireland 2020 {#Ireland}
@@ -176,9 +214,9 @@ Next, we fit the model to observations of the daily number of COVID-19 cases in 
 
 The calibration model is constructed using the basic SIR model, with an initial recovery rate of \(\gamma = 1/6\), which is obtained from the results of Park et al. [@parkImportanceGenerationInterval2022].
 
-Figure \ref{fig:ireland_combined} presents the results of the best models, which utilize the GP, TPRS, and CR smoothing bases. The BS basis functions exhibited extremely large uncertainty estimates, so we did not include the results. All bases displayed an excellent fit to the observed incidence data with appropriately sized uncertainty estimates.
+Figure \ref{fig:ireland_combined} presents the results of the models using the GP, TPRS, and CR smoothing bases. The BS basis functions exhibited extremely large uncertainty estimates, so we did not include the results. All bases displayed an excellent fit to the observed incidence data with appropriately sized uncertainty estimates.
 
-Table \ref{tab:aic-table-ireland} provides the conditional AIC scores.
+Table \ref{tab:aic-table-ireland} provides the delta values for the conditional AIC scores and the MSE calculations. The CR basis has the best AIC score, while the GP basis has the lowest MSE calculation. The difference in AIC scores between the model with the CR basis and those with the GP and TP bases is less than two, suggesting that the AIC score alone cannot distinguish the best basis for fitting the data.
 
 The model's sensitivity to changes in the starting value of \(\gamma\) (ranging from 7 to 14 days) does not alter the shape of the functional form of \(\beta\), but it changes the amplitude of the peak, leading to an increase in \(R_t\). Increasing the variance of the log-normal prior on \(\gamma\) causes the model to tend to select a larger \(\gamma\). However, this also results in a dramatic increase in uncertainty estimates. We observed that when the starting value of \(\gamma\) is lowered and the variance of the log-normal prior is increased simultaneously, the model still predicts larger values of \(\gamma\).
 
@@ -195,13 +233,14 @@ library(kableExtra)
 library(tidyr)
 
 # Load the saved R object
-aic_table <- readRDS("data/Ireland_combined_k7.rds")
+load("data/Tables/Ireland/MSE_AIC_Ireland.RData")
 
 # Generate and display the table with additional headers
-kable(aic_table, format = "latex", booktabs = TRUE, 
-      col.names = c("Smooth Type", "cAIC"),
-      caption = "\\textbf{Conditional AIC Scores of calibrating models with varying smoothing basis, calibrated to Ireland Covid-19 (2020).} The degrees of freedom are defined as the model degrees of freedom which is computed as the trace of penalized smoothing matrix.") %>%
+kable(combined_df, format = "latex", booktabs = TRUE, 
+      col.names = c("Basis Type", "Delta MSE", "Delta cAIC"),
+      caption = "\\textbf{\\(\\Delta \\text{cAIC}\\) and \\(\\Delta \\text{MSE}\\) Scores for Calibrating Models with Varying Smoothing Basis, Calibrated to Ireland Covid-19 (2020).} \\(\\Delta \\text{cAIC}\\) and \\(\\Delta \\text{MSE}\\) values are calculated relative to the best score.") %>%
   kable_styling(latex_options = c("hold_position", "float_placement"))
+
 ```
 
 \begin{figure}[H]
@@ -210,11 +249,6 @@ kable(aic_table, format = "latex", booktabs = TRUE,
 \caption[Combined Analysis of Covid-19 in Ireland (2020)]{\textbf{Combined analysis of predicted incidence, estimated transmission rate, and effective reproduction number for observed Covid-19 cases in Ireland, 2020.} The data is given on a daily scale, and the trajectory is simulated daily but aggregated to a weekly scale for fitting the model. Each column represents the predicted incidence, estimated transmission rate, and effective reproduction number, respectively. Each row corresponds to different smoothing bases used to calibrate the data, all fitted with \(k=7\) knots. The true incidence is shown in red. The covariance function of the GP basis uses an exponential kernel function, which makes the basis an Ornstein-Uhlenbeck process, with exponent parameter \(\kappa = 1\) and range parameter \(\ell = 2\). The figures display 95\% and 50\% confidence intervals.}
 \label{fig:ireland_combined}
 \end{figure}
-
-
-
-
-
 
 ## Measles London UK 1944-1984 {#Measles}
 We now present a more challenging problem than the previous examples. We consider weekly observed measles cases in London, UK, from 1944 to 1984. This dataset was first utilized in a publication by David Earn et al. [@earnSimpleModelComplex2000]. 

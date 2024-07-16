@@ -11,7 +11,7 @@ _McMaster Pandemic 2_ (`macpan2`) is an `R` modeling package designed as a compa
 
 _Template Model Builder_ (`TMB`) is an R package specifically designed to fit latent variable models efficiently to data. With `macpan2`, users can write the negative log-likelihood of their objective function with respect to the parameters to be fit to the data in R code. `macpan2` then converts this objective function to `C++` code. It implements maximum likelihood estimation and uncertainty calculations by maximizing the Laplace approximation of the marginal likelihood. 
 
-The use of the Laplace approximation to estimate model parameters and their uncertainties (using the delta method) involves the computation of first and second-order derivatives, respectively. Nonlinear optimization algorithms that use quasi-Newton methods (such as `nlminb` or BFGS) leverage differences of gradients to iteratively approximate the Hessian matrix. Accurate estimates of the gradient function are essential for the quasi-Newton algorithm to obtain efficient parameter updates. Inaccuracies in the gradient can lead to suboptimal parameter updates, slow convergence, or convergence to non-optimal points. `TMB` harnesses the capabilities of _automatic differentiation_ (AD), a computational technique for accurately calculating derivatives of functions. Unlike numerical or symbolic differentiation, AD operates by exploiting the fact that all computationally implemented functions decompose into a finite sequence of elementary arithmetic operations and functions [@fournierADModelBuilder2012]. Using the chain rule, AD breaks down these complex functions into simpler operations, computing derivatives in a sequence that parallels the function's evaluation. This method enables the precise calculation of derivatives up to machine precision. AD helps efficiently implement the Laplace Approximation because finite differences is a crude and slow method. For its implementation of AD, `TMB` utilizes the `C++` libraries `CppAD` for automatic differentiation and `Eigen` for handling both sparse and dense matrix computations.
+The use of the Laplace approximation to estimate model parameters and their uncertainties (using the delta method) involves the computation of first and second-order derivatives, respectively. Nonlinear optimization algorithms that use Quasi-Newton methods (such as `nlminb` or BFGS) leverage differences of gradients to iteratively approximate the Hessian matrix. Accurate estimates of the gradient function are essential for the Quasi-Newton algorithm to obtain efficient parameter updates. Inaccuracies in the gradient can lead to suboptimal parameter updates, slow convergence, or convergence to non-optimal points. `TMB` harnesses the capabilities of _automatic differentiation_ (AD), a computational technique for accurately calculating derivatives of functions. Unlike numerical or symbolic differentiation, AD operates by exploiting the fact that all computationally implemented functions decompose into a finite sequence of elementary arithmetic operations and functions [@fournierADModelBuilder2012]. Using the chain rule, AD breaks down these complex functions into simpler operations, computing derivatives in a sequence that parallels the function's evaluation. This method enables the precise calculation of derivatives up to machine precision. AD helps efficiently implement the Laplace Approximation because finite differences is a crude and slow method. For its implementation of AD, `TMB` utilizes the `C++` libraries `CppAD` for automatic differentiation and `Eigen` for handling both sparse and dense matrix computations.
 
 In `macpan2`, specifying that the optimizer includes uncertainty estimates for parameters is straight forward. This functionality enables the computation of Wald confidence intervals with specified uncertainty levels using the delta method. This requires the computation of the Hessian matrix, which AD makes computationally efficient. Confidence intervals, as discussed in chapter \ref{Results}, are computed using this method.
 
@@ -21,13 +21,13 @@ For further reading on `TMB`, refer to [@kristensenTMBAutomaticDifferentiation20
 We specify the _time-varying transmission rate_ \(\beta\) in our model using a linear smoother defined as 
 
 \begin{equation}
-\beta = \text{exp}(b_0 + \mathbf{X}b),
+\boldsymbol{\beta} = \text{exp}(b_0 + \mathbf{X}\mathbf{b}),
 \label{eq:linear smoother}
 \end{equation}
 
-where \(b_0\) is the intercept, \(\mathbf{X}\) is the basis matrix of dimensions \(n \times (k-1)\), and \(b\) is a vector of basis coefficients of length \(k-1\). The basis matrix \(\mathbf{X}\) is constructed using the `smoothCon` function from the `mgcv` package in R. The structure of \(\mathbf{X}\) depends on the selected type of smoother, as indicated by the `bs` arguement, and the number of knots \(k\). 
+where \(b_0\) is the intercept, \(\mathbf{X}\) is the basis matrix of dimensions \(n \times (k-1)\), and \(\mathbf{b}\) is a vector of basis coefficients of length \(k-1\). The structure of \(\mathbf{X}\) depends on the selected type of basis functions.
 
-The `R` package _Mixed GAM Computation Vehicle with Automatic Smoothness Estimation_ (`mgcv`), developed by Simon Wood, implements a variety of smoothers that can be used for penalized generalized additive models. In our approach, we utilize `smoothCon` to create the model matrix \(\mathbf{X}\) and its corresponding penalty matrix \(\mathbf{P}\) for \(\beta\). This function facilitates the capture of the nonlinear relationships of the latent variable \(\beta\) from the data by constructing a univariate Gaussian regression smoother. While typically used internally by `mgcv` in calls to the `gam` function for fitting generalized additive models, `smoothCon` serves as a critical low-level function for constructing smooth terms in our model.
+The `R` package _Mixed GAM Computation Vehicle with Automatic Smoothness Estimation_ (`mgcv`), developed by Simon Wood, implements a variety of smoothers that can be used for penalized generalized additive models. In our approach, we utilize `smoothCon` to create the model matrix \(\mathbf{X}\) and its corresponding penalty matrix \(\mathbf{P}\) for \(\boldsymbol{\beta}\). This function facilitates the capture of the nonlinear relationships of the latent process \(\boldsymbol{\beta}\) from the data by constructing a univariate Gaussian regression smoother. While typically used internally by `mgcv` in calls to the `gam` function for fitting generalized additive models, `smoothCon` serves as a critical low-level function for constructing smooth terms in our model.
 
 This function is configured via the `bs` argument to select the type of smoother and the `k` argument to determine the number of basis functions, which we refer to as `num_variables`. The number of observations in the data is represented by `n`. The initial step involves constructing a simple data frame `dd = seq(from = 0, to = n, by = 1)`, which discretizes our time variable into intervals that map directly onto the domain over which the smoother operates. 
 
@@ -46,12 +46,10 @@ Details on the range of smoothers implemented in our models and their respective
 The argument `absorb.cons = TRUE` absorbs the identifiability constraints into the basis matrix, instead of treating them as external conditions or adding them through additional penalty terms. The default _identifiability constraint_ in `mgcv` ensures the smooth sums to zero over the observed values of \(x_j\), i.e, 
 
 \[
-1^T\mathbf{X\beta} = 0.
+\mathbf{1}^T\mathbf{X}\mathbf{b} = 0.
 \]
 
-This implies \(1^T\mathbf{X} = 0\). 
-
-`mgcv` implements this constraint by constructing the following QR decomposition.
+This implies \(\mathbf{1}^T\mathbf{X} = 0\). `mgcv` implements this constraint by constructing the following QR decomposition.
 
 Let 
 
@@ -60,27 +58,27 @@ Let
 \] 
 where \( \mathbf{U} \) is a \( p \times p \) orthogonal matrix and \( \mathbf{P} \) is an \( m \times m \) upper triangular matrix. The zero matrix appended to \( \mathbf{P} \) is \( m \times (p-m) \) to match the dimensions of \( \mathbf{U} \). Now, \( \mathbf{U} \) is partitioned as \( \mathbf{U} \equiv (\mathbf{D} : \mathbf{Z}) \), where \( \mathbf{D} \) is a \( p \times m \) matrix and \( \mathbf{Z} \) is a \( p \times (p-m) \) matrix.
 
-Given that \( \beta = \mathbf{Z}\beta_z \) and \( \beta_z \) is a \( (p-m) \)-dimensional vector, we compute:
+Given that \( \mathbf{b} = \mathbf{Z}\mathbf{b}_z \) and \( \mathbf{b}_z \) is a \( (p-m) \)-dimensional vector, we compute:
    \[
-   \mathbf{C}\beta = \begin{bmatrix} \mathbf{P}^T \\ 0 \end{bmatrix} \begin{bmatrix} \mathbf{D}^T \\ \mathbf{Z}^T \end{bmatrix} \mathbf{Z}\beta_z = \begin{bmatrix} \mathbf{P}^T\mathbf{D}^T \\ 0 \end{bmatrix} \mathbf{Z}\beta_z = \begin{bmatrix} \mathbf{P}^T \\ 0 \end{bmatrix} \beta_z = 0,
+   \mathbf{C}\mathbf{b} = \begin{bmatrix} \mathbf{P}^T \\ 0 \end{bmatrix} \begin{bmatrix} \mathbf{D}^T \\ \mathbf{Z}^T \end{bmatrix} \mathbf{Z}\mathbf{b}_z = \begin{bmatrix} \mathbf{P}^T\mathbf{D}^T \\ 0 \end{bmatrix} \mathbf{Z}\mathbf{b}_z = \begin{bmatrix} \mathbf{P}^T \\ 0 \end{bmatrix} \mathbf{b}_z = 0,
    \]
 where we used the fact that \( \mathbf{D}^T\mathbf{Z} = 0 \),  and \( \mathbf{Z}^T\mathbf{Z} = \mathbf{I}_{p-m} \) because \( \mathbf{U} \) is orthogonal, hence \( \mathbf{U}^T\mathbf{U} = \mathbf{I}_p \).
 
-To minimize equation \ref{eq:penalizedregression} such that \(1^T\mathbf{X\beta} = 0\),
-find the \(k \times (k-1)\) matrix \(Z\)  and reparameterize the basis matrix to \(\mathbf{XZ}\) and the penalty matrix to \(\mathbf{Z^TPZ}\). 
+To minimize equation \ref{eq:penalizedregression} such that \(\mathbf{1}^T\mathbf{b} = 0\),
+find the \(k \times (k-1)\) matrix \(\mathbf{Z}\)  and reparameterize the basis matrix to \(\mathbf{XZ}\) and the penalty matrix to \(\mathbf{Z^TPZ}\). 
 
 While zero-centering \(\mathbf{X}\) is a computationally more expensive method to address identifiability issues, it is still valuable to explain because it provides a clearer understanding of how the spline components and intercept interact in the model. By default, the basis matrix \(\mathbf{X}\) produced by `mgcv::smoothCon` doesn't include an intercept. Zero-centering the spline basis functions ensures that the spline components represent deviations or variations around a central tendency, rather than absolute values. This allows the intercept, \(b_0\), in the model to uniquely capture the central tendency of the response variable. Consequently, the intercept and the spline coefficients are identifiable as distinct contributors to the model: the intercept as the average response and the spline coefficients as the adjustments from this average. Each spline coefficient can be interpreted as the effect of that basis function relative to the central tendency captured by the intercept.
 
-Zero-centering is implemented by subtracting the column mean from each column of \(\mathbf{X}\), which effectively reduces the rank of \(\mathbf{X}\) by one. This process removes one degree of freedom, corresponding to the zero eigenvalue, from the basis matrix. To resolve this, we exclude the row and column associated with the zero eigenvalue from \(\mathbf{X}\), and we also remove the corresponding element from the vector of coefficients, \(\beta\). This adjustment ensures that the remaining components of \(\mathbf{X}\) and \(\beta\) are identifiable.
+Zero-centering is implemented by subtracting the column mean from each column of \(\mathbf{X}\), which effectively reduces the rank of \(\mathbf{X}\) by one. This process removes one degree of freedom, corresponding to the zero eigenvalue, from the basis matrix. To resolve this, we exclude the row and column associated with the zero eigenvalue from \(\mathbf{X}\), and we also remove the corresponding element from the vector of coefficients, \(\mathbf{b}\). This adjustment ensures that the remaining components of \(\mathbf{X}\) and \(\mathbf{b}\) are identifiable.
 
-\(\mathbf{X}\) and \(b\) now have one fewer dimension than the number of knots due to the null space of the penalty matrix. The penalty matrix's null space dimension of one means the function can vary linearly without penalty. As \(\lambda\) increases, the model reverts to a linear trend because this minimizes penalized complexity under high penalty values.
+\(\mathbf{X}\) and \(\mathbf{b}\) now have one fewer dimension than the number of knots due to the null space of the penalty matrix. The penalty matrix's null space dimension of one means the function can vary linearly without penalty. As \(\lambda\) increases, the model reverts to a linear trend because this minimizes penalized complexity under high penalty values.
 
-There are difficulties encountered when working with the penalty matrix that has been transformed into the constraint space of the sum to zero constraint. Computing the eigendecomposition of the penalty matrix, returned by `mgcv::smoothCon`, one of the eigenvalues is essentially zero, in terms of numerical precision, being on the order of \(\leq 10^{-10}\). This implies that the penalty matrix is singular. It is not possible to take the logarithmic determinant of a singular matrix when taking numerical precision limitations into account. Computing the log determinant is part of the objective equation (\ref{eq:obj eqn}). To overcome this we can take the regularized determinant by adding a small value (\(\approx 10^{-5})\)) to the diagonal of the penalty matrix. Another option (which we did not implement) is to take the singular value decomposition \(\mathbf{P} = \mathbf{U}\mathbf{\Sigma} \mathbf{V}^T\) and use the fact that \(\text{logdet}\mathbf{P}= \sum_i \text{log}\Sigma_{ii}\). 
+There are difficulties encountered when working with the penalty matrix that has been transformed into the constraint space of the sum to zero constraint. Computing the eigendecomposition of the penalty matrix, returned by `mgcv::smoothCon`, one of the eigenvalues is essentially zero, in terms of numerical precision, being on the order of \(\leq 10^{-10}\). This implies that the penalty matrix is singular. It is not possible to take the logarithmic determinant of a singular matrix when taking numerical precision limitations into account. Computing the log determinant is part of the objective equation (\ref{eq:obj eqn}). To overcome this we can take the regularized determinant by adding a small value \((\approx 10^{-10})\) to the diagonal of the penalty matrix. Another option (which we did not implement) is to take the singular value decomposition \(\mathbf{P} = \mathbf{U}\mathbf{\Sigma} \mathbf{V}^T\) and use the fact that \(\text{logdet}\mathbf{P}= \sum_i \text{log}\Sigma_{ii}\). 
 
-We scaled \(\mathbf{X}\) to make it compatible across bases, with a choice of the standard deviation used to simulate the starting values for \(\beta\). Each column of the basis matrix \(\mathbf{X}\) is normalized by dividing it by its Euclidean norm, resulting in each column having a unit norm. Then \(\mathbf{X}\beta\) is on the range of about of plus or minus \(\text{log}(2)\) (i.e \(\mathbf{X}\beta \pm 1)\), since
+We scaled \(\mathbf{X}\) to make it comparable across bases, with a choice of the standard deviation used to simulate the starting values for \(\mathbf{b}\). Each column of the basis matrix \(\mathbf{X}\) is normalized by dividing it by its Euclidean norm, resulting in each column having a unit norm. Then \(\mathbf{X}\mathbf{b}\) is on the range of about of plus or minus \(\text{log}(2)\) (i.e \(\mathbf{X}\mathbf{b} \pm 1)\), since
 
 \[
-\beta \sim \mathcal{N}(0, b_{sd}).
+\mathbf{b} \sim \mathcal{N}(\mathbf{0}, b_{sd}).
 \]
 
 When the sum-to-zero constraints are absorbed into the basis matrix, this also sets the penalty matrix for the Gaussian process to have the last row and column equal to zero, effectively absorbing the null space constraints into the penalty matrix. This makes \(\mathbf{P}\) singular. If we remove the final row and column of \(\mathbf{P}\), then we get a non-singular matrix.
@@ -119,7 +117,7 @@ R &= \frac{\gamma N (\beta - \gamma)}{\beta (\phi + \gamma)}.
 
 By initializing the compartment values deterministically as functions of the total population \(N\), the transmission rate \(\beta\), the recovery rate \(\gamma\), and the waning rate \(\phi\), we can start the simulation close to the endemic equilibrium. This approach stabilizes the influence of the starting parameters, particularly \(\beta\), on the model dynamics. Consequently, the system begins in a balanced state, reducing the transient effects that might otherwise occur due to arbitrary initial conditions. This transformation was not necessary for the real-world data examples.
 
-For these examples, the state vectors are initialized as follows:
+For the real data examples, the state vectors are initialized as follows:
 
 \[
 \begin{aligned}
@@ -131,29 +129,29 @@ R &= 0.
 
 The _initial number of infected individuals_, \(I_0\), at time \(t=0\) is modeled as a fixed parameter. To account for uncertainty about \(I_0\), we employ a log-normal prior distribution. We use a similar approach for the recovery rate \(\gamma\), also modeled with a log-normal prior to ensure positivity and reflect our uncertainty regarding its value. Specifically, we set the mean of the priors to the logarithmic values of \(I_0\) and \(\gamma\), and the standard deviation for each parameter is set to a small reasonable value \(\sigma = 0.1\) to instill a sharp prior.
 
-The smoothing coefficients vector \( b = (b_1, \ldots, b_{k-2}) \) is initialized using \( k-1 \) random draws from a standard normal distribution. 
+The smoothing coefficients vector \( \mathbf{b} = (b_1, \ldots, b_{k-2}) \) is initialized using \( k-1 \) random draws from a standard normal distribution. 
 
 The intercept \(b_0\) of the linear smoother (\ref{eq:linear smoother}), for the time varying transmission, is estimated in the model. It starting value is set to the logarithm of the starting value of \(\beta\) at time \(t= 0\). 
 
-We can compute the likelihood of the basis coefficients by making the assumption that
-the spline basis coefficients \(\beta\) follow a multivariate Gaussian distribution, i.e., \(\beta \sim \mathcal{N}(\mathbf{0}, \mathbf{\Sigma})\). The log likelihood function for \(\beta\) is then
+We can compute the log likelihood of the basis coefficients by making the assumption that
+the spline basis coefficients \(b\) follow a multivariate Gaussian distribution, i.e., \(\mathbf{b} \sim \mathcal{N}(\mathbf{0}, \mathbf{\Sigma})\). The log likelihood function for \(\mathbf{b}\) is then
 
 \[
-L(\beta) = -\frac{k}{2} \log(2\pi) -\frac{1}{2} \log(\text{det}(\mathbf{\Sigma})) -\frac{1}{2} (\mathbf{x}-\mu)^T \mathbf{\Sigma}^{-1} (\mathbf{x}-\mu).
+L(\mathbf{b}) = -\frac{k}{2} \log(2\pi) -\frac{1}{2} \log(\text{det}(\mathbf{\Sigma})) -\frac{1}{2} (\mathbf{x}-\mu)^T \mathbf{\Sigma}^{-1} (\mathbf{x}-\mu).
 \]
 
-Now let \(\beta = \mathbf{x}- \mu\) and \(\Sigma^{-1}= a\mathbf{S}\), where \(a = \frac{1}{\sigma^2}\), \(\sigma^2 \in \mathbb{R}\) and \(\mathbf{S}\) is the penalty matrix. This implies \(\mathbf{\Sigma} = a^{-1}\mathbf{S}^{-1}= \sigma^2\mathbf{S}^{-1}\).
+Now let \(\mathbf{b} = \mathbf{x}- \mu\) and \(\Sigma^{-1}= a\mathbf{S}\), where \(a = \frac{1}{\sigma^2}\), \(\sigma^2 \in \mathbb{R}\) and \(\mathbf{S}\) is the penalty matrix. This implies \(\mathbf{\Sigma} = a^{-1}\mathbf{S}^{-1}= \sigma^2\mathbf{S}^{-1}\).
 
 Then,
 
 \begin{equation}
-L(\beta) = -\frac{k}{2} \log(2\pi) - \frac{1}{2} \log(\sigma^2) -  \log(\text{det}(\mathbf{S})) + \frac{1}{2\sigma^2} \beta^T \mathbf{S} \beta.
+L(\mathbf{b}) = -\frac{k}{2} \log(2\pi) - \frac{1}{2} \log(\sigma^2) -  \log(\text{det}(\mathbf{S})) + \frac{1}{2\sigma^2} \mathbf{b}^T \mathbf{S} \mathbf{b}.
 \label{eq:obj eqn}
 \end{equation}
 
-The term \(\sigma^2\) represents a variance component that scales the penalty matrix \(\mathbf{S}\). It acts as a global variance parameter that moderates the extent to which the penalty is applied. By scaling \(\mathbf{S}\) with \(\sigma^2\), you effectively adjust the strength of the regularization relative to the variance of the data. Consequently, \(\lambda = \frac{1}{2\sigma^2}\) functions as a regularization parameter, controlling the "wiggliness" of the fit by influencing the variance of the distribution of the smoothing coefficients. This setup can be viewed as placing a prior distribution on \(\beta\), with \(\mathbf{S}\) acting as the precision matrix of the prior. This approach is analogous to the Bayesian perspective of smoothing, as discussed in equation \ref{eq:penalty prior}. Here, \(\sigma^2\) scales the precision matrix of the prior, influencing how strongly the prior beliefs (e.g., smoothness) affect the posterior estimates.
+The term \(\sigma^2\) represents a variance component that scales the penalty matrix \(\mathbf{S}\). It acts as a global variance parameter that moderates the extent to which the penalty is applied. By scaling \(\mathbf{S}\) with \(\sigma^2\), you effectively adjust the strength of the regularization relative to the variance of the data. Consequently, \(\lambda = \frac{1}{2\sigma^2}\) functions as a regularization parameter, controlling the 'wiggliness' of the fit by influencing the variance of the distribution of the smoothing coefficients. This setup can be viewed as placing a prior distribution on \(\mathbf{b}\), with \(\mathbf{S}\) acting as the precision matrix of the prior. This approach is analogous to the Bayesian perspective of smoothing, as discussed in equation \ref{eq:penalty prior}. Here, \(\sigma^2\) scales the precision matrix of the prior, influencing how strongly the prior beliefs (e.g., smoothness) affect the posterior estimates.
 
-Therefore \(L(\beta)\) is the derived form of the penalty functional \(J(f)\) in equation \ref{eq: general penalized spline} when the smoothing coefficients are assumed to be Gaussian.
+Therefore \(L(\mathbf{b})\) is the derived form of the penalty functional \(J(f)\) in equation \ref{eq: general penalized spline} when the smoothing coefficients are assumed to be Gaussian.
 
 Considering the data model \(Y_i = f(x_i) + \epsilon_i\), where \(i = 1, \dots, n\) and \(\epsilon_i \sim \text{N}(0, \sigma^2)\), the likelihood functional \(L(f|\text{data})\) in equation \ref{eq: general penalized spline} simplifies to a least squares functional. This is proportional to \(\sum_{i=1}^n (Y_i - f(x_i))^2\), aligning with the Gaussian likelihood. Therefore, the likelihood can be expressed using a Gaussian density function evaluated at the vector of observed values \(\mathbf{Y}\), with mean \(f(\mathbf{x})\) and variance \(\sigma^2_Y\).
 
@@ -168,18 +166,18 @@ Recall the following assumptions in the model:
 \begin{aligned}
 I_0 &\sim \text{Lognormal}(\mu_{I_0}, \sigma^2_{I_0}) \\
 \gamma &\sim \text{Lognormal}(\mu_{\gamma}, \sigma^2_{\gamma}) \\
-Y &\sim \mathcal{N}(f(x), \sigma^2_Y) \\
-\beta &\sim \mathcal{N}(0, \frac{\mathbf{S}^{-1}}{\sigma^2}),
+\mathbf{y} &\sim \mathcal{N}(f(x), \sigma^2_y) \\
+\mathbf{b} &\sim \mathcal{N}(0, \frac{\mathbf{S}^{-}}{\sigma^2}),
 \end{aligned}
 \]
 where \(f(x)\) is the fitted values (incidence). Note that
-we are not estimating the observed values \(Y\) but estimating the variance \(\sigma^2_Y\) corresponding to its likelihood equation. In this way the fitted values \(f(x)\) behave as a sort of Gaussian process. 
+we are not estimating the observed values \(\mathbf{y}\) but estimating the variance \(\sigma^2_y\) corresponding to its likelihood equation. In this way the fitted values \(f(x)\) behave as a sort of Gaussian process. 
 
 The model assumptions and starting conditions are specified and passed to a simulator object in `macpan2`. `TMB` simulates the trajectory using the Euler method.
 
-At \( t= 0\) the smoothing basis \(\mathbf{X}\), the vector of smoothing coefficients \(b\) and its intercept \(b_0\) are used to construct the transmission rate \(\beta\), a vector equal to the number of observations, of size \(n\). At each time step, \(1 \leq t \leq n\), \(\beta\) is used to compute the number of new infections (`incidence`), which in turn is used to compute the total number of infected (`I`) and susceptible (`S`) at that time point. Additionally, \(\beta\) is used to compute the instantaneous effective reproduction number \(R_t\). 
+At \( t= 0\) the smoothing basis \(\mathbf{X}\), the vector of smoothing coefficients \(\mathbf{b}\) and its intercept \(b_0\) are used to construct the transmission rate \(\boldsymbol{\beta}\), a vector equal to the number of observations, of size \(n\). At each time step, \(1 \leq t \leq n\), \(\beta_i\) is used to compute the number of new infections (`incidence`), which in turn is used to compute the total number of infected (`I`) and susceptible (`S`) at that time point. Additionally, \(\boldsymbol{\beta}\) is used to compute the instantaneous effective reproduction number \(R_t\). 
 
-After simulating the trajectory, the negative log likelihood is minimized subject to finding the optimal values of the starting values of the initial number of infected \(I_0\), the recovery rate \(\gamma\), the variance \(\sigma^2_Y\) of likelihood of the observed data and the regularization/smoothing parameter \(\sigma^2\). Note that the priors on the recovery rate and the initial number of infected are not 'fully Bayesian' in the sense that there are not priors placed on the mean and variance of the prior distribution, i.e no there are no hyper-priors. Parameter estimates for the intercept \(b_0\) of the linear smoother are also obtained.
+After simulating the trajectory, the negative log likelihood is minimized subject to finding the optimal values of the starting values of the initial number of infected \(I_0\), the recovery rate \(\gamma\), the variance \(\sigma^2_y\) of the likelihood of the observed data and the regularization/smoothing parameter \(\sigma^2\). Note that the priors on the recovery rate and the initial number of infected are not 'fully Bayesian' in the sense that there are not priors placed on the mean and variance of the prior distribution, i.e., no there are no hyper-priors. Parameter estimates for the intercept \(b_0\) of the linear smoother are also obtained.
 
 For each iteration, the simulated trajectory is matched to the observed values and the likelihood is calculated using the Laplace approximation. New parameter estimates are updated using Quasi-Newton methods via `nlminb`. This process is then iterated until the parameter estimates converge. 
 
@@ -203,7 +201,7 @@ Before the simulation loop (t = 0):
 ---------------------
 At every iteration of the simulation loop (t = 1 to n):
 ---------------------
-1: beta ~ exp(eta[time_step(1)])
+1: beta ~ exp(eta[time_step(1)]) 
 2: R_t ~ (log(beta) - log(gamma) + log(S) - log(N))
 3: incidence ~ S * I * beta/N
 4: recovery ~ gamma * I
@@ -224,9 +222,9 @@ After the simulation loop (t = n+1):
 
 Sometimes it is useful to simulate the trajectory for \(n\) time steps and then calibrate the model over a smaller time series by aggregating the data into \(\frac{n}{k}\) time steps by averaging the trajectory and data over a period of \(k\) steps. For example, in the case of the Ireland Covid-19 dataset (\ref{Ireland}), the reported incidence was inconsistent on a daily scale. By averaging the observations over a weekly scale, the variance is reduced as the averaging process diminishes the day-to-day fluctuations caused by sporadic reporting.
 
-Extra care is needed to handle the uncertainty estimates of aggregated trajectory simulations. For un-aggreggated data, `macpan2`, which has `TMB` for its optimization engine, uses the Laplace Approximation to compute uncertainty estimates with the delta method. By averaging the trajectory over a time period of size \(k\), we are in effect making a transformation of a random variable. The uncertainty estimates are required to take this into account. The variance of a function \(h(\beta) = \mathbf{H} \beta\) of the random variable \(\beta\) is computed as 
+Extra care is needed to handle the uncertainty estimates of aggregated trajectory simulations. For un-aggreggated data, `macpan2`, which has `TMB` for its optimization engine, uses the Laplace Approximation to compute uncertainty estimates with the delta method. By averaging the trajectory over a time period of size \(k\), we are in effect making a transformation of a random variable. The uncertainty estimates are required to take this into account. The variance of a function \(h(\boldsymbol{\beta}) = \mathbf{H} \boldsymbol{\beta}\) of  \(\boldsymbol{\beta}\) is computed as 
 
 \[
-Var(\mathbf{H} \beta) = \mathbf{H}^T Cov(\beta) \mathbf{H},
+Var(\mathbf{H} \boldsymbol{\beta}) = \mathbf{H}^T Cov(\boldsymbol{\beta}) \mathbf{H},
 \]
-where \(\mathbf{H}\) is a \(n \times n_k\)  indicator matrix, where  \(n_k\) is the integer ceiling of \(\frac{n}{k}\)  such that \(\frac{n}{n_k} \in \mathbb{Z}\). The transformed variance is then used to compute the Wald confidence intervals as in the unaggreggated case. 
+where \(\mathbf{H}\) is a \(n \times n_k\) indicator matrix, where \(n_k\) is the integer ceiling of \(\frac{n}{k}\) such that \(\frac{n}{n_k} \in \mathbb{Z}\). The transformed variance is then used to compute the Wald confidence intervals as in the unaggreggated case. 

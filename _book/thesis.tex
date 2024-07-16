@@ -402,7 +402,7 @@ This thesis presents a novel approach to ecological dynamic modeling using non-s
 
     I would like to thank the faculty and staff within the Department of Mathematics and Statistics at McMaster University. I would like to thank Dr.~Anastasios Kratsios and Dr.~Jonathan Dushoff for participating in my examination committee. I would also like to thank all of the professors I took classes from; it has been a privilege to learn from you all. Lastly, I would like to thank the department staff for always being friendly, helpful, and quick to respond.
 
-    I would like to thank my friends and office mates for their company and for taking the time to talk about research. I would like to thank my two dearest friends in the department, Abhiroop Chowdhury and Manan Mukherjee, for their endless conversations about all things statistics, mathematics, research, philosophy, and art.
+    I would like to thank my friends and office mates for their company and for taking the time to talk about research. I would like to thank my dearest friend in the department, Abhiroop Chowdhury and Manan Mukherjee, for their endless conversations about all things statistics, mathematics, research, philosophy, and art.
 
     Lastly, I would like to thank my partner, Melanie, for her endless support, patience, love and encouragement. I could not have done this without you.
   \end{acknowledgements}
@@ -448,13 +448,13 @@ This thesis presents a novel approach to ecological dynamic modeling using non-s
 
 Ecological dynamic models describe how ecological processes drive populations to change over time by estimating the parameters of the deterministic process, observation error, and process error from a single time series {[}1{]}. However, estimating parameters for dynamic models is challenging. One simplification is to assume that the dynamic model only has observation error, which can be implemented by starting with the initial conditions of the system and computing the entire trajectory over the domain at once. This approach assumes there is no uncertainty in the predicted values of the states at each time step, meaning there is no process error. Since the trajectory at every time step is determined solely by the starting parameters and initial conditions, the model is deterministic. The only error accounted for is the difference between observed and predicted values.
 
-To fit the model to data and compute the maximum likelihood estimate (MLE) for a given set of parameters, one assumes independent observations and sums the likelihood for each observation based on the chosen model of observation error. Using a quasi-Newton method, parameter estimates are updated based on the current iteration of trajectory matching until convergence is achieved. If the observation error is normally distributed with constant variance, this process simplifies to least squares fitting.
+To fit the model to data and compute the maximum likelihood estimate (MLE) for a given set of parameters, one assumes independent observations and sums the likelihood for each observation based on the chosen model of observation error. Using a Quasi-Newton method, parameter estimates are updated based on the current iteration of trajectory matching until convergence is achieved. If the observation error is normally distributed with constant variance, this process simplifies to least squares fitting.
 
 In modeling infectious diseases, for example, one may be interested in estimating the unobserved process of the transmission rate between an infectious individual and a susceptible one. Assuming a fixed value for the transmission rate at every time step is often inaccurate because many diseases have dynamic transmission rates influenced by factors such as seasonality or non-pharmaceutical interventions (e.g., social distancing, masking, and changes in mobility patterns). Therefore, it is reasonable to assume that the transmission rate is a time-varying parameter, computed at each observed data point.
 
 A standard method for dealing with time-varying parameters is to introduce a parametric model and estimate its parameters as part of the MLE process. However, imposing a particular shape on the unknown function describing the unobserved process, is often a phenomenological characterization rather than one derived from known biological mechanisms. This can lead to mismatches between the model and data not due to biological inaccuracies but due to the chosen parametric form of the latent variable.
 
-Fitting dynamic ecological models with time-varying latent variables is a challenging task. Rather than specifying the functional form of the unknown function \emph{a priori}, we can adopt a more flexible function estimation method that minimizes incidental assumptions and model misspecification. {[}2{]} and {[}3{]} developed methodologies for general non-parametric statistical modeling, which have been applied to ecological modeling. Wood and Nisbet {[}4{]} used flexible spline models in population ecology modeling. Ellner et al. {[}5{]} described how to infer information about underlying or unobserved processes in a dynamical system using only time series data. Ellner et al. {[}6{]} introduced the concept of ``semimechanistic'' models, which combine deterministic specifications and parametric models for components supported by known biological mechanisms with non-parametric methods for flexible function estimation when insufficient information is available to justify a specific parametric form. Simon Wood {[}7{]} presented a general methodology using penalized smoothing to estimate time-varying latent variables for dynamic ecological models through iterations of quasi-Newton methods with generalized cross-validation.
+Fitting dynamic ecological models with time-varying latent variables is a challenging task. Rather than specifying the functional form of the unknown function \emph{a priori}, we can adopt a more flexible function estimation method that minimizes incidental assumptions and model misspecification. {[}2{]} and {[}3{]} developed methodologies for general non-parametric statistical modeling, which have been applied to ecological modeling. Wood and Nisbet {[}4{]} used flexible spline models in population ecology modeling. Ellner et al. {[}5{]} described how to infer information about underlying or unobserved processes in a dynamical system using only time series data. Ellner et al. {[}6{]} introduced the concept of \emph{semi-mechanistic} models, which combine deterministic specifications and parametric models for components supported by known biological mechanisms with non-parametric methods for flexible function estimation when insufficient information is available to justify a specific parametric form. Simon Wood {[}7{]} presented a general methodology using penalized smoothing to estimate time-varying latent variables for dynamic ecological models through iterations of Quasi-Newton methods with generalized cross-validation.
 
 Implementing Wood's methodology requires expertise in statistical inference, non-linear optimization, splines, numerical analysis, and statistical computing, making it complex for many domain-specific modelers. Our goal was to develop a user-friendly way for modelers to estimate time-varying latent variables in non-stochastic compartmental models. We integrated Simon Wood's methodology for smoothing parameter estimation into the general-purpose compartmental modeling tool \texttt{macpan2}, which uses \texttt{TMB} for optimization. We use the \texttt{mgcv} package in R to obtain low-rank smoothing matrices for the basis and penalty, resulting in a software module within \texttt{macpan2} that allows users to easily formulate and fit semi-mechanistic models.
 
@@ -470,7 +470,7 @@ The second section provides a brief introduction to the basic concepts of using 
 
 \section{Smoothers}\label{Smoothers}
 
-Linear model methods make the assumption that the true function \(f(x)\) is linear in \(x\). To extend beyond this linearity, one approach is to employ a linear transformation of \(\mathbf{X}\). This leads to:
+Linear model methods make the assumption that the true function \(f(x)\) is linear in \(x\). To extend beyond this linearity, one approach is to employ a linear transformation of \(x\). This leads to:
 
 \[
 f(x) = \sum_{m=1}^{M}\beta_m h_m(x),
@@ -478,9 +478,9 @@ f(x) = \sum_{m=1}^{M}\beta_m h_m(x),
 which is a linear basis expansion of \(x\),
 where \(h_m(x): \mathbb{R}^{p} \to \mathbb{R}\) represents the \(m\)-th transformation of \(\mathbf{X}\).
 
-A notable class of these transformations is restriction methods, where the class of functions that \(f(x)\) can assume is limited. A common example within this class is \emph{splines}, which define \(m\) basis functions \(\beta_m h_m(\mathbf{X})\) as local polynomial representations. The domain is divided into contiguous intervals, each represented by a separate polynomial function. The boundaries of these intervals are known as \emph{knots}. An order-\(M\) spline with knots \(\xi_j\), \(j = 1,\dots, K\), is a piecewise-polynomial of order \(M\) and has continuous derivatives up to order \(M-2\).
+A notable class of these transformations is restriction methods, where the class of functions that \(f()\) can assume is limited. A common example within this class is \emph{splines}, which define \(m\) basis functions \(\beta_m h_m(x)\) as local polynomial representations. These specific transformations \(h_m(x)\) in the context of splines translate the input space into a set of polynomial pieces that are smoothly joined together. The domain is divided into contiguous intervals, each represented by a separate polynomial function. The boundaries of these intervals are known as \emph{knots}. An order-\(M\) spline with knots \(\xi_j\), \(j = 1,\dots, K\), is a piecewise-polynomial of order \(M\) and has continuous derivatives up to order \(M-2\).
 
-When the location, derivative order, and number of knots are predetermined, the technique is referred to as regression splines. Natural cubic splines are a specific type where the spline function is composed of cubic polynomial segments.Then it is linear beyond the outermost knots. This spline is represented by \(K\) basis functions \(\beta_m h_m(\mathbf{X})\), one for each specified knot.
+When the location, derivative order, and number of knots are predetermined, the technique is referred to as regression splines. Natural cubic splines are a specific type where the spline function is composed of cubic polynomial segments. Then it is linear beyond the outermost knots. This spline is represented by \(K\) basis functions \(\beta_m h_m(x)\), one for each specified knot.
 
 The complexity of the fit can be adjusted by incorporating regularization to manage the trade-off between data fidelity and smoothness of the curve fit. This is achieved by minimizing a residual sum of squares with an additional penalty term. The penalty term includes a parameter that controls this trade-off, allowing the fit to range between the extremes of pure interpolation and a linear least squares fit. Splines used in this context are known as smoothing splines.
 
@@ -507,7 +507,7 @@ A detailed proof and further discussion on this property of natural cubic spline
 With a natural cubic spline, \(g(x)\), we have two main options: we can interpolate the data by setting each \(g(x_i) = y_i\), or we can smooth the data by treating the values \(g(x_i)\) as variables to be optimized, as in \emph{cubic smoothing splines}. Smoothing is achieved by minimizing the following objective function:
 
 \begin{equation}
-J_{2}(f) = \sum_{i=1}^n (y_i - g(x_i))^2 + \lambda \int g''(x)^2 \, dx,
+J_{2}(f) = \sum_{i=1}^n (y_i - g(x_i))^2 + \lambda \int g''(x)^2 \, dx.
 \label{eq:min_smoothness_obj}
 \end{equation}
 
@@ -533,7 +533,7 @@ This formulation ensures continuity at each knot, as the continuity conditions E
 \mathbf{B} \cdot (f''(x_2),\dots, f''(x_{k-1}))^{T} = \mathbf{D} \cdot (f(x_2),\dots, f(x_{k-1}))^{T},
 \label{eq:spline_matrix_equations}
 \end{equation}
-where \(B\) defines the relationships among the second derivatives and \(D\) defines the relationships between the second derivatives and the function values. \(B\) and \(D\) are therefore the matrix elements expressing the continuity and naturally constraints as defined in Equations \ref{eq: spline_matrix_element_B} and \ref{eq: spline_matrix_element_D}.
+where \(\mathbf{B}\) defines the relationships among the second derivatives and \(\mathbf{D}\) defines the relationships between the second derivatives and the function values. \(\mathbf{B}\) and \(\mathbf{D}\) are therefore the matrix elements expressing the continuity and naturally constraints as defined in Equations \ref{eq: spline_matrix_element_B} and \ref{eq: spline_matrix_element_D}.
 
 By integrating these conditions into Equation \ref{eq:spline eqn}, and redefining \(f(x)\) in terms of the basis functions, we arrive at:
 
@@ -628,11 +628,9 @@ Thus, the penalty term can be fully expressed as:
 \beta.
 \]
 
-This formulation ensures that the differences between adjacent \(\beta_i\) are penalized, thereby controlling the smoothness of the resulting P-spline.
-
 \subsection{Thin plate regression splines}\label{Thin-plate-regression-splines}
 
-So far, the discussion has focused on smoothing methods that apply to a single predictor variable. While uni variate smoothing is useful, multivariate smoothing techniques available as well. One such technique is the thin plate splines (TPS). We follow the method given by Simon Wood in {[}14{]}.
+So far, the discussion has focused on smoothing methods that apply to a single predictor variable. While univariate smoothing is useful, multivariate smoothing techniques available as well. One such technique is the thin plate spline (TPS). We follow the method given by Simon Wood in {[}14{]}.
 
 In the general case, a \emph{thin plate spline} (TPS) is defined for a number of predictor variables \(d\) and a penalty of degree \(m\) such that \(2m > d\). The TPS penalty, \(J_{md}\), is given by:
 
@@ -663,15 +661,15 @@ In the univariate case with derivative penalty of degree two, i.e \(d =  1\) and
 
 In this case, the minimizing function has the form:
 \[
-\hat{f}(x) = \sum_{i=1}^n \delta_i |x - x_i|^2 \log(|x - x_i|) + \alpha_0\phi_1(x) + \alpha_1 \phi_2(x),
+\hat{f}(x) = \sum_{i=1}^n \delta_i |x - x_i| \log(|x - x_i|) + \alpha_0\phi_1(x) + \alpha_1 \phi_2(x),
 \]
-where the basis function \(\eta_{21}(r) =|x - x_i|^2 \log(|x - x_i|)\) is a specific radial basis function for the univariate TPS. The basis functions \(\phi_i\) are:
+where the basis function \(\eta_{21}(r) =|x - x_i| \log(|x - x_i|)\) is a specific radial basis function for the univariate TPS. The basis functions \(\phi_i\) are:
 \[
 \phi_1(x) = 1, \quad \phi_2(x) = x_1.
 \]
-Here, \(\delta_i\) and \(\alpha_j\) are coefficients to be estimated, with \(\alpha_0\) and \(\alpha_1\) accounting for the polynomial part of the spline, which form the familiar ``linear'' null space of the univariate Gaussian objective function we have seen so far.
+Here, \(\delta_i\) and \(\alpha_j\) are coefficients to be estimated, with \(\alpha_0\) and \(\alpha_1\) accounting for the polynomial part of the spline, which form the familiar `linear' null space of the univariate Gaussian objective function we have seen so far.
 
-The expression of a TPS as a linear mixed model, with a separation of basis functions into null and non-null spaces, shows how the smoothness penalty operates. We construct the model matrix for the basis functions \(\mathbf{E}\) for the radial basis functions \(\mathbf{E}_{ij} = |x_i - x_j|^2 \log(|x_i - x_j|)\) and \(\mathbf{T}\) for the polynomial basis functions \(\mathbf{T}_{ij} = \phi_j(x_i)\). By expressing the function \(\hat{f}(x)\) in terms of \(\delta\) and \(\alpha\), the minimization problem becomes:
+The expression of a TPS as a linear mixed model, with a separation of basis functions into null and non-null spaces, shows how the smoothness penalty operates. We construct the model matrix for the basis functions \(\mathbf{E}\) for the radial basis functions \(\mathbf{E}_{ij} = |x_i - x_j| \log(|x_i - x_j|)\) and \(\mathbf{T}\) for the polynomial basis functions \(\mathbf{T}_{ij} = \phi_j(x_i)\). By expressing the function \(\hat{f}(x)\) in terms of \(\delta\) and \(\alpha\), the minimization problem becomes:
 
 \[
 \text{minimize} \quad \left\| \mathbf{y} - \mathbf{E} \delta - \mathbf{T} \alpha \right\|^2 + \lambda \delta^T \mathbf{E} \delta \quad \text{subject to} \quad \mathbf{T}^T \delta = 0,
@@ -703,9 +701,9 @@ with the corresponding hat matrix:
 often called the \emph{smoother matrix}. In a typical data model \(y = f(x) + \epsilon\), the estimate \(\hat{y}\) is computed as:
 
 \[
-\hat{y} = \mathbf{L}y,
+\hat{y} = \mathbf{A}y.
 \]
-where \(\mathbf{L}\) is an \(n \times n\) matrix dependent on \(\lambda\). Although \(\mathbf{L}\) renders the smoother non-linear in nature due to its dependency on \(\lambda\), it can be treated as linear for fixed \(\lambda\), simplifying the use of penalized regression splines in practical applications.
+Although \(\mathbf{A}\) renders the smoother non-linear in nature due to its dependency on \(\lambda\), it can be treated as linear for fixed \(\lambda\), simplifying the use of penalized regression splines in practical applications.
 
 Now, consider the general case of flexible function estimation within a statistical model defined over the domain \(\mathbb{R}^n\). The functional can be expressed as:
 
@@ -724,53 +722,53 @@ By focusing on Gaussian regression within the framework of penalized likelihood 
 In a Bayesian context, prior beliefs about parameters before observing the data are specified through a prior distribution. For smoothing, the penalty term \(\beta^T \mathbf{S} \beta\) suggests a prior on \(\beta\):
 
 \begin{equation}
-\beta \sim \mathcal{N}(0, \mathbf{S}^{-}/\lambda),
+\mathbf{\beta} \sim \mathcal{N}(\mathbf{0}, \mathbf{S}^{-}/\lambda),
 \label{eq:penalty prior}
 \end{equation}
 where \(\mathbf{S}^{-}\) is the pseudoinverse of \(\mathbf{S}\), accounting for its rank deficiency. This prior implies that the values of \(\beta\) are normally distributed with a mean of zero and a covariance matrix \(\mathbf{S}^{-}\), tightening around zero as \(\lambda\) increases and becoming flatter as \(\lambda\) decreases. This Bayesian interpretation of smoothing is discussed in {[}9{]}.
 
 Consequently, the maximum posteriori (MAP) estimate of \(\beta\) is given by:
 \begin{equation}
-\beta \mid y \sim \mathcal{N}(\hat{\beta}, (\mathbf{X}^T \mathbf{X} + \lambda \mathbf{S})^{-1} \sigma^2),
+\mathbf{\beta} \mid \mathbf{y} \sim \mathcal{N}(\hat{\mathbf{\beta}}, (\mathbf{X}^T \mathbf{X} + \lambda \mathbf{S})^{-1} \sigma^2),
 \label{eq:MAP estimate}
 \end{equation}
 which aligns with the solution of Equation \ref{eq:penalizedleastsquaresminimizer} derived from Equation \ref{eq:penalizedregression}.
 
 This reveals that methodologies designed for smoothing problems are applicable for estimating Gaussian random effects.
 
-It is possible to conceptually link penalized smoothing splines with linear mixed models (LMMs). This connection was first explored in-depth in {[}17{]}. In this framework,the smooth function in flexible function estimation is represented by a high-dimensiona lbasis. The penalty on spline coefficients, represented as \(\beta^T \mathbf{S} \beta\), can be interpreted as an \emph{a priori} distribution, yielding a mixed linear model by treating the smooth components of the model as random effects. The parametric components and the components of the smooth in the null space are treated as fixed effects. For a deep exploration of this duality see {[}2{]} or {[}17{]}. For a computational overview see {[}14{]}.
+It is possible to conceptually link penalized smoothing splines with linear mixed models (LMMs). This connection was first explored in-depth in {[}17{]}. In this framework,the smooth function in flexible function estimation is represented by a high-dimensional basis. The penalty on spline coefficients, represented as \(\mathbf{\beta}^T \mathbf{S} \mathbf{\beta}\), can be interpreted as an \emph{a priori} distribution, yielding a mixed linear model by treating the smooth components of the model as random effects. The parametric components and the components of the smooth in the null space are treated as fixed effects. For a deep exploration of this duality see {[}2{]} or {[}17{]}. For a computational overview see {[}14{]}.
 
 The primary advantage of using the mixed model formulation for penalized splines is that the computational methods developed to estimate random effects in software like \texttt{lme4} can also be employed to estimate smooth functions. However, it is possible to write the objective function out explicitly with the penalty term expressed as a quadratic form using the penalty matrices computed via the \texttt{mgcv} package. Optimization of the objective function is handled by \texttt{macpan2}, which uses Template Model Builder as the optimization engine {[}18{]}. Therefore in this case it is not necessary to write out the model in the mathematical form of a mixed model. However, should one choose to adopt this modeling methodology with another optimization engine, detailing the model in the form of a mixed model could be essential.
 
 \subsection{Gaussian processes regression smoothers}\label{Gaussian-process-regression-smoothers}
 
-A \emph{random field} is a function \(f\) that assigns a random value \(f(x_i)\) at each point \(x_i\) within its domain \(\mathcal{X}\). If we assume that the collection of values \(f(x)\) for any finite selection of points \(\{x_i\}_{i=1}^n\) follows a multivariate Gaussian distribution, then the subset \(\{f(x_i)\}_{i=1}^n\) is jointly normally distributed. This distribution is characterized by a mean function \(\mu(x)\) and a covariance function \(C(x, x')\), which measures how correlations decay with distance between any two points, thereby defining a \emph{Gaussian Random Field} (GRF).
+A \emph{random field} is a function \(f\) that assigns a random value \(f(x_i)\) at each point \(x_i\) within its domain \(\mathcal{X}\). If we assume that the collection of values \(f(\mathbf{x})\) for any finite selection of points \(\{x_i\}_{i=1}^n\) follows a multivariate Gaussian distribution, then the subset \(\{f(x_i)\}_{i=1}^n\) is jointly normally distributed. This distribution is characterized by a mean function \(\mu(\mathbf{x})\) and a covariance function \(C(\mathbf{x}, \mathbf{x}')\), which measures how correlations decay with distance between any two points, thereby defining a \emph{Gaussian Random Field} (GRF).
 
-Unlike being restricted to fixed or discrete locations, a GRF can be generalized by defining a distribution over functions, making the model continuous with respect to its domain. How is this achieved? The covariance function \(C\) of the GRF, initially defined on a set of discrete points such as a lattice, can be generalized through a \emph{kernel} \(k(x, x_i)\). This kernel extends the covariance function to a continuous domain, ensuring that its realization over any finite subset of this domain yields a positive semi-definite matrix. This requirement extends the univariate requirement of a positive variance parameter \(\sigma^2\) to a multivariate scenario.
+Unlike being restricted to fixed or discrete locations, a GRF can be generalized by defining a distribution over functions, making the model continuous with respect to its domain. How is this achieved? The covariance function \(C\) of the GRF, initially defined on a set of discrete points such as a lattice, can be generalized through a \emph{kernel} \(k(\mathbf{x}, \mathbf{x}_i)\). This kernel extends the covariance function to a continuous domain, ensuring that its realization over any finite subset of this domain yields a positive semi-definite matrix. This requirement extends the univariate requirement of a positive variance parameter \(\sigma^2\) to a multivariate scenario.
 
-A \emph{Gaussian process} is thus defined as the model where any finite collection of realizations (i.e., \(n\) observations) is treated as having a multivariate normal distribution. The characteristics of these realizations are determined by the mean function \(\mu(x)\) and the kernel \(k(x, x_i)\), with the latter's realization forming a positive semi-definite symmetric matrix \(\mathbf{K}\).
+A \emph{Gaussian process} is thus defined as the model where any finite collection of realizations (i.e., \(n\) observations) is treated as having a multivariate normal distribution. The characteristics of these realizations are determined by the mean function \(\mu(\mathbf{x})\) and the kernel \(k(\mathbf{x}, \mathbf{x}_i)\), with the latter's realization forming a positive semi-definite symmetric matrix \(\mathbf{K}\).
 
 The function \(f\) can be represented as:
 \[
-f(x) = (1, \mathbf{x}^T)\beta + \sum_i b_i C(x, x_i),
+f(\mathbf{x}) = (\mathbf{1}, \mathbf{x}^T)\boldsymbol{\beta} + \sum_i b_i C(\mathbf{x}, \mathbf{x}_i),
 \]
-where \(C(x, x_i)\) is a non-negative function measuring the distance between two points. The value of \(C(x, x_i)\) should equal one when points are identical (indicating maximum correlation) and approach zero as the distance between points increases to infinity. Given the vector \(b\), its prior distribution is \(b \sim \mathcal{N}(0, \mathbf{S}^{-1}/\lambda)\). Here, \(\beta\) is a vector of fixed effect parameters (in the sense of the mixed model formulation), and the model depicts \(f\) as a linear combination of these fixed effects and a random effect weighted by the kernel function \(C(x, x_i)\).
+where \(C(\mathbf{x}, \mathbf{x}_i)\) is a non-negative function measuring the distance between two points. The value of \(C(\mathbf{x}, \mathbf{x}_i)\) should equal one when points are identical (indicating maximum correlation) and approach zero as the distance between points increases to infinity. Given the vector \(\mathbf{b}\), its prior distribution is \(\mathbf{b} \sim \mathcal{N}(\mathbf{0}, \mathbf{S}^{-1}/\lambda)\). Here, \(\boldsymbol{\beta}\) is a vector of fixed effect parameters (in the sense of the mixed model formulation), and the model depicts \(f\) as a linear combination of these fixed effects and a random effect weighted by the kernel function \(C(\mathbf{x}, \mathbf{x}_i)\).
 
 In matrix form, \(f\) is represented as:
 \[
-f = \mathbf{B} \beta + \mathbf{C}b.
+f = \mathbf{B} \boldsymbol{\beta} + \mathbf{C}\mathbf{b}.
 \]
 To find the covariance matrix of \(f\), compute:
 \[
-\text{Cov}(f) = \text{Cov}(\mathbf{C}b) = \mathbf{C} \text{Cov}(b) \mathbf{C}^T = \mathbf{C} (\lambda \mathbf{C})^{-1} \mathbf{C}^T = \mathbf{C} / \lambda,
+\text{Cov}(f) = \text{Cov}(\mathbf{C}\mathbf{b}) = \mathbf{C} \text{Cov}(\mathbf{b}) \mathbf{C}^T = \mathbf{C} (\lambda \mathbf{C})^{-1} \mathbf{C}^T = \mathbf{C} / \lambda,
 \]
 leveraging the fact that \(C = S^{-1}\) and \(\mathbf{C}\) is symmetric.
 
 Minimizing the objective function:
 \[
-\|y - \mathbf{B}\beta - \mathbf{C}b\|^2/\sigma^2 + \lambda b^T \mathbf{C} b
+\|y - \mathbf{B}\boldsymbol{\beta} - \mathbf{C}\mathbf{b}\|^2/\sigma^2 + \lambda \mathbf{b}^T \mathbf{C} \mathbf{b}
 \]
-is equivalent to maximizing the posterior probability of the parameters given the data, usually incorporating \(\sigma^2\) into the smoothing parameter \(\lambda\). The values of \(\beta\) and \(b\) that minimize this function are the MAP estimates given in equation \ref{eq:MAP estimate}.
+is equivalent to maximizing the posterior probability of the parameters given the data, usually incorporating \(\sigma^2\) into the smoothing parameter \(\lambda\). The values of \(\boldsymbol{\beta}\) and \(\mathbf{b}\) that minimize this function are the MAP estimates given in equation \ref{eq:MAP estimate}.
 
 This methodology is known as \emph{Gaussian process regression}. Gaussian process regression's complexity primarily resides in the choice of the kernel. The kernel encodes assumptions about the function \(f\) by defining the concept of proximity or similarity used in the estimation. For an introduction to Gaussian Processes, including many covariance functions and further details, see {[}19{]}.
 
@@ -810,13 +808,13 @@ How can we account for overfitting in statistical modeling when comparing the fi
 
 See appendix \ref{AIC} for the background on the using \emph{Akaike information criterion} (AIC) for comparison between models with unpenalized parameters. Given equation \ref{eq:AIC}, we now have a measure for model performance that takes into account complexity by penalizing for the number of parameters in the model. However, the notion of degrees of freedom for penalized smoothing coefficients is more complicated than in the unpenalized case. To address this complexity, it is helpful to introduce the concept of natural parameterization and the effective degrees of freedom (EDF). These concepts explain the impact of penalties on model coefficients and for defining a correction notion for what \(p\) should be in expression \ref{eq:AIC}.
 
-In the context of penalized smoothers, Simon Wood {[}9{]} describes a ``natural'' parameterization, that simplifies the understanding of how penalties affect model degrees of freedom. The \emph{natural parameterization} transforms the parameter estimators such that they are independent with unit variance in the absence of a penalty, and the penalty matrix becomes diagonal.
+In the context of penalized smoothers, Simon Wood {[}9{]} describes a `natural' parameterization, that simplifies the understanding of how penalties affect model degrees of freedom. The \emph{natural parameterization} transforms the parameter estimators such that they are independent with unit variance in the absence of a penalty, and the penalty matrix becomes diagonal.
 
 Consider a model with a design matrix \(\mathbf{X}\), parameter vector \(\boldsymbol{\beta}\), wiggliness penalty matrix \(\mathbf{S}\), and smoothing parameter \(\lambda\). Using the QR decomposition, \(\mathbf{X}\) is factorized as \(\mathbf{X} = \mathbf{Q} \mathbf{R}\). Re-parameterizing in terms of \(\boldsymbol{\beta''} = \mathbf{R} \boldsymbol{\beta}\) transforms the model matrix to \(\mathbf{Q}\) and the penalty matrix to \(\mathbf{R}^{-T} \mathbf{S} \mathbf{R}^{-1}\).
 
-The penalty matrix is then eigen-decomposed as \(\mathbf{R}^{-T} \mathbf{S} \mathbf{R}^{-1} = \mathbf{U} \mathbf{D} \mathbf{U}^T\), where \(\mathbf{U}\) is orthogonal and \(\mathbf{D}\) is diagonal. Further re-parameterization via a rotation/reflection of the parameter space yields parameters \(\boldsymbol{\beta'} = \mathbf{U}^T \boldsymbol{\beta''}\), resulting in a model matrix \(\mathbf{Q} \mathbf{U}\) and penalty matrix \(\mathbf{D}\). This ``natural'' parameterization allows for a clear understanding of the penalty's role in limiting parameter variance.
+The penalty matrix is then eigen-decomposed as \(\mathbf{R}^{-T} \mathbf{S} \mathbf{R}^{-1} = \mathbf{U} \mathbf{D} \mathbf{U}^T\), where \(\mathbf{U}\) is orthogonal and \(\mathbf{D}\) is diagonal. Further re-parameterization via a rotation/reflection of the parameter space yields parameters \(\boldsymbol{\beta'} = \mathbf{U}^T \boldsymbol{\beta''}\), resulting in a model matrix \(\mathbf{Q} \mathbf{U}\) and penalty matrix \(\mathbf{D}\). This `natural' parameterization allows for a clear understanding of the penalty's role in limiting parameter variance.
 
-Each unpenalized coefficient has one degree of freedom. The penalized estimates are shrunken versions of the unpenalized estimates: \(\hat{\beta'}_i = (1 + \lambda D_{ii})^{-1} \tilde{\beta'}_i\), where \(D_{ii}\) are the eigenvalues of the penalty matrix. The shrinkage factor \((1 + \lambda D_{ii})^{-1}\) represents the \emph{effective degrees of freedom} for each penalized coefficient.
+Each unpenalized coefficient has one degree of freedom. The penalized estimates are shrunken versions of the unpenalized estimates: \(\hat{\boldsymbol{\beta}'}_i = (1 + \lambda D_{ii})^{-1} \tilde{\boldsymbol{\beta}'}_i\), where \(D_{ii}\) are the eigenvalues of the penalty matrix. The shrinkage factor \((1 + \lambda D_{ii})^{-1}\) represents the \emph{effective degrees of freedom} for each penalized coefficient.
 
 The total EDF for the smooth is the sum of the individual shrinkage factors:
 
@@ -824,16 +822,16 @@ The total EDF for the smooth is the sum of the individual shrinkage factors:
 \sum_i (1 + \lambda D_{ii})^{-1} = \text{tr}(\mathbf{\tau}) \quad \text{where} \quad \mathbf{\tau} = (\mathbf{X}^T \mathbf{X} + \lambda \mathbf{S})^{-1} \mathbf{X}^T \mathbf{X}.
 \]
 
-\(\tau\) can be interpreted as the matrix that maps the un-penalized coefficient estimates to the penalized coefficient estimates. This means that the trace of \(\tau\) can be understood as having the effect of being the average shrinkage of the coefficients, multiplied by the number of coefficients. This measure is bounded between the number of zero eigenvalues of the penalty (as \(\lambda \to \infty\)) and the total number of coefficients (when \(\lambda = 0\)). The `trace of the hat matrix' is an idea also found elsewhere, e.g Hastie et Tibshirani {[}8{]}.
+\(\tau\) can be interpreted as the matrix that maps the un-penalized coefficient estimates to the penalized coefficient estimates. This means that the trace of \(\tau\) can be understood as having the effect of being the average shrinkage of the coefficients, multiplied by the number of coefficients. This measure is bounded between the number of zero eigenvalues of the penalty (as \(\lambda \to \infty\)) and the total number of coefficients (when \(\lambda = 0\)). The `trace of the hat matrix' is an idea also found elsewhere, e.g Hastie and Tibshirani {[}8{]}.
 
-The unpenalized estimators are unbiased, leading to the expected value of the penalized estimates: \(E(\hat{\beta'}_i) = (1 + \lambda D_{ii})^{-1} \beta_i\). The shrinkage factors determine the relative smoothing bias.
+The unpenalized estimators are unbiased, leading to the expected value of the penalized estimates: \(E(\hat{\boldsymbol{\beta}'}_i) = (1 + \lambda D_{ii})^{-1} \boldsymbol{\beta}_i\). The shrinkage factors determine the relative smoothing bias.
 
 The penalty suppresses variability in parameters corresponding to high eigenvalues \(D_{ii}\), effectively reducing model complexity.
 
 Therefore, the AIC formula corrected to incorporate the effective degrees of freedom is the \emph{conditional AIC}:
 
 \begin{equation}
-\text{AIC} = -2 \ell(\hat{\beta}) + 2 \tau.
+\text{AIC} = -2 \ell(\hat{\boldsymbol{\beta}}) + 2 \tau.
 \label{eq:corrected AIC}
 \end{equation}
 
@@ -842,25 +840,26 @@ The effective degrees of freedom for the calibrated models are computed as the m
 Although the model degrees of freedom take into account the value of the smoothing parameter, it does not take into account the uncertainty estimates of the fitted smoothing parameter. From Appendix \ref{AIC}, the effective degrees of freedom is equal to:
 
 \[
-\tau = \text{tr}2\mathbb{E}\left[\frac{1}{2} (\hat{\beta} - \beta_K)^T \mathbf{ \mathcal{I}}_K (\hat{\beta} - \beta_K)\right] = \text{tr}  \mathbb{E}[\chi^2_p] = p,
+\tau = \text{tr}2\mathbb{E}\left[\frac{1}{2} (\hat{\boldsymbol{\beta}} - \boldsymbol{\beta}_K)^T \boldsymbol{ \mathcal{I}}_K (\hat{\boldsymbol{\beta}} - \boldsymbol{\beta}_K)\right] = \text{tr}  \mathbb{E}[\chi^2_p] = p,
 \]
-where \(\beta_K\) is the coefficient vector minimizing the K-L divergence and \(\mathbf{ \mathcal{I}}_K\) is the expected negative Hessian of the log likelihood. In {[}20{]}, Wood et al defines the corrected AIC as
+where \(\boldsymbol{\beta}_K\) is the coefficient vector minimizing the K-L divergence and \(\boldsymbol{ \mathcal{I}}_K\) is the expected negative Hessian of the log likelihood. In {[}20{]}, Wood et al defines the corrected AIC as
 
-\[
-\tau_2 = \text{tr}(\mathbf{V}'_{\beta}\hat{\mathbf{ \mathcal{I}}}),
-\]
+\begin{equation}
+\tau_2 = \text{tr}(\mathbf{V}'_{\boldsymbol{\beta}}\hat{\boldsymbol{ \mathcal{I}}}),
+\label{eq:corrected_aic}
+\end{equation}
 where \(\mathbf{V}'\) is an approximation of the covariance matrix of the Bayesian large sample approximation
 
 \[
-\beta \mid y,\lambda \sim \mathcal{N}(\hat{\beta}_{\lambda},\mathbf{V}_{\beta})
+\boldsymbol{\beta} \mid \mathbf{y},\lambda \sim \mathcal{N}(\hat{\boldsymbol{\beta}}_{\lambda},\mathbf{V}_{\boldsymbol{\beta}})
 \]
-and \(\mathbf{V}_{\beta} = (\hat{\mathbf{\mathcal{I}}} + \mathbf{P})^{-1}\). \(\hat{\mathbf{ \mathcal{I}}}\) is the is the Hessian of the negative log likelihood at \(\mathbf{ \mathcal{I}}_K\). The goal is to calculate a first-order adjustment to the posterior distribution of the model coefficients, taking into account the uncertainty in the smoothing parameter. After that, the penalty term in the AIC is represented using the Bayesian covariance matrix of the coefficients.
+and \(\mathbf{V}_{\boldsymbol{\beta}} = (\hat{\boldsymbol{ \mathcal{I}}} + \mathbf{P})^{-1}\). \(\hat{\boldsymbol{ \mathcal{I}}}\) is the is the Hessian of the negative log likelihood at \(\boldsymbol{ \mathcal{I}}_K\). The goal is to calculate a first-order adjustment to the posterior distribution of the model coefficients, taking into account the uncertainty in the smoothing parameter. After that, the penalty term in the AIC is represented using the Bayesian covariance matrix of the coefficients.
 
 \section{The SIR and SIRS compartmental models}\label{the-sir-and-sirs-compartmental-models}
 
 The \emph{SIR model} (Figure \ref{fig:sir-model}) categorizes the population into three distinct compartments: \(S(t)\), \(I(t)\), and \(R(t)\), which represent the number of susceptible, infected, and recovered individuals, respectively. As the disease progresses, the number of individuals in each compartment changes over time, thus these compartments are represented as functions of time. The transitions between these compartments are guided by the processes depicted in the schematic shown in Figure \ref{fig:sir-model}.
 
-The model incorporates two primary parameters: the transmission rate (\(\beta\)) and the recovery rate (\(\gamma\)). The \emph{transmission rate}, \(\beta\) is the per capita rate at which two different individuals come in effective contact per unit time. This rate is used to calculate \(\beta SI\), where \(SI\) is the total number of interactions between susceptible and infected individuals; \(\beta SI\) thus represents the expected number of new infections per unit time.
+The model incorporates two primary parameters: the transmission rate (\(\beta\)) and the recovery rate (\(\gamma\)). The \emph{transmission rate}, \(\beta\), is the per capita rate at which two different individuals come in effective contact per unit time. This rate is used to calculate \(\beta SI\), where \(SI\) is the total number of interactions between susceptible and infected individuals; \(\beta SI\) thus represents the expected number of new infections per unit time.
 
 On the other hand, the \emph{recovery rate}, \(\gamma\), indicates how quickly infected individuals recover and gain immunity. If an individual is infectious for a period \(D\), then \(\gamma\) is defined as \(\gamma = \frac{1}{D}\). Therefore, \(\gamma I\) calculates what proportion of the infected population will recover during any given time interval, moving from the infected compartment to the recovered compartment, based on the infectious period \(D\).
 
@@ -875,8 +874,8 @@ The rates of transition between compartments in the SIR model can be derived fro
 
 \begin{equation}
 \begin{aligned}
-\frac{dS}{dt} &= -\beta IS, \\
-\frac{dI}{dt} &= \beta IS - \gamma I, \\
+\frac{dS}{dt} &= -\beta SI, \\
+\frac{dI}{dt} &= \beta SI - \gamma I, \\
 \frac{dR}{dt} &= \gamma I.
 \end{aligned}
 \label{eq:sir ode}
@@ -893,13 +892,15 @@ The basic SIR model can be modified to include a process where recovered individ
 
 \subsection{\texorpdfstring{Force of Infection and the Basic Reproduction Number (\(R_0\))}{Force of Infection and the Basic Reproduction Number (R\_0)}}\label{FOI-and-R0}
 
-In equation \ref{eq:sir ode}, for \(\frac{dS}{dt}\), the term \(\beta \frac{I}{N} S\) represents the rate at which susceptible are becoming infected. Here, \(\lambda = \beta \frac{I}{N}\) is the \emph{force of infection}, which means that each susceptible individual has a probability \(\lambda\) of becoming infected per unit time. The force of infection is defined as as the per capita rate at which susceptible individuals contract the disease. Essentially, it quantifies the risk that a susceptible individual faces of becoming infected at a given time, depending on the current prevalence and contagiousness of the disease in the population. The force of infection is directly proportional to the number of infectious individuals in the population.
+In equation \ref{eq:sir ode}, for \(\frac{dS}{dt}\), the term \(\frac{\beta SI}{N}\) represents the rate at which susceptible are becoming infected. Here, \(\lambda = \beta \frac{I}{N}\) is the \emph{force of infection}, which means that each susceptible individual has a probability \(\lambda\) of becoming infected per unit time. The force of infection is defined as as the per capita rate at which susceptible individuals contract the disease. Essentially, it quantifies the risk that a susceptible individual faces of becoming infected at a given time, depending on the current prevalence and contagiousness of the disease in the population. The force of infection is directly proportional to the number of infectious individuals in the population.
 
-An infectious individual contacts \(\beta\) individuals per unit time, and the proportion of susceptibles in the population is \(\frac{S}{N}\). Therefore, the effective contacts that can result in a new infection are \(\beta \frac{S}{N}\). An infectious individual remains infectious for \(\frac{1}{\gamma}\) units of time, on average (since \(\gamma\) is the rate at which individuals recover and cease being infectious). The \emph{basic reproduction number} \(R_0\) is defined as:
+An infectious individual contacts \(\beta\) individuals per unit time, and the proportion of susceptibles in the population is \(\frac{S}{N}\). Therefore, the effective contacts that can result in a new infection are \(\beta \frac{S}{N}\). An infectious individual remains infectious for \(\frac{1}{\gamma}\) units of time, on average (since \(\gamma\) is the rate at which individuals recover and cease being infectious).
+
+The \emph{basic reproduction number} \(R_0\) is defined as:
 \[
    R_0 = \frac{\beta}{\gamma}.
    \]
-Therefore \(R_0\) is the average number of secondary cases of disease caused by a single infected individual overtheir infectious period. {[}21{]} discusses the subtleties in defining and estimating the reproductive number.
+Therefore \(R_0\) is the average number of secondary cases of disease caused by a single infected individual over their infectious period. {[}21{]} discusses the subtleties in defining and estimating the reproductive number.
 
 If \(R_0 > 1\), each infectious individual, on average, infects more than one other person, leading to the potential for an epidemic. Conversely, if \(R_0 < 1\), the disease will likely die out in the population over time. Understanding \(R_0\) helps in predicting disease behavior and controlling outbreaks. For instance if we can reduce \(\beta\) (e.g., through vaccination, social distancing, or wearing masks), or increase \(\gamma\) (e.g., through faster diagnosis and treatment), \(R_0\) can be brought below 1, aiming to control the spread of the disease.
 
@@ -913,7 +914,7 @@ This chapter covers the technical details of using semi-mechanistic models. Ther
 
 \emph{Template Model Builder} (\texttt{TMB}) is an R package specifically designed to fit latent variable models efficiently to data. With \texttt{macpan2}, users can write the negative log-likelihood of their objective function with respect to the parameters to be fit to the data in R code. \texttt{macpan2} then converts this objective function to \texttt{C++} code. It implements maximum likelihood estimation and uncertainty calculations by maximizing the Laplace approximation of the marginal likelihood.
 
-The use of the Laplace approximation to estimate model parameters and their uncertainties (using the delta method) involves the computation of first and second-order derivatives, respectively. Nonlinear optimization algorithms that use quasi-Newton methods (such as \texttt{nlminb} or BFGS) leverage differences of gradients to iteratively approximate the Hessian matrix. Accurate estimates of the gradient function are essential for the quasi-Newton algorithm to obtain efficient parameter updates. Inaccuracies in the gradient can lead to suboptimal parameter updates, slow convergence, or convergence to non-optimal points. \texttt{TMB} harnesses the capabilities of \emph{automatic differentiation} (AD), a computational technique for accurately calculating derivatives of functions. Unlike numerical or symbolic differentiation, AD operates by exploiting the fact that all computationally implemented functions decompose into a finite sequence of elementary arithmetic operations and functions {[}22{]}. Using the chain rule, AD breaks down these complex functions into simpler operations, computing derivatives in a sequence that parallels the function's evaluation. This method enables the precise calculation of derivatives up to machine precision. AD helps efficiently implement the Laplace Approximation because finite differences is a crude and slow method. For its implementation of AD, \texttt{TMB} utilizes the \texttt{C++} libraries \texttt{CppAD} for automatic differentiation and \texttt{Eigen} for handling both sparse and dense matrix computations.
+The use of the Laplace approximation to estimate model parameters and their uncertainties (using the delta method) involves the computation of first and second-order derivatives, respectively. Nonlinear optimization algorithms that use Quasi-Newton methods (such as \texttt{nlminb} or BFGS) leverage differences of gradients to iteratively approximate the Hessian matrix. Accurate estimates of the gradient function are essential for the Quasi-Newton algorithm to obtain efficient parameter updates. Inaccuracies in the gradient can lead to suboptimal parameter updates, slow convergence, or convergence to non-optimal points. \texttt{TMB} harnesses the capabilities of \emph{automatic differentiation} (AD), a computational technique for accurately calculating derivatives of functions. Unlike numerical or symbolic differentiation, AD operates by exploiting the fact that all computationally implemented functions decompose into a finite sequence of elementary arithmetic operations and functions {[}22{]}. Using the chain rule, AD breaks down these complex functions into simpler operations, computing derivatives in a sequence that parallels the function's evaluation. This method enables the precise calculation of derivatives up to machine precision. AD helps efficiently implement the Laplace Approximation because finite differences is a crude and slow method. For its implementation of AD, \texttt{TMB} utilizes the \texttt{C++} libraries \texttt{CppAD} for automatic differentiation and \texttt{Eigen} for handling both sparse and dense matrix computations.
 
 In \texttt{macpan2}, specifying that the optimizer includes uncertainty estimates for parameters is straight forward. This functionality enables the computation of Wald confidence intervals with specified uncertainty levels using the delta method. This requires the computation of the Hessian matrix, which AD makes computationally efficient. Confidence intervals, as discussed in chapter \ref{Results}, are computed using this method.
 
@@ -924,13 +925,13 @@ For further reading on \texttt{TMB}, refer to {[}23{]}. For more information on 
 We specify the \emph{time-varying transmission rate} \(\beta\) in our model using a linear smoother defined as
 
 \begin{equation}
-\beta = \text{exp}(b_0 + \mathbf{X}b),
+\boldsymbol{\beta} = \text{exp}(b_0 + \mathbf{X}\mathbf{b}),
 \label{eq:linear smoother}
 \end{equation}
 
-where \(b_0\) is the intercept, \(\mathbf{X}\) is the basis matrix of dimensions \(n \times (k-1)\), and \(b\) is a vector of basis coefficients of length \(k-1\). The basis matrix \(\mathbf{X}\) is constructed using the \texttt{smoothCon} function from the \texttt{mgcv} package in R. The structure of \(\mathbf{X}\) depends on the selected type of smoother, as indicated by the \texttt{bs} arguement, and the number of knots \(k\).
+where \(b_0\) is the intercept, \(\mathbf{X}\) is the basis matrix of dimensions \(n \times (k-1)\), and \(\mathbf{b}\) is a vector of basis coefficients of length \(k-1\). The structure of \(\mathbf{X}\) depends on the selected type of basis functions.
 
-The \texttt{R} package \emph{Mixed GAM Computation Vehicle with Automatic Smoothness Estimation} (\texttt{mgcv}), developed by Simon Wood, implements a variety of smoothers that can be used for penalized generalized additive models. In our approach, we utilize \texttt{smoothCon} to create the model matrix \(\mathbf{X}\) and its corresponding penalty matrix \(\mathbf{P}\) for \(\beta\). This function facilitates the capture of the nonlinear relationships of the latent variable \(\beta\) from the data by constructing a univariate Gaussian regression smoother. While typically used internally by \texttt{mgcv} in calls to the \texttt{gam} function for fitting generalized additive models, \texttt{smoothCon} serves as a critical low-level function for constructing smooth terms in our model.
+The \texttt{R} package \emph{Mixed GAM Computation Vehicle with Automatic Smoothness Estimation} (\texttt{mgcv}), developed by Simon Wood, implements a variety of smoothers that can be used for penalized generalized additive models. In our approach, we utilize \texttt{smoothCon} to create the model matrix \(\mathbf{X}\) and its corresponding penalty matrix \(\mathbf{P}\) for \(\boldsymbol{\beta}\). This function facilitates the capture of the nonlinear relationships of the latent process \(\boldsymbol{\beta}\) from the data by constructing a univariate Gaussian regression smoother. While typically used internally by \texttt{mgcv} in calls to the \texttt{gam} function for fitting generalized additive models, \texttt{smoothCon} serves as a critical low-level function for constructing smooth terms in our model.
 
 This function is configured via the \texttt{bs} argument to select the type of smoother and the \texttt{k} argument to determine the number of basis functions, which we refer to as \texttt{num\_variables}. The number of observations in the data is represented by \texttt{n}. The initial step involves constructing a simple data frame \texttt{dd\ =\ seq(from\ =\ 0,\ to\ =\ n,\ by\ =\ 1)}, which discretizes our time variable into intervals that map directly onto the domain over which the smoother operates.
 
@@ -952,12 +953,10 @@ Details on the range of smoothers implemented in our models and their respective
 The argument \texttt{absorb.cons\ =\ TRUE} absorbs the identifiability constraints into the basis matrix, instead of treating them as external conditions or adding them through additional penalty terms. The default \emph{identifiability constraint} in \texttt{mgcv} ensures the smooth sums to zero over the observed values of \(x_j\), i.e,
 
 \[
-1^T\mathbf{X\beta} = 0.
+\mathbf{1}^T\mathbf{X}\mathbf{b} = 0.
 \]
 
-This implies \(1^T\mathbf{X} = 0\).
-
-\texttt{mgcv} implements this constraint by constructing the following QR decomposition.
+This implies \(\mathbf{1}^T\mathbf{X} = 0\). \texttt{mgcv} implements this constraint by constructing the following QR decomposition.
 
 Let
 
@@ -966,27 +965,27 @@ Let
 \]
 where \(\mathbf{U}\) is a \(p \times p\) orthogonal matrix and \(\mathbf{P}\) is an \(m \times m\) upper triangular matrix. The zero matrix appended to \(\mathbf{P}\) is \(m \times (p-m)\) to match the dimensions of \(\mathbf{U}\). Now, \(\mathbf{U}\) is partitioned as \(\mathbf{U} \equiv (\mathbf{D} : \mathbf{Z})\), where \(\mathbf{D}\) is a \(p \times m\) matrix and \(\mathbf{Z}\) is a \(p \times (p-m)\) matrix.
 
-Given that \(\beta = \mathbf{Z}\beta_z\) and \(\beta_z\) is a \((p-m)\)-dimensional vector, we compute:
+Given that \(\mathbf{b} = \mathbf{Z}\mathbf{b}_z\) and \(\mathbf{b}_z\) is a \((p-m)\)-dimensional vector, we compute:
 \[
-   \mathbf{C}\beta = \begin{bmatrix} \mathbf{P}^T \\ 0 \end{bmatrix} \begin{bmatrix} \mathbf{D}^T \\ \mathbf{Z}^T \end{bmatrix} \mathbf{Z}\beta_z = \begin{bmatrix} \mathbf{P}^T\mathbf{D}^T \\ 0 \end{bmatrix} \mathbf{Z}\beta_z = \begin{bmatrix} \mathbf{P}^T \\ 0 \end{bmatrix} \beta_z = 0,
+   \mathbf{C}\mathbf{b} = \begin{bmatrix} \mathbf{P}^T \\ 0 \end{bmatrix} \begin{bmatrix} \mathbf{D}^T \\ \mathbf{Z}^T \end{bmatrix} \mathbf{Z}\mathbf{b}_z = \begin{bmatrix} \mathbf{P}^T\mathbf{D}^T \\ 0 \end{bmatrix} \mathbf{Z}\mathbf{b}_z = \begin{bmatrix} \mathbf{P}^T \\ 0 \end{bmatrix} \mathbf{b}_z = 0,
    \]
 where we used the fact that \(\mathbf{D}^T\mathbf{Z} = 0\), and \(\mathbf{Z}^T\mathbf{Z} = \mathbf{I}_{p-m}\) because \(\mathbf{U}\) is orthogonal, hence \(\mathbf{U}^T\mathbf{U} = \mathbf{I}_p\).
 
-To minimize equation \ref{eq:penalizedregression} such that \(1^T\mathbf{X\beta} = 0\),
-find the \(k \times (k-1)\) matrix \(Z\) and reparameterize the basis matrix to \(\mathbf{XZ}\) and the penalty matrix to \(\mathbf{Z^TPZ}\).
+To minimize equation \ref{eq:penalizedregression} such that \(\mathbf{1}^T\mathbf{b} = 0\),
+find the \(k \times (k-1)\) matrix \(\mathbf{Z}\) and reparameterize the basis matrix to \(\mathbf{XZ}\) and the penalty matrix to \(\mathbf{Z^TPZ}\).
 
 While zero-centering \(\mathbf{X}\) is a computationally more expensive method to address identifiability issues, it is still valuable to explain because it provides a clearer understanding of how the spline components and intercept interact in the model. By default, the basis matrix \(\mathbf{X}\) produced by \texttt{mgcv::smoothCon} doesn't include an intercept. Zero-centering the spline basis functions ensures that the spline components represent deviations or variations around a central tendency, rather than absolute values. This allows the intercept, \(b_0\), in the model to uniquely capture the central tendency of the response variable. Consequently, the intercept and the spline coefficients are identifiable as distinct contributors to the model: the intercept as the average response and the spline coefficients as the adjustments from this average. Each spline coefficient can be interpreted as the effect of that basis function relative to the central tendency captured by the intercept.
 
-Zero-centering is implemented by subtracting the column mean from each column of \(\mathbf{X}\), which effectively reduces the rank of \(\mathbf{X}\) by one. This process removes one degree of freedom, corresponding to the zero eigenvalue, from the basis matrix. To resolve this, we exclude the row and column associated with the zero eigenvalue from \(\mathbf{X}\), and we also remove the corresponding element from the vector of coefficients, \(\beta\). This adjustment ensures that the remaining components of \(\mathbf{X}\) and \(\beta\) are identifiable.
+Zero-centering is implemented by subtracting the column mean from each column of \(\mathbf{X}\), which effectively reduces the rank of \(\mathbf{X}\) by one. This process removes one degree of freedom, corresponding to the zero eigenvalue, from the basis matrix. To resolve this, we exclude the row and column associated with the zero eigenvalue from \(\mathbf{X}\), and we also remove the corresponding element from the vector of coefficients, \(\mathbf{b}\). This adjustment ensures that the remaining components of \(\mathbf{X}\) and \(\mathbf{b}\) are identifiable.
 
-\(\mathbf{X}\) and \(b\) now have one fewer dimension than the number of knots due to the null space of the penalty matrix. The penalty matrix's null space dimension of one means the function can vary linearly without penalty. As \(\lambda\) increases, the model reverts to a linear trend because this minimizes penalized complexity under high penalty values.
+\(\mathbf{X}\) and \(\mathbf{b}\) now have one fewer dimension than the number of knots due to the null space of the penalty matrix. The penalty matrix's null space dimension of one means the function can vary linearly without penalty. As \(\lambda\) increases, the model reverts to a linear trend because this minimizes penalized complexity under high penalty values.
 
-There are difficulties encountered when working with the penalty matrix that has been transformed into the constraint space of the sum to zero constraint. Computing the eigendecomposition of the penalty matrix, returned by \texttt{mgcv::smoothCon}, one of the eigenvalues is essentially zero, in terms of numerical precision, being on the order of \(\leq 10^{-10}\). This implies that the penalty matrix is singular. It is not possible to take the logarithmic determinant of a singular matrix when taking numerical precision limitations into account. Computing the log determinant is part of the objective equation (\ref{eq:obj eqn}). To overcome this we can take the regularized determinant by adding a small value (\(\approx 10^{-5})\)) to the diagonal of the penalty matrix. Another option (which we did not implement) is to take the singular value decomposition \(\mathbf{P} = \mathbf{U}\mathbf{\Sigma} \mathbf{V}^T\) and use the fact that \(\text{logdet}\mathbf{P}= \sum_i \text{log}\Sigma_{ii}\).
+There are difficulties encountered when working with the penalty matrix that has been transformed into the constraint space of the sum to zero constraint. Computing the eigendecomposition of the penalty matrix, returned by \texttt{mgcv::smoothCon}, one of the eigenvalues is essentially zero, in terms of numerical precision, being on the order of \(\leq 10^{-10}\). This implies that the penalty matrix is singular. It is not possible to take the logarithmic determinant of a singular matrix when taking numerical precision limitations into account. Computing the log determinant is part of the objective equation (\ref{eq:obj eqn}). To overcome this we can take the regularized determinant by adding a small value \((\approx 10^{-10})\) to the diagonal of the penalty matrix. Another option (which we did not implement) is to take the singular value decomposition \(\mathbf{P} = \mathbf{U}\mathbf{\Sigma} \mathbf{V}^T\) and use the fact that \(\text{logdet}\mathbf{P}= \sum_i \text{log}\Sigma_{ii}\).
 
-We scaled \(\mathbf{X}\) to make it compatible across bases, with a choice of the standard deviation used to simulate the starting values for \(\beta\). Each column of the basis matrix \(\mathbf{X}\) is normalized by dividing it by its Euclidean norm, resulting in each column having a unit norm. Then \(\mathbf{X}\beta\) is on the range of about of plus or minus \(\text{log}(2)\) (i.e \(\mathbf{X}\beta \pm 1)\), since
+We scaled \(\mathbf{X}\) to make it comparable across bases, with a choice of the standard deviation used to simulate the starting values for \(\mathbf{b}\). Each column of the basis matrix \(\mathbf{X}\) is normalized by dividing it by its Euclidean norm, resulting in each column having a unit norm. Then \(\mathbf{X}\mathbf{b}\) is on the range of about of plus or minus \(\text{log}(2)\) (i.e \(\mathbf{X}\mathbf{b} \pm 1)\), since
 
 \[
-\beta \sim \mathcal{N}(0, b_{sd}).
+\mathbf{b} \sim \mathcal{N}(\mathbf{0}, b_{sd}).
 \]
 
 When the sum-to-zero constraints are absorbed into the basis matrix, this also sets the penalty matrix for the Gaussian process to have the last row and column equal to zero, effectively absorbing the null space constraints into the penalty matrix. This makes \(\mathbf{P}\) singular. If we remove the final row and column of \(\mathbf{P}\), then we get a non-singular matrix.
@@ -1027,7 +1026,7 @@ R &= \frac{\gamma N (\beta - \gamma)}{\beta (\phi + \gamma)}.
 
 By initializing the compartment values deterministically as functions of the total population \(N\), the transmission rate \(\beta\), the recovery rate \(\gamma\), and the waning rate \(\phi\), we can start the simulation close to the endemic equilibrium. This approach stabilizes the influence of the starting parameters, particularly \(\beta\), on the model dynamics. Consequently, the system begins in a balanced state, reducing the transient effects that might otherwise occur due to arbitrary initial conditions. This transformation was not necessary for the real-world data examples.
 
-For these examples, the state vectors are initialized as follows:
+For the real data examples, the state vectors are initialized as follows:
 
 \[
 \begin{aligned}
@@ -1039,29 +1038,29 @@ R &= 0.
 
 The \emph{initial number of infected individuals}, \(I_0\), at time \(t=0\) is modeled as a fixed parameter. To account for uncertainty about \(I_0\), we employ a log-normal prior distribution. We use a similar approach for the recovery rate \(\gamma\), also modeled with a log-normal prior to ensure positivity and reflect our uncertainty regarding its value. Specifically, we set the mean of the priors to the logarithmic values of \(I_0\) and \(\gamma\), and the standard deviation for each parameter is set to a small reasonable value \(\sigma = 0.1\) to instill a sharp prior.
 
-The smoothing coefficients vector \(b = (b_1, \ldots, b_{k-2})\) is initialized using \(k-1\) random draws from a standard normal distribution.
+The smoothing coefficients vector \(\mathbf{b} = (b_1, \ldots, b_{k-2})\) is initialized using \(k-1\) random draws from a standard normal distribution.
 
 The intercept \(b_0\) of the linear smoother (\ref{eq:linear smoother}), for the time varying transmission, is estimated in the model. It starting value is set to the logarithm of the starting value of \(\beta\) at time \(t= 0\).
 
-We can compute the likelihood of the basis coefficients by making the assumption that
-the spline basis coefficients \(\beta\) follow a multivariate Gaussian distribution, i.e., \(\beta \sim \mathcal{N}(\mathbf{0}, \mathbf{\Sigma})\). The log likelihood function for \(\beta\) is then
+We can compute the log likelihood of the basis coefficients by making the assumption that
+the spline basis coefficients \(b\) follow a multivariate Gaussian distribution, i.e., \(\mathbf{b} \sim \mathcal{N}(\mathbf{0}, \mathbf{\Sigma})\). The log likelihood function for \(\mathbf{b}\) is then
 
 \[
-L(\beta) = -\frac{k}{2} \log(2\pi) -\frac{1}{2} \log(\text{det}(\mathbf{\Sigma})) -\frac{1}{2} (\mathbf{x}-\mu)^T \mathbf{\Sigma}^{-1} (\mathbf{x}-\mu).
+L(\mathbf{b}) = -\frac{k}{2} \log(2\pi) -\frac{1}{2} \log(\text{det}(\mathbf{\Sigma})) -\frac{1}{2} (\mathbf{x}-\mu)^T \mathbf{\Sigma}^{-1} (\mathbf{x}-\mu).
 \]
 
-Now let \(\beta = \mathbf{x}- \mu\) and \(\Sigma^{-1}= a\mathbf{S}\), where \(a = \frac{1}{\sigma^2}\), \(\sigma^2 \in \mathbb{R}\) and \(\mathbf{S}\) is the penalty matrix. This implies \(\mathbf{\Sigma} = a^{-1}\mathbf{S}^{-1}= \sigma^2\mathbf{S}^{-1}\).
+Now let \(\mathbf{b} = \mathbf{x}- \mu\) and \(\Sigma^{-1}= a\mathbf{S}\), where \(a = \frac{1}{\sigma^2}\), \(\sigma^2 \in \mathbb{R}\) and \(\mathbf{S}\) is the penalty matrix. This implies \(\mathbf{\Sigma} = a^{-1}\mathbf{S}^{-1}= \sigma^2\mathbf{S}^{-1}\).
 
 Then,
 
 \begin{equation}
-L(\beta) = -\frac{k}{2} \log(2\pi) - \frac{1}{2} \log(\sigma^2) -  \log(\text{det}(\mathbf{S})) + \frac{1}{2\sigma^2} \beta^T \mathbf{S} \beta.
+L(\mathbf{b}) = -\frac{k}{2} \log(2\pi) - \frac{1}{2} \log(\sigma^2) -  \log(\text{det}(\mathbf{S})) + \frac{1}{2\sigma^2} \mathbf{b}^T \mathbf{S} \mathbf{b}.
 \label{eq:obj eqn}
 \end{equation}
 
-The term \(\sigma^2\) represents a variance component that scales the penalty matrix \(\mathbf{S}\). It acts as a global variance parameter that moderates the extent to which the penalty is applied. By scaling \(\mathbf{S}\) with \(\sigma^2\), you effectively adjust the strength of the regularization relative to the variance of the data. Consequently, \(\lambda = \frac{1}{2\sigma^2}\) functions as a regularization parameter, controlling the ``wiggliness'' of the fit by influencing the variance of the distribution of the smoothing coefficients. This setup can be viewed as placing a prior distribution on \(\beta\), with \(\mathbf{S}\) acting as the precision matrix of the prior. This approach is analogous to the Bayesian perspective of smoothing, as discussed in equation \ref{eq:penalty prior}. Here, \(\sigma^2\) scales the precision matrix of the prior, influencing how strongly the prior beliefs (e.g., smoothness) affect the posterior estimates.
+The term \(\sigma^2\) represents a variance component that scales the penalty matrix \(\mathbf{S}\). It acts as a global variance parameter that moderates the extent to which the penalty is applied. By scaling \(\mathbf{S}\) with \(\sigma^2\), you effectively adjust the strength of the regularization relative to the variance of the data. Consequently, \(\lambda = \frac{1}{2\sigma^2}\) functions as a regularization parameter, controlling the `wiggliness' of the fit by influencing the variance of the distribution of the smoothing coefficients. This setup can be viewed as placing a prior distribution on \(\mathbf{b}\), with \(\mathbf{S}\) acting as the precision matrix of the prior. This approach is analogous to the Bayesian perspective of smoothing, as discussed in equation \ref{eq:penalty prior}. Here, \(\sigma^2\) scales the precision matrix of the prior, influencing how strongly the prior beliefs (e.g., smoothness) affect the posterior estimates.
 
-Therefore \(L(\beta)\) is the derived form of the penalty functional \(J(f)\) in equation \ref{eq: general penalized spline} when the smoothing coefficients are assumed to be Gaussian.
+Therefore \(L(\mathbf{b})\) is the derived form of the penalty functional \(J(f)\) in equation \ref{eq: general penalized spline} when the smoothing coefficients are assumed to be Gaussian.
 
 Considering the data model \(Y_i = f(x_i) + \epsilon_i\), where \(i = 1, \dots, n\) and \(\epsilon_i \sim \text{N}(0, \sigma^2)\), the likelihood functional \(L(f|\text{data})\) in equation \ref{eq: general penalized spline} simplifies to a least squares functional. This is proportional to \(\sum_{i=1}^n (Y_i - f(x_i))^2\), aligning with the Gaussian likelihood. Therefore, the likelihood can be expressed using a Gaussian density function evaluated at the vector of observed values \(\mathbf{Y}\), with mean \(f(\mathbf{x})\) and variance \(\sigma^2_Y\).
 
@@ -1077,18 +1076,18 @@ Recall the following assumptions in the model:
 \begin{aligned}
 I_0 &\sim \text{Lognormal}(\mu_{I_0}, \sigma^2_{I_0}) \\
 \gamma &\sim \text{Lognormal}(\mu_{\gamma}, \sigma^2_{\gamma}) \\
-Y &\sim \mathcal{N}(f(x), \sigma^2_Y) \\
-\beta &\sim \mathcal{N}(0, \frac{\mathbf{S}^{-1}}{\sigma^2}),
+\mathbf{y} &\sim \mathcal{N}(f(x), \sigma^2_y) \\
+\mathbf{b} &\sim \mathcal{N}(0, \frac{\mathbf{S}^{-}}{\sigma^2}),
 \end{aligned}
 \]
 where \(f(x)\) is the fitted values (incidence). Note that
-we are not estimating the observed values \(Y\) but estimating the variance \(\sigma^2_Y\) corresponding to its likelihood equation. In this way the fitted values \(f(x)\) behave as a sort of Gaussian process.
+we are not estimating the observed values \(\mathbf{y}\) but estimating the variance \(\sigma^2_y\) corresponding to its likelihood equation. In this way the fitted values \(f(x)\) behave as a sort of Gaussian process.
 
 The model assumptions and starting conditions are specified and passed to a simulator object in \texttt{macpan2}. \texttt{TMB} simulates the trajectory using the Euler method.
 
-At \(t= 0\) the smoothing basis \(\mathbf{X}\), the vector of smoothing coefficients \(b\) and its intercept \(b_0\) are used to construct the transmission rate \(\beta\), a vector equal to the number of observations, of size \(n\). At each time step, \(1 \leq t \leq n\), \(\beta\) is used to compute the number of new infections (\texttt{incidence}), which in turn is used to compute the total number of infected (\texttt{I}) and susceptible (\texttt{S}) at that time point. Additionally, \(\beta\) is used to compute the instantaneous effective reproduction number \(R_t\).
+At \(t= 0\) the smoothing basis \(\mathbf{X}\), the vector of smoothing coefficients \(\mathbf{b}\) and its intercept \(b_0\) are used to construct the transmission rate \(\boldsymbol{\beta}\), a vector equal to the number of observations, of size \(n\). At each time step, \(1 \leq t \leq n\), \(\beta_i\) is used to compute the number of new infections (\texttt{incidence}), which in turn is used to compute the total number of infected (\texttt{I}) and susceptible (\texttt{S}) at that time point. Additionally, \(\boldsymbol{\beta}\) is used to compute the instantaneous effective reproduction number \(R_t\).
 
-After simulating the trajectory, the negative log likelihood is minimized subject to finding the optimal values of the starting values of the initial number of infected \(I_0\), the recovery rate \(\gamma\), the variance \(\sigma^2_Y\) of likelihood of the observed data and the regularization/smoothing parameter \(\sigma^2\). Note that the priors on the recovery rate and the initial number of infected are not `fully Bayesian' in the sense that there are not priors placed on the mean and variance of the prior distribution, i.e no there are no hyper-priors. Parameter estimates for the intercept \(b_0\) of the linear smoother are also obtained.
+After simulating the trajectory, the negative log likelihood is minimized subject to finding the optimal values of the starting values of the initial number of infected \(I_0\), the recovery rate \(\gamma\), the variance \(\sigma^2_y\) of the likelihood of the observed data and the regularization/smoothing parameter \(\sigma^2\). Note that the priors on the recovery rate and the initial number of infected are not `fully Bayesian' in the sense that there are not priors placed on the mean and variance of the prior distribution, i.e., no there are no hyper-priors. Parameter estimates for the intercept \(b_0\) of the linear smoother are also obtained.
 
 For each iteration, the simulated trajectory is matched to the observed values and the likelihood is calculated using the Laplace approximation. New parameter estimates are updated using Quasi-Newton methods via \texttt{nlminb}. This process is then iterated until the parameter estimates converge.
 
@@ -1112,7 +1111,7 @@ Here is an example of what the simulator object for an SIR model in \texttt{macp
 \SpecialCharTok{{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
 \NormalTok{At every iteration of the simulation }\FunctionTok{loop}\NormalTok{ (}\AttributeTok{t =} \DecValTok{1}\NormalTok{ to n)}\SpecialCharTok{:}
 \SpecialCharTok{{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
-\DecValTok{1}\SpecialCharTok{:}\NormalTok{ beta }\SpecialCharTok{\textasciitilde{}} \FunctionTok{exp}\NormalTok{(eta[}\FunctionTok{time\_step}\NormalTok{(}\DecValTok{1}\NormalTok{)])}
+\DecValTok{1}\SpecialCharTok{:}\NormalTok{ beta }\SpecialCharTok{\textasciitilde{}} \FunctionTok{exp}\NormalTok{(eta[}\FunctionTok{time\_step}\NormalTok{(}\DecValTok{1}\NormalTok{)]) }
 \DecValTok{2}\SpecialCharTok{:}\NormalTok{ R\_t }\SpecialCharTok{\textasciitilde{}}\NormalTok{ (}\FunctionTok{log}\NormalTok{(beta) }\SpecialCharTok{{-}} \FunctionTok{log}\NormalTok{(gamma) }\SpecialCharTok{+} \FunctionTok{log}\NormalTok{(S) }\SpecialCharTok{{-}} \FunctionTok{log}\NormalTok{(N))}
 \DecValTok{3}\SpecialCharTok{:}\NormalTok{ incidence }\SpecialCharTok{\textasciitilde{}}\NormalTok{ S }\SpecialCharTok{*}\NormalTok{ I }\SpecialCharTok{*}\NormalTok{ beta}\SpecialCharTok{/}\NormalTok{N}
 \DecValTok{4}\SpecialCharTok{:}\NormalTok{ recovery }\SpecialCharTok{\textasciitilde{}}\NormalTok{ gamma }\SpecialCharTok{*}\NormalTok{ I}
@@ -1134,10 +1133,10 @@ Here is an example of what the simulator object for an SIR model in \texttt{macp
 
 Sometimes it is useful to simulate the trajectory for \(n\) time steps and then calibrate the model over a smaller time series by aggregating the data into \(\frac{n}{k}\) time steps by averaging the trajectory and data over a period of \(k\) steps. For example, in the case of the Ireland Covid-19 dataset (\ref{Ireland}), the reported incidence was inconsistent on a daily scale. By averaging the observations over a weekly scale, the variance is reduced as the averaging process diminishes the day-to-day fluctuations caused by sporadic reporting.
 
-Extra care is needed to handle the uncertainty estimates of aggregated trajectory simulations. For un-aggreggated data, \texttt{macpan2}, which has \texttt{TMB} for its optimization engine, uses the Laplace Approximation to compute uncertainty estimates with the delta method. By averaging the trajectory over a time period of size \(k\), we are in effect making a transformation of a random variable. The uncertainty estimates are required to take this into account. The variance of a function \(h(\beta) = \mathbf{H} \beta\) of the random variable \(\beta\) is computed as
+Extra care is needed to handle the uncertainty estimates of aggregated trajectory simulations. For un-aggreggated data, \texttt{macpan2}, which has \texttt{TMB} for its optimization engine, uses the Laplace Approximation to compute uncertainty estimates with the delta method. By averaging the trajectory over a time period of size \(k\), we are in effect making a transformation of a random variable. The uncertainty estimates are required to take this into account. The variance of a function \(h(\boldsymbol{\beta}) = \mathbf{H} \boldsymbol{\beta}\) of \(\boldsymbol{\beta}\) is computed as
 
 \[
-Var(\mathbf{H} \beta) = \mathbf{H}^T Cov(\beta) \mathbf{H},
+Var(\mathbf{H} \boldsymbol{\beta}) = \mathbf{H}^T Cov(\boldsymbol{\beta}) \mathbf{H},
 \]
 where \(\mathbf{H}\) is a \(n \times n_k\) indicator matrix, where \(n_k\) is the integer ceiling of \(\frac{n}{k}\) such that \(\frac{n}{n_k} \in \mathbb{Z}\). The transformed variance is then used to compute the Wald confidence intervals as in the unaggreggated case.
 
@@ -1149,15 +1148,15 @@ This chapter presents examples demonstrating the application of semi-mechanistic
 
 One challenge in epidemiological modeling is the lack of direct observation of the transmission rate within datasets containing incidence or prevalence data. Consequently, the true shape of the function used to estimate the transmission rate remains unknown. Our goal is to develop a compartmental model, formulated as a deterministic system of ordinary differential equations, incorporating a linear smoother component. If this model can accurately predict population dynamics based on the time-varying transmission rate, it should enable us to infer the transmission rate by fitting the model to the data. This approach allows us to validate the effectiveness of the smoothing parameter estimation methodology and demonstrate the applicability of these methods with models formulated as discrete systems of ordinary differential equations.
 
-Consider the time-varying transmission rate \(\beta\) as a latent variable. `Time-varying' means that at each observation \(x_i\) in the dataset, the model---comprising a system of ordinary differential equations---contains an estimated value for the transmission rate for each \(1 \leq i \leq n\), where \(n\) is the number of observations.
+Consider the time-varying transmission rate \(\boldsymbol{\beta}\) as a latent process. `Time-varying' means that at each observation \(x_i\) in the dataset, the model---comprising a system of ordinary differential equations---contains an estimated value for the transmission rate for each \(1 \leq i \leq n\), where \(n\) is the number of observations.
 
-\(\beta\) is constructed as the linear smoother \(b_0 + \mathbf{X}b\), where \(b_0\) is the intercept, \(\mathbf{X}\) is the model matrix associated with the particular smoother, and \(b\) is the vector of smoothing coefficients. Both \(b_0\) and \(b\) are parameters that need to be estimated. This linear smoother, which estimates \(\beta\), is a non-parametric component inside a deterministic system of differential equations, whose trajectory is determined entirely by the starting parameters. This is why the model is called semi-mechanistic or partially specified. Some components of the model contain unknown functions, while the rest of the model comprises conventional elements with only unknown scalar parameters.
+\(\boldsymbol{\beta}\) is constructed as the linear smoother \(b_0 + \mathbf{X}\mathbf{b}\), where \(b_0\) is the intercept, \(\mathbf{X}\) is the model matrix associated with the particular smoother, and \(\mathbf{b}\) is the vector of smoothing coefficients. Both \(b_0\) and \(\mathbf{b}\) are parameters that need to be estimated. This linear smoother, which estimates \(\boldsymbol{\beta}\), is a non-parametric component inside a deterministic system of differential equations, whose trajectory is determined entirely by the starting parameters. This is why the model is called semi-mechanistic or partially specified. Some components of the model contain unknown functions, while the rest of the model comprises conventional elements with only unknown scalar parameters.
 
 To prove that semi-mechanistic models within the \texttt{macpan2} modeling framework are capable for this problem, we conduct a simulation study. For a chosen smooth, we simulate data and add Gaussian noise to the incidence. The simulated data is used to calibrate the model using various smoothers available in the \texttt{mgcv} package. In Figure \ref{fig:sim_basis}, we illustrate the shape of the basis functions for each of the univariate smoothing bases used in this methodology.
 
 Consider a SIRS compartmental model with a fixed waning immunity parameter \(\phi\). The total number of individuals in the population is given by \(N\). The initial values of \(S\), \(I\), and \(R\) are fixed at the endemic equilibrium solutions.
 
-We construct the data-generating model as follows. The smoother type and the number of knots \(k\) are specified using a particular \texttt{mgcv} smooth. This determines the form of \(\mathbf{X}\) and the penalty matrix \(\mathbf{P}\). The smoothing coefficients \(b\), of dimension \(k-2\), are assumed to be multivariate Gaussian. Thus, \(b\) is defined as random normal deviates at the \(k-2\) evenly spaced quantiles with a mean of 0 and a standard deviation specified as \(b_{sd}\). As the variation of this distribution increases, the true function describing the time-varying transmission rate for the data model will become more complex. An initial value for \(b_0\) is chosen as the log of the initial value of \(\beta\). The recovery rate \(\gamma\) is fixed. Initial values for the remaining parameter estimates are set to 1.
+We construct the data-generating model as follows. The smoother type and the number of knots \(k\) are specified using a particular \texttt{mgcv} smooth. This determines the form of \(\mathbf{X}\) and the penalty matrix \(\mathbf{P}\). The smoothing coefficients \(\mathbf{b}\), of dimension \(k-2\), are assumed to be multivariate Gaussian. Thus, \(\mathbf{b}\) is defined as random normal deviates at the \(k-2\) evenly spaced quantiles with a mean of 0 and a standard deviation specified as \(b_{sd}\). As the variation of this distribution increases, the true function describing the time-varying transmission rate for the data model will become more complex. An initial value for \(b_0\) is chosen as the log of the initial value of \(\beta\). The recovery rate \(\gamma\) is fixed. Initial values for the remaining parameter estimates are set to .
 
 The model trajectory is simulated from these initial conditions using Euler steps. Gaussian noise (\(sd = 0.2\)) is added to the log-transformed simulated incidence vector, and then the inverse transformation is applied. This vector is used to test the efficacy of the semi-mechanistic models. The models are calibrated using \texttt{macpan2}, which uses the Laplace approximation via \texttt{TMB} to optimize the objective function and update parameter estimates using Quasi-Newton methods.
 
@@ -1175,7 +1174,9 @@ For the estimated effective reproduction number \(R_t\), the black line represen
 
 The number of knots used to calibrate the models was \(k =20\) for simulated data sets, except the TP basis for both the unaggregated and aggregated data. For the GP, CR, and BS data, the value \(k =20\) was chosen as the smallest value of \(k\) to fit the predicted and estimated values without introducing overfitting. This was evaluated by visually inspecting the results of the figures below. For the TP basis, the optimization procedure for the model calibration did not converge for values of \(k \geq 10\). None of the bases were able to match the highly oscillating trajectory observed in the last 75 days of Figures \ref{fig:sim_tp} and \ref{fig:sim_agg_tp}.
 
-In Table \ref{tab:aic-table-sim}, we present the comparison of the conditional AIC scores for all eight models. We observe that the Gaussian process (GP) model consistently has the lowest AIC score across all datasets. The AIC score, which balances model fit and complexity, suggests that the GP model provides the best trade-off between these two aspects among the models compared. A lower AIC score indicates that the GP model is relatively the best fit for the data, taking into account the effect of penalization on the number of knots used, i.e., effective degrees of freedom. Thus, the GP model is the most likely to minimize information loss when approximating the true data-generating process, compared to the other models tested.
+In Tables \ref{tab:aic-table-sim} and \ref{tab:aic-table-sim-agg}, we present a comparison of the conditional AIC scores for all sixteen models for the unaggregated and aggregated data sets, respectively. We observe that the cubic regression spline (CR) model consistently has the lowest AIC score across all datasets. A lower conditional AIC score indicates that the model is relatively the best fit for the data, taking into account the effect of penalization on the number of knots used, i.e., effective degrees of freedom. The best model is the most likely to minimize information loss when approximating the true data-generating process, compared to the other models tested. The AIC score, which balances model fit and complexity, suggests that the CR model provides the best trade-off between these two aspects among the models compared. However, the \(\Delta\text{AIC}\) values are within two points of each other, indicating that this difference is negligible and one model is not significantly better than the others.
+
+In Tables \ref{tab:mse-table-sim} and \ref{tab:mse-table-sim-agg}, we present a comparison of the mean square error (MSE) for all sixteen models for the unaggregated and aggregated data sets, respectively. For the unaggregated data, we observe that models using the same basis for generation and fitting have the lowest MSE for all bases except the B-spline basis. For the aggregated data, the models using the same basis for generation and fitting have the lowest MSE for all bases except the thin plate spline basis.
 
 \begin{figure}[H]
 \centering
@@ -1242,32 +1243,64 @@ In Table \ref{tab:aic-table-sim}, we present the comparison of the conditional A
 
 \begin{table}[!h]
 \centering
-\caption{\label{tab:aic-table-sim}\textbf{Conditional AIC Scores for SIRS Model with Simulated Data}. The columns represent the smoothing basis used to fit the model, while the rows indicate the basis used to generate the simulated data. The degrees of freedom are computed as the trace of the penalized smoothing matrix.}
+\caption{\label{tab:aic-table-sim}\textbf{Conditional AIC Scores for SIRS Model with Simulated Data}. The columns represent the smoothing basis used to fit the model, while the rows indicate the basis used to generate the simulated data. \(\Delta \text{cAIC}\) values are calculated relative to the best score within each row.}
 \centering
 \begin{tabular}[t]{lrrrr}
 \toprule
-SmoothType & gp & tp & cr & bs\\
+BasisType & gp & tp & cr & bs\\
 \midrule
-gp & -14.71778 & -12.65528 & -5.264389 & -5.612026\\
-tp & -14.83786 & -12.84670 & -11.309710 & -11.419310\\
-cr & -14.69682 & -12.63324 & -5.700246 & -5.279962\\
-bs & -14.68249 & -12.61321 & -4.394767 & -4.831813\\
+gp & 0.91 & 0.50 & 0 & 1.01\\
+tp & 0.49 & 0.03 & 0 & NA\\
+cr & 0.87 & 0.46 & 0 & 0.97\\
+bs & 0.94 & 0.54 & 0 & 1.05\\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \begin{table}[!h]
 \centering
-\caption{\label{tab:aic-table-sim-agg}\textbf{Conditional AIC Scores for SIRS Model with Simulated Data Aggregated to a Weekly Scale}. The columns represent the smoothing basis used to fit the model, while the rows indicate the basis used to generate the simulated data. The trajectories were simulated on a daily scale and then aggregated to a weekly scale for model calibration. The degrees of freedom are computed as the trace of the penalized smoothing matrix.}
+\caption{\label{tab:mse-table-sim}\textbf{Mean Square Error (MSE) for SIRS Model with Simulated Data}. The columns represent the smoothing basis used to fit the model, while the rows indicate the basis used to generate the simulated data.  \(\Delta \text{MSE}\) values are calculated relative to the best score within each row.}
+\centering
+\begin{tabular}[t]{lllll}
+\toprule
+Basis Type & gp & tp & cr & bs\\
+\midrule
+gp & 0 & 10678.8 & 70174.8 & 87100.2\\
+tp & 68244 & 0 & 13228 & NA\\
+cr & 61176.8 & 71138.9 & 0 & 123283.5\\
+bs & 20945.7 & 9691.2 & 0 & 13889.7\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[!h]
+\centering
+\caption{\label{tab:aic-table-sim-agg}\textbf{Conditional AIC Scores for SIR Model with Simulated Data Aggregated to a Weekly Scale}. The columns represent the smoothing basis used to fit the model, while the rows indicate the basis used to generate the simulated data. The trajectories were simulated on a daily scale and then aggregated to a weekly scale for model calibration. \(\Delta \text{cAIC}\) values are calculated relative to the best score within each row.}
 \centering
 \begin{tabular}[t]{lrrrr}
 \toprule
-SmoothType & gp & tp & cr & bs\\
+BasisType & gp & tp & cr & bs\\
 \midrule
-gp & -10.32319 & -7.765698 & -2.372933 & -2.627495\\
-cr & -10.37053 & -7.701646 & -1.430775 & -2.446943\\
-tp & -11.00475 & -8.981243 & -6.110389 & NA\\
-bs & -10.31313 & -7.467689 & 0.067092 & -1.028919\\
+gp & 1.93 & 2.02 & 0 & 1.01\\
+tp & 0.90 & 0.69 & 0 & NA\\
+cr & 1.78 & 1.98 & 0 & 0.93\\
+bs & 1.90 & 2.28 & 0 & 1.10\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[!h]
+\centering
+\caption{\label{tab:mse-table-sim-agg}\textbf{Mean Square Error (MSE) for SIR Model with Simulated Data Aggregated to a Weekly Scale}. The columns represent the smoothing basis used to fit the model, while the rows indicate the basis used to generate the simulated data. The trajectories were simulated on a daily scale and then aggregated to a weekly scale for model calibration. \(\Delta \text{MSE}\) values are calculated relative to the best score within each row.}
+\centering
+\begin{tabular}[t]{lrrrr}
+\toprule
+Basis Type & gp & tp & cr & bs\\
+\midrule
+gp & 0.0 & 3608396 & 652617.0 & 257866.70\\
+tp & 570236.7 & 2558394 & 683489.6 & 0.00\\
+cr & 3327258.5 & 2616685 & 0.0 & 62911.79\\
+bs & 1092529.9 & NA & 1878868.7 & 0.00\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1282,7 +1315,7 @@ In Figure \ref{fig:scarlet_combined}, we show the predicted incidence, estimated
 
 The shape of the estimated transmission rate and reproduction number varies across the smoothing bases for this example. The GP basis shows a positive slope as the rate of transmission reaches its maximum, whereas the TPRS, CR, and CC bases start at or very near the maximum.
 
-In the conditional AIC scores of the four models in Table \ref{tab:aic-table-scarlet}, we see that the AIC score for the GP basis is the lowest compared to the other bases.
+In Table \ref{tab:aic-table-scarlet}, we present the conditional AIC scores and MSE calculations for the four models. We provide the delta values, which are calculated by subtracting the best score from each result for both the AIC and MSE calculations. The AIC score for the cubic regression spline (CR) basis is the lowest compared to the other bases. However, the difference in AIC scores between the bases is less than 2, implying that no single model should be chosen over the others based solely on the AIC. In the same table, we observe that the mean square error (MSE) is lowest for the thin plate spline (TP) model rather than the CR model.
 
 \begin{figure}[H]
 \centering
@@ -1293,16 +1326,16 @@ In the conditional AIC scores of the four models in Table \ref{tab:aic-table-sca
 
 \begin{table}[!h]
 \centering
-\caption{\label{tab:aic-table-scarlet}\textbf{Conditional AIC Scores of calibrating models with varying smoothing basis, calibrated to Ontario scarlet fever (1929-1930.} The degrees of freedom are defined as the model degrees of freedom which is computed as the trace of penalized smoothing matrix.}
+\caption{\label{tab:aic-table-scarlet}\textbf{\(\Delta \text{cAIC}\) and \(\Delta \text{MSE}\) Scores for Ontario Scarlet Fever (1929-1930).} \(\Delta \text{cAIC}\) and \(\Delta \text{MSE}\) values are calculated relative to the best score.}
 \centering
-\begin{tabular}[t]{ll}
+\begin{tabular}[t]{lrr}
 \toprule
-Smooth Type & cAIC\\
+Basis Type & Delta MSE & Delta cAIC\\
 \midrule
-gp & -12.60263\\
-tp & -10.63062\\
-cr & -8.483888\\
-bs & -8.952309\\
+bs & 137.422 & 0.55687\\
+cr & 42.982 & 0.00000\\
+gp & 91.939 & 0.72060\\
+tp & 0.000 & 1.15344\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1313,9 +1346,9 @@ Next, we fit the model to observations of the daily number of COVID-19 cases in 
 
 The calibration model is constructed using the basic SIR model, with an initial recovery rate of \(\gamma = 1/6\), which is obtained from the results of Park et al. {[}28{]}.
 
-Figure \ref{fig:ireland_combined} presents the results of the best models, which utilize the GP, TPRS, and CR smoothing bases. The BS basis functions exhibited extremely large uncertainty estimates, so we did not include the results. All bases displayed an excellent fit to the observed incidence data with appropriately sized uncertainty estimates.
+Figure \ref{fig:ireland_combined} presents the results of the models using the GP, TPRS, and CR smoothing bases. The BS basis functions exhibited extremely large uncertainty estimates, so we did not include the results. All bases displayed an excellent fit to the observed incidence data with appropriately sized uncertainty estimates.
 
-Table \ref{tab:aic-table-ireland} provides the conditional AIC scores.
+Table \ref{tab:aic-table-ireland} provides the delta values for the conditional AIC scores and the MSE calculations. The CR basis has the best AIC score, while the GP basis has the lowest MSE calculation. The difference in AIC scores between the model with the CR basis and those with the GP and TP bases is less than two, suggesting that the AIC score alone cannot distinguish the best basis for fitting the data.
 
 The model's sensitivity to changes in the starting value of \(\gamma\) (ranging from 7 to 14 days) does not alter the shape of the functional form of \(\beta\), but it changes the amplitude of the peak, leading to an increase in \(R_t\). Increasing the variance of the log-normal prior on \(\gamma\) causes the model to tend to select a larger \(\gamma\). However, this also results in a dramatic increase in uncertainty estimates. We observed that when the starting value of \(\gamma\) is lowered and the variance of the log-normal prior is increased simultaneously, the model still predicts larger values of \(\gamma\).
 
@@ -1327,15 +1360,15 @@ The predicted incidence fits the data well, with very reasonable uncertainty bou
 
 \begin{table}[!h]
 \centering
-\caption{\label{tab:aic-table-ireland}\textbf{Conditional AIC Scores of calibrating models with varying smoothing basis, calibrated to Ireland Covid-19 (2020).} The degrees of freedom are defined as the model degrees of freedom which is computed as the trace of penalized smoothing matrix.}
+\caption{\label{tab:aic-table-ireland}\textbf{\(\Delta \text{cAIC}\) and \(\Delta \text{MSE}\) Scores for Calibrating Models with Varying Smoothing Basis, Calibrated to Ireland Covid-19 (2020).} \(\Delta \text{cAIC}\) and \(\Delta \text{MSE}\) values are calculated relative to the best score.}
 \centering
-\begin{tabular}[t]{ll}
+\begin{tabular}[t]{lrr}
 \toprule
-Smooth Type & cAIC\\
+Basis Type & Delta MSE & Delta cAIC\\
 \midrule
-gp & -8.594023\\
-tp & -6.867158\\
-cr & -5.810518\\
+cr & 39706.28 & 0.000000\\
+gp & 0.00 & 1.239482\\
+tp & 59513.85 & 0.137893\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1372,13 +1405,13 @@ This thesis presents a method for formulating infectious disease compartmental m
 
 Our work differs from that of Simon Wood by making this methodology accessible to quantitatively minded modelers who may not be experts in nonlinear optimization and smoothing theory. This was achieved because \texttt{macpan2} is designed from a software-engineering perspective. It wraps all the necessary \texttt{C++} code to interact with \texttt{TMB} in an \texttt{R} wrapper, eliminating the need for modelers to write bespoke optimization code, which can be a significant barrier to using such models.
 
-Through simulation studies, we demonstrated the efficacy of penalized smoothing parameter estimation. The \texttt{mgcv} package greatly facilitated the construction of low-rank smoothing bases and penalty matrices for a given domain and model granularity. We compared different smoothing bases, evaluating their performance based on uncertainty estimates, AIC scores, and the shapes of the estimated functions.
+Through simulation studies, we demonstrated the efficacy of penalized smoothing parameter estimation. The \texttt{mgcv} package greatly facilitated the construction of low-rank smoothing bases and penalty matrices for a given domain and model granularity. We compared different smoothing bases, evaluating their performance based on uncertainty estimates, AIC scores, MSE and the shapes of the estimated functions.
 
 We successfully fitted the models to real-world incidence data, with the goodness of fit controlled by smoothness inferred through penalization. These results indicate that this methodology can be beneficial to any modeler wishing to estimate a time-varying latent variable by inferring the shape of an unknown function. Although we focused on modeling infectious disease with unknown transmission rates and reproduction numbers, it seems reasonable that this approach can be applied to arbitrary compartmental models with unknown time-varying functions. This methodology can even extend to dynamic ecological models formulated using compartmental models.
 
-The models were effective in inferring fixed parameters. Unlike most epidemiological studies {[}30,31{]}, we did not fix the recovery rate and the initial number of infected individuals to their initial values. Instead, we introduced flexibility by applying a sharp partial Bayesian log-normal prior, treating the quantile of this prior as a parameter calibrated using the data. For future research, a fully Bayesian approach could be adopted by specifying prior distributions for both the mean and variance of the log-normal distribution.
+The models were effective in inferring fixed parameters. Unlike most epidemiological studies {[}30,31{]}, we did not fix the recovery rate and the initial number of infected individuals to their initial values. Instead, we introduced an empirical Bayesian approach by applying a sharp partial Bayesian log-normal prior, treating the quantile of this prior as a parameter calibrated using the data. For future research, a fully Bayesian approach could be adopted by specifying prior distributions for both the mean and variance of the log-normal distribution.
 
-The relative performance of different smoothing bases across all examples can be analyzed. In all examples (subsections \ref{simulation}, \ref{scarlet}, \ref{Ireland}, and \ref{Measles}), the Gaussian process (GP) regression smoothing basis consistently proved to be the best in several respects. The GP basis was the most robust to increases in effective degrees of freedom. Tables \ref{tab:aic-table-sim}, \ref{tab:aic-table-scarlet}, and \ref{tab:aic-table-ireland} show that during model fitting, selecting model complexity by adjusting the smoothing parameter \(\lambda\) resulted in an increase in the conditional AIC score. Checking the resultant effective degrees of freedom for the fitted models across different bases, the GP basis consistently showed the lowest values. This indicates that the GP basis, in conjunction with the \texttt{nlminb} optimizer used by \texttt{TMB}, is able to find the best smoothing parameter value compared to other bases. Additionally, across all datasets, the GP basis performed best or near-best. Notably, it was the only model capable of fitting the large measles dataset. Our conclusion is that using this methodology, a GP basis is generally an effective choice.
+The relative performance of different smoothing bases across all examples can be analyzed. In all examples (subsections \ref{simulation}, \ref{scarlet}, \ref{Ireland}, and \ref{Measles}), the cubic regression spline (CR) basis now has the lowest AIC score across almost all simulated data sets. However, the mean square error (MSE) in the simulation study is lowest when the same basis is used to generate the data. In the real data examples, CR continues to have the lowest AIC but does not have the lowest MSE. Given that the AIC difference is less than two across models with differing bases and that the MSE for the CR basis is not the lowest, it suggests two things. First, there is not one basis that is a clearly better choice than the others. Second, there may be something unaccounted for in the AIC calculation. It is possible that we are not accounting for the uncertainty in the smoothing coefficient estimates as described in equation \ref{eq:corrected_aic}. It would be informative to calculate the AIC scores using this method for formulating the effective degrees of freedom of a penalized model by accounting for the uncertainty estimates in the estimated coefficients of the linear smoother.
 
 The SIR and SIRS compartmental models used in this work are basic compartmental models. Theoretically, a compartmental model can be as complex as the modeler wishes, but in practice, certain assumptions are made to make the fitting process tractable. The models we used serve as toy examples that demonstrate the proof of concept for the efficacy of the methodology presented in this thesis.
 
